@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package p2p;
+
+option java_multiple_files = true;
+option java_outer_classname = "p2p";
+option java_package = "com.my.simple.p2p";
+option go_package = "github.com/saichler/my.simple/go/p2p/packet";
+
+/*
+  Packet is to transmit a piece of data from one process to one or more processes.
+ */
+message Packet {
+  // The source process id of this packet.
+  string sid = 1;
+  // The destination id, can be a process destination id or a topic.
+  string did = 2;
+  // The switch id, switch is the machine 2 machine aggregator. For example, each k8s
+  // node will have a switch service (not a pod)
+  string swid = 3;
+  // To uniquely identify the source packet, the sender process maintain a sequence number.
+  int32 seq = 4;
+  // Priority of this packet
+  int32 pri = 5;
+  // The packet data
+  bytes data = 6;
+}
