@@ -2,12 +2,12 @@ package tests
 
 import (
 	"fmt"
-	"github.com/saichler/my.simple/go/utils/strings"
+	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
 	"testing"
 )
 
-func checkString(s *strings.String, ex string, t *testing.T) bool {
+func checkString(s *strng.String, ex string, t *testing.T) bool {
 	if s.String() != ex {
 		t.Fail()
 		fmt.Println("Expected String to be '" + ex + "' but got " + s.String())
@@ -21,9 +21,14 @@ func checkToString(any interface{}, ex string, t *testing.T) bool {
 }
 
 func _checkToString(any interface{}, ex, ex2 string, t *testing.T) bool {
-	s := strings.StringOf(any)
-	_ex := strings.Kind2String(reflect.ValueOf(any)).Add(ex).String()
-	_ex2 := strings.Kind2String(reflect.ValueOf(any)).Add(ex2).String()
+	s, e := strng.StringOf(any)
+	if e != nil {
+		t.Fail()
+		fmt.Println("error:", e)
+		return false
+	}
+	_ex := strng.Kind2String(reflect.ValueOf(any)).Add(ex).String()
+	_ex2 := strng.Kind2String(reflect.ValueOf(any)).Add(ex2).String()
 	if s != _ex && s != _ex2 {
 		t.Fail()
 		fmt.Println("Expected String to be '" + ex + "' but got '" + s + "'")
@@ -33,7 +38,7 @@ func _checkToString(any interface{}, ex, ex2 string, t *testing.T) bool {
 }
 
 func TestString(t *testing.T) {
-	s := strings.New("test")
+	s := strng.New("test")
 	if ok := checkString(s, "test", t); !ok {
 		return
 	}
@@ -43,7 +48,7 @@ func TestString(t *testing.T) {
 		return
 	}
 
-	s.Join(strings.New("test"))
+	s.Join(strng.New("test"))
 	if ok := checkString(s, "testtesttest", t); !ok {
 		return
 	}
@@ -51,7 +56,7 @@ func TestString(t *testing.T) {
 		t.Failed()
 		fmt.Println("Expected s to NOT be blank")
 	}
-	s = strings.New("")
+	s = strng.New("")
 	if !s.IsBlank() {
 		t.Failed()
 		fmt.Println("Expected s to be blank")
@@ -108,6 +113,121 @@ func TestToString(t *testing.T) {
 	k := reflect.New(reflect.ValueOf("").Type()).Interface()
 
 	if ok := checkToString(k, "", t); !ok {
+		return
+	}
+}
+
+func TestFromStringPtr(t *testing.T) {
+	s, e := strng.InstanceOf("{22,24}test")
+	if e != nil {
+		t.Fail()
+		fmt.Println(e)
+		return
+	}
+	s1 := *s.(*string)
+	if s1 != "test" {
+		t.Fail()
+		fmt.Println("Expected value to be test but got ", s1)
+		return
+	}
+}
+
+func TestFromStringInt(t *testing.T) {
+	v, e := strng.InstanceOf("{2}5")
+	if e != nil {
+		t.Fail()
+		fmt.Println(e)
+		return
+	}
+	r := v.(int)
+	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Int {
+		t.Fail()
+		fmt.Println("From string failed for int")
+		return
+	}
+}
+
+func TestFromStringInt8(t *testing.T) {
+	v, e := strng.InstanceOf("{3}5")
+	if e != nil {
+		t.Fail()
+		fmt.Println(e)
+		return
+	}
+	r := v.(int8)
+	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Int8 {
+		t.Fail()
+		fmt.Println("From string failed for int8")
+		return
+	}
+}
+
+func TestFromStringInt16(t *testing.T) {
+	v, e := strng.InstanceOf("{4}5")
+	if e != nil {
+		t.Fail()
+		fmt.Println(e)
+		return
+	}
+	r := v.(int16)
+	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Int16 {
+		t.Fail()
+		fmt.Println("From string failed for int16")
+		return
+	}
+}
+
+func TestFromStringFloat32(t *testing.T) {
+	v, e := strng.InstanceOf("{13}5.8")
+	if e != nil {
+		t.Fail()
+		fmt.Println(e)
+		return
+	}
+	r := v.(float32)
+	if r != 5.8 || reflect.ValueOf(r).Kind() != reflect.Float32 {
+		t.Fail()
+		fmt.Println("From string failed for float32")
+		return
+	}
+}
+
+func TestFromStringSlice(t *testing.T) {
+	s, e := strng.InstanceOf("{23,24}[a,b]")
+	if e != nil {
+		t.Fail()
+		fmt.Println(e)
+		return
+	}
+	s1 := s.([]string)
+	if s1[0] != "a" {
+		t.Fail()
+		fmt.Println("value for index 0 was not equale to a")
+		return
+	}
+	if s1[1] != "b" {
+		t.Fail()
+		fmt.Println("value for index 0 was not equale to b")
+		return
+	}
+}
+
+func TestFromStringMap(t *testing.T) {
+	s, e := strng.InstanceOf("{21,24,2}[a=1,b=2]")
+	if e != nil {
+		t.Fail()
+		fmt.Println(e)
+		return
+	}
+	s1 := s.(map[string]int)
+	if s1["a"] != 1 {
+		t.Fail()
+		fmt.Println("value for key 'a' was not found or not equale to 1")
+		return
+	}
+	if s1["b"] != 2 {
+		t.Fail()
+		fmt.Println("value for key 'b' was not found or not equale to 2")
 		return
 	}
 }

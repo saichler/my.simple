@@ -1,12 +1,13 @@
-package strings
+package strng
 
 import (
+	"errors"
 	"reflect"
 	"strconv"
 )
 
 // Global map from kind/type into a function that converts this type instance into a string representation
-var tostrings = make(map[reflect.Kind]func(reflect.Value) string)
+var tostrings = make(map[reflect.Kind]func(reflect.Value) (string, error))
 
 // Initialize, map between the kind and the function that handle it
 func init() {
@@ -32,88 +33,89 @@ func init() {
 }
 
 // StringOf Accept an instance of any kind and convert it to a String
-func StringOf(any interface{}) string {
+func StringOf(any interface{}) (string, error) {
 	val := reflect.ValueOf(any)
 	return ToString(val)
 }
 
-func ToString(value reflect.Value) string {
-	return Kind2String(value).Add(toString(value)).String()
+func ToString(value reflect.Value) (string, error) {
+	v, e := toString(value)
+	return Kind2String(value).Add(v).String(), e
 }
 
 // ToString Accepts a value of reflect.value and return its string representation
-func toString(value reflect.Value) string {
+func toString(value reflect.Value) (string, error) {
 	if !value.IsValid() {
-		return ""
+		return "", nil
 	}
 	tostring := tostrings[value.Kind()]
 	if tostring == nil {
-		panic("No ToString for kind:" + value.Kind().String() + ":" + value.String())
+		return "", errors.New("No ToString for kind:" + value.Kind().String() + ":" + value.String())
 	}
 	return tostring(value)
 }
 
 // ToString of a String
-func stringToString(value reflect.Value) string {
-	return value.String()
+func stringToString(value reflect.Value) (string, error) {
+	return value.String(), nil
 }
 
 // ToString of an int, int8, int16, int32, int64
-func intToString(value reflect.Value) string {
-	return strconv.Itoa(int(value.Int()))
+func intToString(value reflect.Value) (string, error) {
+	return strconv.Itoa(int(value.Int())), nil
 }
 
 // ToString of an uint, uint8, uint16, uint32, uint64
-func uintToString(value reflect.Value) string {
-	return strconv.Itoa(int(value.Uint()))
+func uintToString(value reflect.Value) (string, error) {
+	return strconv.Itoa(int(value.Uint())), nil
 }
 
 // ToString of a float32
-func float32ToString(value reflect.Value) string {
-	return strconv.FormatFloat(float64(value.Float()), 'f', -1, 32)
+func float32ToString(value reflect.Value) (string, error) {
+	return strconv.FormatFloat(float64(value.Float()), 'f', -1, 32), nil
 }
 
 // ToString of a float64
-func float64ToString(value reflect.Value) string {
-	return strconv.FormatFloat(float64(value.Float()), 'f', -1, 64)
+func float64ToString(value reflect.Value) (string, error) {
+	return strconv.FormatFloat(float64(value.Float()), 'f', -1, 64), nil
 }
 
 // ToString of a boolean
-func boolToString(value reflect.Value) string {
+func boolToString(value reflect.Value) (string, error) {
 	if value.Bool() {
-		return "true"
+		return "true", nil
 	} else {
-		return "false"
+		return "false", nil
 	}
 }
 
 // ToString of a pointer
-func ptrToString(value reflect.Value) string {
+func ptrToString(value reflect.Value) (string, error) {
 	if value.IsNil() {
-		return "<Nil>"
+		return "<Nil>", nil
 	}
 	return toString(value.Elem())
 }
 
 // ToString of a struct
 // @TODO - Implement properly
-func structToString(value reflect.Value) string {
-	return value.String()
+func structToString(value reflect.Value) (string, error) {
+	return value.String(), nil
 }
 
 // ToString of a slice
 // format is [<elem>,<elem>,...]
-func sliceToString(value reflect.Value) string {
+func sliceToString(value reflect.Value) (string, error) {
 	// Special case if the value is a byte array
 	b, ok := value.Interface().([]byte)
 	if ok {
 		// create a string out of the byte array
-		return string(b)
+		return string(b), nil
 	}
 
 	//If the slice is empty, return empty square brackets
 	if value.Len() == 0 {
-		return "[]"
+		return "[]", nil
 	}
 
 	//Return the elements of the slice inside square brackets & delimited by comma
@@ -123,18 +125,22 @@ func sliceToString(value reflect.Value) string {
 			result.Add(",")
 		}
 		elem := value.Index(i)
-		result.Add(toString(elem))
+		v, e := toString(elem)
+		if e != nil {
+			return "", e
+		}
+		result.Add(v)
 	}
 	result.Add("]")
-	return result.String()
+	return result.String(), nil
 }
 
 // ToStrng of a map
 // formst is [<key>=<value,<key>=<value],...]
-func mapToString(value reflect.Value) string {
+func mapToString(value reflect.Value) (string, error) {
 	mapkeys := value.MapKeys()
 	if len(mapkeys) == 0 {
-		return "[]"
+		return "[]", nil
 	}
 	result := New("[")
 	for i, key := range mapkeys {
@@ -142,16 +148,24 @@ func mapToString(value reflect.Value) string {
 			result.Add(",")
 		}
 		val := value.MapIndex(key)
-		result.Add(toString(key))
+		kv, ke := toString(key)
+		if ke != nil {
+			return "", ke
+		}
+		result.Add(kv)
 		result.Add("=")
-		result.Add(toString(val))
+		vv, ve := toString(val)
+		if ve != nil {
+			return "", ve
+		}
+		result.Add(vv)
 	}
 	result.Add("]")
-	return result.String()
+	return result.String(), nil
 }
 
 // To String of an interface
-func interfaceToString(value reflect.Value) string {
+func interfaceToString(value reflect.Value) (string, error) {
 	return toString(value.Elem())
 }
 

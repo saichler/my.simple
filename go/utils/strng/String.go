@@ -1,4 +1,4 @@
-package strings
+package strng
 
 import "bytes"
 
