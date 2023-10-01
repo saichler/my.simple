@@ -4,8 +4,8 @@ package p2p;
 
 option java_multiple_files = true;
 option java_outer_classname = "p2p";
-option java_package = "com.my.simple.p2p";
-option go_package = "github.com/saichler/my.simple/go/p2p/packet";
+option java_package = "com.my.simple.p2p.model";
+option go_package = "github.com/saichler/my.simple/go/p2p/model";
 
 /*
   Packet is to transmit a piece of data from one process to one or more processes.
