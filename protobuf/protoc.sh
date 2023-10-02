@@ -1,1 +1,2 @@
-protoc --go_out=../../../../ P2P.proto
+protoc --go_out=../../../../ p2p.proto
+protoc --go_out=../../../../ directory.proto
