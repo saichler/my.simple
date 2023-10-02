@@ -6,3 +6,5 @@ Let's make it simple... K8s, micro services, cloud, security, networking, high a
 
 ### [The strgs (strings) package](https://github.com/saichler/my.simple/tree/main/go/utils/strng)
 Efficient string concatenation & type included ToString & From String methods to enable instance->string->instance seamless conversions.
+
+### [The queues package]()
