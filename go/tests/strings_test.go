@@ -4,8 +4,15 @@ import (
 	"fmt"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
+	"strings"
 	"testing"
 )
+
+var Str = strng.New("")
+
+func init() {
+	Str.TypesPrefix = true
+}
 
 func checkString(s *strng.String, ex string, t *testing.T) bool {
 	if s.String() != ex {
@@ -17,16 +24,24 @@ func checkString(s *strng.String, ex string, t *testing.T) bool {
 }
 
 func checkToString(any interface{}, ex string, t *testing.T) bool {
-	return _checkToString(any, ex, "xyz", t)
+	return checkToFromString(any, ex, "xyz", t)
 }
 
-func _checkToString(any interface{}, ex, ex2 string, t *testing.T) bool {
-	s, e := strng.StringOf(any)
+func checkToFromString(any interface{}, ex, ex2 string, t *testing.T) bool {
+	s, e := Str.StringOf(any)
 	if e != nil {
 		t.Fail()
 		fmt.Println("error:", e)
 		return false
 	}
+	fs, e := strng.FromString(s)
+	// Until struct is implemented, skip it
+	if e != nil && !strings.Contains(s, ",25") {
+		t.Fail()
+		fmt.Println("error from string:", s, e, fs)
+		return false
+	}
+
 	_ex := strng.Kind2String(reflect.ValueOf(any)).Add(ex).String()
 	_ex2 := strng.Kind2String(reflect.ValueOf(any)).Add(ex2).String()
 	if s != _ex && s != _ex2 {
@@ -106,7 +121,7 @@ func TestToString(t *testing.T) {
 	if ok := checkToString([]byte("ABC"), "ABC", t); !ok {
 		return
 	}
-	if ok := _checkToString(map[string]int{"a": 1, "b": 2}, "[a=1,b=2]", "[b=2,a=1]", t); !ok {
+	if ok := checkToFromString(map[string]int{"a": 1, "b": 2}, "[a=1,b=2]", "[b=2,a=1]", t); !ok {
 		return
 	}
 

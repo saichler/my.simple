@@ -41,6 +41,9 @@ func stringFromString(str string, kinds []reflect.Kind) (reflect.Value, error) {
 
 // Convert string to int
 func intFromString(str string, kinds []reflect.Kind) (reflect.Value, error) {
+	if str == "" {
+		return reflect.ValueOf(0), nil
+	}
 	i, err := strconv.Atoi(str)
 	if err != nil {
 		return errorValue, err
@@ -95,11 +98,10 @@ func uintFromString(str string, kinds []reflect.Kind) (reflect.Value, error) {
 
 // Convert string to uint8
 func uint8FromString(str string, kinds []reflect.Kind) (reflect.Value, error) {
-	i, err := strconv.Atoi(str)
-	if err != nil {
-		return errorValue, err
+	if str == "" {
+		return reflect.ValueOf(byte(0)), nil
 	}
-	return reflect.ValueOf(uint8(i)), nil
+	return reflect.ValueOf([]byte(str)), nil
 }
 
 // Convert string to uint16
@@ -224,25 +226,40 @@ func mapFromString(str string, kinds []reflect.Kind) (reflect.Value, error) {
 // Convert string to slice
 func sliceFromString(str string, kinds []reflect.Kind) (reflect.Value, error) {
 	str = strings.TrimSpace(str)
-	str = str[1 : len(str)-1]
+	// if it is byte array, it will not have square brackets
+	if len(str) > 1 && str[0] == '[' {
+		str = str[1 : len(str)-1]
+	}
 	items := strings.Split(str, ",")
-	var newSlice *reflect.Value
+
+	itemF := fromstrings[kinds[0]]
+	if itemF == nil {
+		return errorValue, errors.New("Cannot find converter item kind " + kinds[0].String())
+	}
+	defaultValue, err := itemF("", kinds[1:])
+	if err != nil {
+		return errorValue, err
+	}
+
+	//Special case for byte array
+	if defaultValue.Kind() == reflect.Uint8 {
+		newSlice := reflect.MakeSlice(reflect.SliceOf(defaultValue.Type()), len(str), len(str))
+		for i, v := range str {
+			newSlice.Index(i).Set(reflect.ValueOf(byte(v)))
+		}
+		return newSlice, nil
+	}
+
+	newSlice := reflect.MakeSlice(reflect.SliceOf(defaultValue.Type()), len(items), len(items))
+
 	for i, item := range items {
-		itemF := fromstrings[kinds[0]]
-		if itemF == nil {
-			return errorValue, errors.New("Cannot find converter item kind " + kinds[0].String())
-		}
-		v, err := itemF(item, kinds[1:])
-		if err != nil {
-			return errorValue, err
-		}
-		if newSlice == nil {
-			sl := reflect.MakeSlice(reflect.SliceOf(v.Type()), len(items), len(items))
-			newSlice = &sl
+		v, e := itemF(item, kinds[1:])
+		if e != nil {
+			return errorValue, e
 		}
 		newSlice.Index(i).Set(v)
 	}
-	return *newSlice, nil
+	return newSlice, nil
 }
 
 // Convert string to an instance
@@ -256,6 +273,9 @@ func InstanceOf(str string) (interface{}, error) {
 
 // Conver string to a reflect.value
 func FromString(str string) (reflect.Value, error) {
+	if str == "" || str == "{0}" {
+		return reflect.ValueOf(nil), nil
+	}
 	v, k, e := parseStringForKinds(str)
 	if e != nil {
 		return errorValue, e

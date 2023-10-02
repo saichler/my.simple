@@ -33,14 +33,17 @@ func init() {
 }
 
 // StringOf Accept an instance of any kind and convert it to a String
-func StringOf(any interface{}) (string, error) {
+func (s *String) StringOf(any interface{}) (string, error) {
 	val := reflect.ValueOf(any)
-	return ToString(val)
+	return s.ToString(val)
 }
 
-func ToString(value reflect.Value) (string, error) {
+func (s *String) ToString(value reflect.Value) (string, error) {
 	v, e := toString(value)
-	return Kind2String(value).Add(v).String(), e
+	if s.TypesPrefix {
+		return Kind2String(value).Add(v).String(), e
+	}
+	return v, e
 }
 
 // ToString Accepts a value of reflect.value and return its string representation

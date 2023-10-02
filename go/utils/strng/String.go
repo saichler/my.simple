@@ -4,7 +4,9 @@ import "bytes"
 
 // String is a wrapper over buff.bytes to make it seamless to concatenate strings
 type String struct {
-	buff *bytes.Buffer
+	buff               *bytes.Buffer
+	TypesPrefix        bool
+	AddSpaceWhenAdding bool
 }
 
 // New construct a new String instance and initialize the buff with the input string
@@ -25,6 +27,9 @@ func (s *String) init() {
 // Add concatenate a string to this String instance
 func (s *String) Add(str string) *String {
 	s.init()
+	if s.AddSpaceWhenAdding {
+		s.buff.WriteString(" ")
+	}
 	s.buff.WriteString(str)
 	return s
 }
