@@ -24,4 +24,17 @@ message Packet {
   int32 pri = 5;
   // The packet data
   bytes data = 6;
+  // The protobuf type name of the serialized data
+  string proto_type_name = 7;
+  // Action to do with this packet
+  Action action = 8;
+}
+
+enum Action {
+  Action_Invalid = 0;
+  Action_Post = 1;
+  Action_Put = 2;
+  Action_Patch = 3;
+  Action_Delete = 4;
+  Action_Get = 5;
 }

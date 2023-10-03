@@ -1,6 +1,8 @@
 package logs
 
-import "github.com/saichler/my.simple/go/utils/logs/common"
+import (
+	"github.com/saichler/my.simple/go/common"
+)
 
 var Log common.Logger = NewFmtLogger()
 
