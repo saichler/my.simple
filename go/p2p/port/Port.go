@@ -3,7 +3,7 @@ package port
 import (
 	"errors"
 	"github.com/google/uuid"
-	common2 "github.com/saichler/my.simple/go/common"
+	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"github.com/saichler/my.simple/go/utils/queues"
 	"github.com/saichler/my.simple/go/utils/security"
@@ -25,7 +25,7 @@ type PortImpl struct {
 	writeMutex *sync.Cond
 	conn       net.Conn
 	active     bool
-	listener   common2.Listener
+	listener   common.Listener
 	ipAndPort  string
 	portType   string
 	serviceId  string
@@ -36,7 +36,7 @@ type PortImpl struct {
 	doneReconnect bool
 }
 
-func NewPortImpl(local bool, con net.Conn, key string, listener common2.Listener, maxInputQueueSize, maxOutputQueueSize int) *PortImpl {
+func NewPortImpl(local bool, con net.Conn, key string, listener common.Listener, maxInputQueueSize, maxOutputQueueSize int) *PortImpl {
 	port := &PortImpl{}
 	port.uuid = uuid.New().String()
 	port.conn = con
@@ -56,7 +56,7 @@ func NewPortImpl(local bool, con net.Conn, key string, listener common2.Listener
 	return port
 }
 
-func ConnectTo(host, key, secret string, destPort int, listener common2.Listener, maxIn, maxOut, notifiers int) (common2.Port, error) {
+func ConnectTo(host, key, secret string, destPort int, listener common.Listener, maxIn, maxOut, notifiers int) (common.Port, error) {
 	conn, err := net.Dial("tcp", host+":"+strconv.Itoa(destPort))
 	if err != nil {
 		return nil, err
@@ -67,12 +67,12 @@ func ConnectTo(host, key, secret string, destPort int, listener common2.Listener
 		return nil, err
 	}
 
-	err = common2.Write([]byte(data), conn)
+	err = common.Write([]byte(data), conn)
 	if err != nil {
 		return nil, err
 	}
 
-	inData, err := common2.Read(conn)
+	inData, err := common.Read(conn)
 	if string(inData) != "OK" {
 		return nil, errors.New("Failed to connect, incorrect Key/Secret")
 	}
@@ -88,12 +88,12 @@ func ConnectTo(host, key, secret string, destPort int, listener common2.Listener
 		return nil, err
 	}
 
-	err = common2.Write([]byte(data), conn)
+	err = common.Write([]byte(data), conn)
 	if err != nil {
 		return nil, err
 	}
 
-	inData, err = common2.Read(conn)
+	inData, err = common.Read(conn)
 	port.zside = string(inData)
 
 	go port.read()
@@ -119,11 +119,11 @@ func (port *PortImpl) ZSide() string {
 
 func (port *PortImpl) read() {
 	for port.active {
-		packet, err := common2.Read(port.conn)
+		packet, err := common.Read(port.conn)
 		if err != nil {
 			if port.secret != "" {
 				port.attemptToReconnect()
-				packet, err = common2.Read(port.conn)
+				packet, err = common.Read(port.conn)
 			} else {
 				logs.Error(err)
 				break
@@ -135,7 +135,7 @@ func (port *PortImpl) read() {
 				port.writeMutex.Broadcast()
 				port.writeMutex.L.Unlock()
 				continue
-			} else if len(packet) >= common2.LARGE_PACKET {
+			} else if len(packet) >= common.LARGE_PACKET {
 				/*
 					p.writeMutex.L.Lock()
 					writePacket([]byte("WC"), p.conn)
@@ -173,17 +173,17 @@ func (port *PortImpl) write() {
 		if packet != nil {
 			port.writeMutex.L.Lock()
 			if port.active {
-				err := common2.Write(packet, port.conn)
+				err := common.Write(packet, port.conn)
 				if err != nil {
 					if port.secret != "" {
 						port.attemptToReconnect()
-						err = common2.Write(packet, port.conn)
+						err = common.Write(packet, port.conn)
 					} else {
 						break
 					}
 				}
 			}
-			if len(packet) >= common2.LARGE_PACKET {
+			if len(packet) >= common.LARGE_PACKET {
 				//c.writeMutex.Wait()
 			}
 			port.writeMutex.L.Unlock()
@@ -266,12 +266,12 @@ func (port *PortImpl) reconnect() error {
 		return logs.Error("Unable to encode when reconnecting to switch...", err.Error())
 	}
 
-	err = common2.Write([]byte(data), conn)
+	err = common.Write([]byte(data), conn)
 	if err != nil {
 		return logs.Error("Unable to write when reconnecting to switch...", err.Error())
 	}
 
-	inData, err := common2.Read(conn)
+	inData, err := common.Read(conn)
 	if string(inData) != "OK" {
 		return logs.Error("Failed to reconnect, incorrect Key/Secret")
 	}
@@ -281,12 +281,12 @@ func (port *PortImpl) reconnect() error {
 		return err
 	}
 
-	err = common2.Write([]byte(data), conn)
+	err = common.Write([]byte(data), conn)
 	if err != nil {
 		return err
 	}
 
-	inData, err = common2.Read(conn)
+	inData, err = common.Read(conn)
 	port.zside = string(inData)
 
 	port.conn = conn
