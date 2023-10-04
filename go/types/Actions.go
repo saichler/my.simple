@@ -17,7 +17,10 @@ func (types *TypesImpl) RegisterTypeHandler(pb proto.Message, handler common.Typ
 		return logs.Error("Cannot register nil handler for type ", t.Name())
 	}
 
-	types.registerType(common.TypeOf(pb))
+	err := types.registerType(common.TypeOf(pb))
+	if err != nil {
+		return err
+	}
 
 	types.mtx.Lock()
 	defer types.mtx.Unlock()
@@ -57,7 +60,7 @@ func (types *TypesImpl) handle(pb proto.Message, action model.Action, port commo
 	case model.Action_Action_Get:
 		return h.Get(pb, port)
 	case model.Action_Action_Invalid:
-		return nil, logs.Error("Invalid Crud Operation, ignoring")
+		return nil, logs.Error("Invalid Action, ignoring")
 	}
 	panic("Unknown Action:" + action.String())
 }

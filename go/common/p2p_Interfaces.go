@@ -1,10 +1,13 @@
 package common
 
+import "google.golang.org/protobuf/proto"
+
 var MAX_DATA_SIZE = int64(1024 * 1024 * 50)
 var LARGE_PACKET = 1024 * 1024 * 5
 
 type Port interface {
-	Send([]byte) error
+	SendRawData([]byte) error
+	SendProtobuf(proto.Message) error
 }
 
 type Listener interface {

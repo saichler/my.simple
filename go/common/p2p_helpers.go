@@ -2,40 +2,47 @@ package common
 
 import (
 	"errors"
-	"google.golang.org/protobuf/proto"
+	"github.com/saichler/my-habitat/go/common"
 	"net"
 	"time"
 )
 
-func Send(pb proto.Message, port Port) error {
-	data, err := proto.Marshal(pb)
-	if err != nil {
-		return err
-	}
-	return port.Send(data)
-}
-
+// Write data to socket
 func Write(data []byte, conn net.Conn) error {
+	// If the connection is nil, return an error
 	if conn == nil {
-		return errors.New("No Connection Available")
+		return errors.New("no Connection Available")
 	}
+	// Error is the data is too big
+	if len(data) > common.MAX_DATA_SIZE {
+		return errors.New("data is larger than MAX size allowed")
+	}
+	// Write the size of the data
 	_, e := conn.Write(Long2Bytes(int64(len(data))))
 	if e != nil {
 		return e
 	}
+	// Write the actual data
 	_, e = conn.Write(data)
 	return e
 }
 
+// Read data from socket
 func Read(conn net.Conn) ([]byte, error) {
+	// read 8 bytes, e.g. long, hinting of the size of the byte array
 	sizebytes, err := ReadSize(8, conn)
 	if sizebytes == nil || err != nil {
 		return nil, err
 	}
+	// Translate the 8 byte array into int64
 	size := Bytes2Long(sizebytes)
+	// If the size is larger than the MAX Data Size, return an error
+	// this is to protect against overflowing the buffers
+	// When data to send is > the max data size, one needs to split the data into chunks at a higher level
 	if size > MAX_DATA_SIZE {
 		return nil, errors.New("Max Size Exceeded!")
 	}
+	// Read the bunch of bytes according to the size from the socket
 	data, err := ReadSize(int(size), conn)
 	return data, err
 }

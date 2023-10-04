@@ -96,9 +96,11 @@ func ConnectTo(host, key, secret string, destPort int, listener common.Listener,
 	inData, err = common.Read(conn)
 	port.zside = string(inData)
 
-	go port.read()
+	// Start loop reading from the socker
+	go port.readFromSocket()
 	go port.write()
-	go port.process()
+	// Start loop decoding from RX queue
+	go port.decodeIncomingData()
 	if notifiers <= 0 {
 		go port.notifier()
 	} else {
@@ -117,42 +119,6 @@ func (port *PortImpl) ZSide() string {
 	return port.zside
 }
 
-func (port *PortImpl) read() {
-	for port.active {
-		packet, err := common.Read(port.conn)
-		if err != nil {
-			if port.secret != "" {
-				port.attemptToReconnect()
-				packet, err = common.Read(port.conn)
-			} else {
-				logs.Error(err)
-				break
-			}
-		}
-		if packet != nil {
-			if len(packet) == 2 && string(packet) == "WC" {
-				port.writeMutex.L.Lock()
-				port.writeMutex.Broadcast()
-				port.writeMutex.L.Unlock()
-				continue
-			} else if len(packet) >= common.LARGE_PACKET {
-				/*
-					p.writeMutex.L.Lock()
-					writePacket([]byte("WC"), p.conn)
-					p.writeMutex.L.Unlock()
-				*/
-			}
-			if port.active {
-				port.rx.Add(packet)
-			}
-		} else {
-			break
-		}
-	}
-	logs.Info("Connection Read for ", port.Name(), " ended.")
-	port.Shutdown()
-}
-
 func (port *PortImpl) Shutdown() {
 	port.active = false
 	if port.conn != nil {
@@ -165,63 +131,6 @@ func (port *PortImpl) Shutdown() {
 	if port.listener != nil {
 		port.listener.PortShutdown(port)
 	}
-}
-
-func (port *PortImpl) write() {
-	for port.active {
-		packet := port.tx.Next()
-		if packet != nil {
-			port.writeMutex.L.Lock()
-			if port.active {
-				err := common.Write(packet, port.conn)
-				if err != nil {
-					if port.secret != "" {
-						port.attemptToReconnect()
-						err = common.Write(packet, port.conn)
-					} else {
-						break
-					}
-				}
-			}
-			if len(packet) >= common.LARGE_PACKET {
-				//c.writeMutex.Wait()
-			}
-			port.writeMutex.L.Unlock()
-		} else {
-			break
-		}
-	}
-	logs.Info("Connection Write for ", port.Name(), " ended.")
-	port.Shutdown()
-}
-
-func (port *PortImpl) Send(data []byte) error {
-	if port.active {
-		encData, err := security.Encode(data, port.key)
-		if err != nil {
-			return err
-		}
-		port.tx.Add([]byte(encData))
-	} else {
-		return errors.New("Port is not active")
-	}
-	return nil
-}
-
-func (port *PortImpl) process() {
-	for port.active {
-		packet := port.rx.Next()
-		if packet != nil {
-			encString := string(packet)
-			data, err := security.Decode(encString, port.key)
-			if err != nil {
-				break
-			}
-			port.nx.Add(data)
-		}
-	}
-	logs.Info("Message Processing for ", port.Name(), " Ended")
-	port.Shutdown()
 }
 
 func (port *PortImpl) notifier() {
