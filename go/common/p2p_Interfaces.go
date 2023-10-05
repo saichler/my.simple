@@ -2,7 +2,7 @@ package common
 
 import "google.golang.org/protobuf/proto"
 
-var MAX_DATA_SIZE = int64(1024 * 1024 * 50)
+var MAX_DATA_SIZE = 1024 * 1024 * 50
 var LARGE_PACKET = 1024 * 1024 * 5
 
 type Port interface {

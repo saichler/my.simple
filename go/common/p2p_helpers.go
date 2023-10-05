@@ -2,10 +2,51 @@ package common
 
 import (
 	"errors"
-	"github.com/saichler/my-habitat/go/common"
+	"github.com/saichler/my.simple/go/utils/security"
 	"net"
+	"strconv"
 	"time"
 )
+
+func ConnectAndValidateSecretAndKey(host, secret, key string, port int) (net.Conn, error) {
+	conn, err := net.Dial("tcp", host+":"+strconv.Itoa(port))
+	if err != nil {
+		return nil, err
+	}
+	data, err := security.Encode([]byte(secret), key)
+	if err != nil {
+		return nil, err
+	}
+
+	err = Write([]byte(data), conn)
+	if err != nil {
+		return nil, err
+	}
+
+	inData, err := Read(conn)
+	if string(inData) != "OK" {
+		return nil, errors.New("Failed to connect, incorrect Key/Secret")
+	}
+	return conn, err
+}
+
+func ExchangeUuid(uuid, key string, conn net.Conn) (string, error) {
+	data, err := security.Encode([]byte(uuid), key)
+	if err != nil {
+		return "", err
+	}
+
+	err = Write([]byte(data), conn)
+	if err != nil {
+		return "", err
+	}
+
+	inData, err := Read(conn)
+	if err != nil {
+		return "", err
+	}
+	return string(inData), nil
+}
 
 // Write data to socket
 func Write(data []byte, conn net.Conn) error {
@@ -14,7 +55,7 @@ func Write(data []byte, conn net.Conn) error {
 		return errors.New("no Connection Available")
 	}
 	// Error is the data is too big
-	if len(data) > common.MAX_DATA_SIZE {
+	if len(data) > MAX_DATA_SIZE {
 		return errors.New("data is larger than MAX size allowed")
 	}
 	// Write the size of the data
@@ -39,7 +80,7 @@ func Read(conn net.Conn) ([]byte, error) {
 	// If the size is larger than the MAX Data Size, return an error
 	// this is to protect against overflowing the buffers
 	// When data to send is > the max data size, one needs to split the data into chunks at a higher level
-	if size > MAX_DATA_SIZE {
+	if size > int64(MAX_DATA_SIZE) {
 		return nil, errors.New("Max Size Exceeded!")
 	}
 	// Read the bunch of bytes according to the size from the socket
