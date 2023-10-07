@@ -2,7 +2,7 @@ package types
 
 import (
 	"github.com/saichler/my.simple/go/common"
-	"github.com/saichler/my.simple/go/p2p/model"
+	"github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"google.golang.org/protobuf/proto"
 	"reflect"
@@ -28,12 +28,12 @@ func (types *TypesImpl) RegisterTypeHandler(pb proto.Message, handler common.Typ
 	return nil
 }
 
-func (types *TypesImpl) Hanlde(packet *model.Packet, port common.Port) (proto.Message, error) {
+func (types *TypesImpl) Hanlde(packet *model.SecureMessage, port common.Port) (proto.Message, error) {
 	pbInstance, err := Types.new(packet.ProtoTypeName)
 	if err != nil {
 		return nil, err
 	}
-	err = proto.Unmarshal(packet.Data, pbInstance)
+	err = proto.Unmarshal(packet.ProtoData, pbInstance)
 	if err != nil {
 		return nil, logs.Error("Unmarshal failed with:", err)
 	}

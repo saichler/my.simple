@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package net_model;
+
+option java_multiple_files = true;
+option java_outer_classname = "NetModel";
+option java_package = "com.my.simple.net.model";
+option go_package = "github.com/saichler/my.simple/go/net/model";
+
+/*
+  Secure Message is to transmit a piece of data, securly, from one process to one or more processes.
+ */
+message SecureMessage {
+  // The source uuid
+  string source = 1;
+  // The destination id, can be a process destination id or a topic.
+  string destination = 2;
+  // To uniquely identify the source packet, the sender process maintain a sequence number.
+  int32 sequence = 3;
+  // Priority of this packet
+  int32 priority = 4;
+
+  // The protobuf marshaled data
+  bytes proto_data = 5;
+  // The protobuf type name of the serialized data
+  string proto_type_name = 6;
+  // Action to do with this protobuf
+  Action action = 7;
+}
+
+enum Action {
+  Action_Invalid = 0;
+  Action_Post = 1;
+  Action_Put = 2;
+  Action_Patch = 3;
+  Action_Delete = 4;
+  Action_Get = 5;
+}
+
+message NetConfig {
+  uint64 max_data_size = 1;
+  uint64 default_tx_queue_size = 2;
+  uint64 default_rx_queue_size = 3;
+}

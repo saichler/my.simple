@@ -3,6 +3,7 @@ package port
 import (
 	"github.com/google/uuid"
 	"github.com/saichler/my.simple/go/common"
+	"github.com/saichler/my.simple/go/net/protocol"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"github.com/saichler/my.simple/go/utils/queues"
 	"github.com/saichler/my.simple/go/utils/strng"
@@ -24,69 +25,76 @@ type PortImpl struct {
 	rx *queues.ByteSliceQueue
 	// The outgoing data queue
 	tx *queues.ByteSliceQueue
-	// The incoming data queue already decoded
-	nx *queues.ByteSliceQueue
 	// The connection
 	conn net.Conn
 	// is the port active
 	active bool
 	// The incoming data listener
-	listener common.Listener
-	// The ip & port of this port.
-	ipAndPort string
+	listener common.RawDataListener
+	// The local/remote address, depending on if this port is the initiator of the connection
+	addr string
+	//port reconnect info, only valid if the port is the initiating side
+	reconnectInfo *ReconnectInfo
+}
 
-	portType  string
-	serviceId string
-
-	host          string
-	destPort      int
-	reconnectMtx  *sync.Mutex
-	doneReconnect bool
+type ReconnectInfo struct {
+	//The host
+	host string
+	//The port
+	port int
+	// Mutex as multiple go routines might call reconnect
+	reconnectMtx *sync.Mutex
+	// Indicates if the port was already reconnected
+	alreadyReconnected bool
 }
 
 // Instantiate a new port with a connection
-func NewPortImpl(local bool, con net.Conn, key string, listener common.Listener, maxInputQueueSize, maxOutputQueueSize int) *PortImpl {
+func NewPortImpl(incomingConnection bool, con net.Conn, key, secret, _uuid string, listener common.RawDataListener) *PortImpl {
 	port := &PortImpl{}
-	port.uuid = uuid.New().String()
+	port.uuid = _uuid
+	if port.uuid == "" {
+		port.uuid = uuid.New().String()
+	}
 	port.conn = con
 	port.active = true
 	port.key = key
+	port.secret = secret
 	port.listener = listener
 
-	if local {
-		port.portType = "Switch"
-		port.ipAndPort = con.RemoteAddr().String()
+	if incomingConnection {
+		port.addr = con.RemoteAddr().String()
 	} else {
-		port.ipAndPort = con.LocalAddr().String()
+		port.addr = con.LocalAddr().String()
 	}
 
-	port.rx = queues.NewByteSliceQueue("RX", maxInputQueueSize)
-	port.tx = queues.NewByteSliceQueue("TX", maxOutputQueueSize)
-	port.nx = queues.NewByteSliceQueue("NX", maxInputQueueSize)
+	port.rx = queues.NewByteSliceQueue("RX", int(common.NetConfig.DefaultRxQueueSize))
+	port.tx = queues.NewByteSliceQueue("TX", int(common.NetConfig.DefaultTxQueueSize))
 
 	return port
 }
 
 // This is the method that the service port is using to connect to the switch for the VM/machine
-func ConnectTo(host, key, secret string, destPort int, listener common.Listener, maxIn, maxOut, notifiers int) (common.Port, error) {
+func ConnectTo(host, key, secret string, destPort int, listener common.RawDataListener, notifiers int) (common.Port, error) {
 
 	// Dial the destination and validate the secret and key
-	conn, err := common.ConnectAndValidateSecretAndKey(host, secret, key, destPort)
+	conn, err := protocol.ConnectToAndValidateSecretAndKey(host, secret, key, destPort)
 	if err != nil {
 		return nil, err
 	}
 
 	// Instantiate the port
-	port := NewPortImpl(false, conn, key, listener, maxIn, maxOut)
+	port := NewPortImpl(false, conn, key, secret, "", listener)
 
 	//Below attributes are only for the port initiating the connection
 	port.secret = secret
-	port.host = host
-	port.destPort = destPort
-	port.reconnectMtx = &sync.Mutex{}
+	port.reconnectInfo = &ReconnectInfo{
+		host:         host,
+		port:         destPort,
+		reconnectMtx: &sync.Mutex{},
+	}
 
 	// Request the connecting port to send over its uuid
-	zuuid, err := common.ExchangeUuid(port.uuid, port.key, conn)
+	zuuid, err := protocol.ExchangeUuid(port.uuid, port.key, conn)
 	if err != nil {
 		return nil, err
 	}
@@ -94,18 +102,27 @@ func ConnectTo(host, key, secret string, destPort int, listener common.Listener,
 
 	//We have only one go routing per each because we want to keep the order of incoming and outgoing messages
 
-	// Start loop reading from the socket
-	go port.readFromSocket()
-	// Start loop reading from the TX queue and writing to the socket
-	go port.writeToSocket()
-	// Start loop decoding from RX queue
-	go port.decodeIncomingData()
-	// Start loop of reading decoded data from the NX queue and notify the listener
-	go port.incomingDataNotifier()
+	port.Start()
 
 	return port, nil
 }
 
+func (port *PortImpl) Start() {
+	// Start loop reading from the socket
+	go port.readFromSocket()
+	// Start loop reading from the TX queue and writing to the socket
+	go port.writeToSocket()
+	// Start loop notifying the raw data listener on new incoming data
+	go port.notifyRawDataListener()
+}
+
+// Addr The address of this port, either remote addr or local
+// depending on if this is the initiator of the connection
+func (port *PortImpl) Addr() string {
+	return port.addr
+}
+
+// The port uuid
 func (port *PortImpl) Uuid() string {
 	return port.uuid
 }
@@ -121,26 +138,34 @@ func (port *PortImpl) Shutdown() {
 	}
 	port.rx.Shutdown()
 	port.tx.Shutdown()
-	port.nx.Shutdown()
+
 	if port.listener != nil {
 		port.listener.PortShutdown(port)
 	}
 }
 
 func (port *PortImpl) attemptToReconnect() {
-	port.reconnectMtx.Lock()
-	defer port.reconnectMtx.Unlock()
-	if port.doneReconnect {
-		port.doneReconnect = false
+	// Should not be a valid scenario, however bugs do happen
+	if port.reconnectInfo == nil {
 		return
 	}
-	port.doneReconnect = true
+
+	port.reconnectInfo.reconnectMtx.Lock()
+	defer port.reconnectInfo.reconnectMtx.Unlock()
+	if port.reconnectInfo.alreadyReconnected {
+		return
+	}
 	for {
 		time.Sleep(time.Second * 5)
 		logs.Info("Connection issues, trying to reconnect to switch")
 
 		err := port.reconnect()
 		if err == nil {
+			port.reconnectInfo.alreadyReconnected = true
+			go func() {
+				time.Sleep(time.Second)
+				port.reconnectInfo.alreadyReconnected = false
+			}()
 			break
 		}
 
@@ -150,13 +175,13 @@ func (port *PortImpl) attemptToReconnect() {
 
 func (port *PortImpl) reconnect() error {
 	// Dial the destination and validate the secret and key
-	conn, err := common.ConnectAndValidateSecretAndKey(port.host, port.secret, port.key, port.destPort)
+	conn, err := protocol.ConnectToAndValidateSecretAndKey(port.reconnectInfo.host, port.secret, port.key, port.reconnectInfo.port)
 	if err != nil {
 		return err
 	}
 
 	// Request the connecting port to send over its uuid
-	zuuid, err := common.ExchangeUuid(port.uuid, port.key, conn)
+	zuuid, err := protocol.ExchangeUuid(port.uuid, port.key, conn)
 	if err != nil {
 		return err
 	}
@@ -168,19 +193,10 @@ func (port *PortImpl) reconnect() error {
 }
 
 func (port *PortImpl) Name() string {
-	/*
-		if port.serviceId == "" {
-			port.serviceId = handlers.Directory.ServiceId(port.uuid)
-		}*/
 	name := strng.New("")
-	name.Add(port.portType)
-	name.Add("(")
-	name.Add(port.serviceId)
-	name.Add(" ")
 	name.Add(port.uuid)
 	name.Add("[")
-	name.Add(port.ipAndPort)
+	name.Add(port.addr)
 	name.Add("]")
-	name.Add(")")
 	return name.String()
 }

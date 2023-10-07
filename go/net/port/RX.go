@@ -3,7 +3,6 @@ package port
 import (
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/utils/logs"
-	"github.com/saichler/my.simple/go/utils/security"
 )
 
 // loop and Read incoming data from the socket
@@ -44,25 +43,17 @@ func (port *PortImpl) readFromSocket() {
 	port.Shutdown()
 }
 
-// loop and decode incoming data from the RX queue and place it in the NX queue
-func (port *PortImpl) decodeIncomingData() {
+// Notify the RawDataListener on new data
+func (port *PortImpl) notifyRawDataListener() {
 	// While the port is active
 	for port.active {
 		// Read next data ([]byte) block
 		data := port.rx.Next()
 		// If data is not nil
 		if data != nil {
-			encString := string(data)
-			// Decode and unencrypt the data
-			decodedData, err := security.Decode(encString, port.key)
-			if err != nil {
-				// On any error, break and cleanup
-				break
-			}
-			// Add the decoded data to the NX queue
-			port.nx.Add(decodedData)
+			port.listener.DataReceived(data, port)
 		}
 	}
-	logs.Info("Message Processing for ", port.Name(), " Ended")
+	logs.Info("notify data listener for ", port.Name(), " Ended")
 	port.Shutdown()
 }

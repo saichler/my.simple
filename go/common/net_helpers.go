@@ -2,51 +2,9 @@ package common
 
 import (
 	"errors"
-	"github.com/saichler/my.simple/go/utils/security"
 	"net"
-	"strconv"
 	"time"
 )
-
-func ConnectAndValidateSecretAndKey(host, secret, key string, port int) (net.Conn, error) {
-	conn, err := net.Dial("tcp", host+":"+strconv.Itoa(port))
-	if err != nil {
-		return nil, err
-	}
-	data, err := security.Encode([]byte(secret), key)
-	if err != nil {
-		return nil, err
-	}
-
-	err = Write([]byte(data), conn)
-	if err != nil {
-		return nil, err
-	}
-
-	inData, err := Read(conn)
-	if string(inData) != "OK" {
-		return nil, errors.New("Failed to connect, incorrect Key/Secret")
-	}
-	return conn, err
-}
-
-func ExchangeUuid(uuid, key string, conn net.Conn) (string, error) {
-	data, err := security.Encode([]byte(uuid), key)
-	if err != nil {
-		return "", err
-	}
-
-	err = Write([]byte(data), conn)
-	if err != nil {
-		return "", err
-	}
-
-	inData, err := Read(conn)
-	if err != nil {
-		return "", err
-	}
-	return string(inData), nil
-}
 
 // Write data to socket
 func Write(data []byte, conn net.Conn) error {
