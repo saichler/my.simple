@@ -18,14 +18,24 @@ message SecureMessage {
   // To uniquely identify the source packet, the sender process maintain a sequence number.
   int32 sequence = 3;
   // Priority of this packet
-  int32 priority = 4;
-
-  // The protobuf marshaled data
-  bytes proto_data = 5;
+  Priority priority = 4;
+  // The protobuf marshaled data, encoded to base64 string
+  string proto_data = 5;
   // The protobuf type name of the serialized data
   string proto_type_name = 6;
   // Action to do with this protobuf
   Action action = 7;
+}
+
+enum Priority {
+  P0 = 0;
+  P1 = 1;
+  P2 = 2;
+  P3 = 3;
+  P4 = 4;
+  P5 = 5;
+  P6 = 6;
+  P7 = 7;
 }
 
 enum Action {
@@ -38,7 +48,8 @@ enum Action {
 }
 
 message NetConfig {
-  uint64 max_data_size = 1;
+  int64 max_data_size = 1;
   uint64 default_tx_queue_size = 2;
   uint64 default_rx_queue_size = 3;
+  int32 default_switch_port = 4;
 }

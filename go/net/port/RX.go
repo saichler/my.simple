@@ -1,7 +1,9 @@
 package port
 
 import (
+	"fmt"
 	"github.com/saichler/my.simple/go/common"
+	"github.com/saichler/my.simple/go/net/protocol"
 	"github.com/saichler/my.simple/go/utils/logs"
 )
 
@@ -51,7 +53,12 @@ func (port *PortImpl) notifyRawDataListener() {
 		data := port.rx.Next()
 		// If data is not nil
 		if data != nil {
-			port.listener.DataReceived(data, port)
+			if port.listener != nil {
+				port.listener.DataReceived(data, port)
+			} else {
+				s, _, _ := protocol.HeaderOf(data)
+				fmt.Println(port.Name(), "Received message from", s)
+			}
 		}
 	}
 	logs.Info("notify data listener for ", port.Name(), " Ended")

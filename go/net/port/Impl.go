@@ -9,6 +9,7 @@ import (
 	"github.com/saichler/my.simple/go/utils/strng"
 	"net"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -35,13 +36,17 @@ type PortImpl struct {
 	addr string
 	//port reconnect info, only valid if the port is the initiating side
 	reconnectInfo *ReconnectInfo
+	// Running sequence number for the messages
+	sequence atomic.Int32
+	// Is this port belongs to the switch
+	isSwitch bool
 }
 
 type ReconnectInfo struct {
 	//The host
 	host string
 	//The port
-	port int
+	port int32
 	// Mutex as multiple go routines might call reconnect
 	reconnectMtx *sync.Mutex
 	// Indicates if the port was already reconnected
@@ -63,6 +68,7 @@ func NewPortImpl(incomingConnection bool, con net.Conn, key, secret, _uuid strin
 
 	if incomingConnection {
 		port.addr = con.RemoteAddr().String()
+		port.isSwitch = true
 	} else {
 		port.addr = con.LocalAddr().String()
 	}
@@ -74,7 +80,7 @@ func NewPortImpl(incomingConnection bool, con net.Conn, key, secret, _uuid strin
 }
 
 // This is the method that the service port is using to connect to the switch for the VM/machine
-func ConnectTo(host, key, secret string, destPort int, listener common.RawDataListener, notifiers int) (common.Port, error) {
+func ConnectTo(host, key, secret string, destPort int32, listener common.RawDataListener) (common.Port, error) {
 
 	// Dial the destination and validate the secret and key
 	conn, err := protocol.ConnectToAndValidateSecretAndKey(host, secret, key, destPort)
@@ -114,6 +120,7 @@ func (port *PortImpl) Start() {
 	go port.writeToSocket()
 	// Start loop notifying the raw data listener on new incoming data
 	go port.notifyRawDataListener()
+	logs.Info(port.Name(), "Started!")
 }
 
 // Addr The address of this port, either remote addr or local
@@ -132,6 +139,7 @@ func (port *PortImpl) ZSide() string {
 }
 
 func (port *PortImpl) Shutdown() {
+	logs.Info(port.Name(), "Shutdown called...")
 	port.active = false
 	if port.conn != nil {
 		port.conn.Close()
@@ -194,6 +202,11 @@ func (port *PortImpl) reconnect() error {
 
 func (port *PortImpl) Name() string {
 	name := strng.New("")
+	if port.isSwitch {
+		name.Add("Switch Port ")
+	} else {
+		name.Add("Node Port ")
+	}
 	name.Add(port.uuid)
 	name.Add("[")
 	name.Add(port.addr)

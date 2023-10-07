@@ -8,12 +8,12 @@ import (
 type SwitchTable struct {
 	internalPorts map[string]common.Port
 	externalPorts map[string]common.Port
-	mtx           *sync.Mutex
+	mtx           *sync.RWMutex
 }
 
 func newSwitchTable() *SwitchTable {
 	switchTable := &SwitchTable{}
-	switchTable.mtx = &sync.Mutex{}
+	switchTable.mtx = &sync.RWMutex{}
 	switchTable.internalPorts = make(map[string]common.Port)
 	switchTable.externalPorts = make(map[string]common.Port)
 	return switchTable
@@ -43,4 +43,14 @@ func (switchTable *SwitchTable) addPort(port common.Port) {
 		}
 		switchTable.externalPorts[port.Uuid()] = port
 	}
+}
+
+func (switchTable *SwitchTable) fetchPortByUuid(id string) common.Port {
+	switchTable.mtx.RLock()
+	defer switchTable.mtx.RUnlock()
+	p, ok := switchTable.internalPorts[id]
+	if !ok {
+		p = switchTable.externalPorts[id]
+	}
+	return p
 }

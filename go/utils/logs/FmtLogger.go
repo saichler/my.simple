@@ -15,55 +15,67 @@ func NewFmtLogger() *FmtLogger {
 }
 
 func (logger FmtLogger) Trace(any interface{}, anys ...interface{}) {
-	fmt.Print("<Trace> ")
-	fmt.Print(any)
+	str := strng.New("<Trace   > ")
+	str.TypesPrefix = false
+	str.AddSpaceWhenAdding = true
+	s, _ := str.StringOf(any)
+	str.Add(s)
 	if anys != nil {
 		for _, a := range anys {
-			fmt.Print(" ")
-			fmt.Print(a)
+			s, _ = str.StringOf(a)
+			str.Add(s)
 		}
 	}
-	fmt.Println()
+	fmt.Println(str.String())
 }
 
 func (logger FmtLogger) Debug(any interface{}, anys ...interface{}) {
-	fmt.Print("< Debug> ")
-	fmt.Print(any)
+	str := strng.New("< Debug   > ")
+	str.TypesPrefix = false
+	str.AddSpaceWhenAdding = true
+	s, _ := str.StringOf(any)
+	str.Add(s)
 	if anys != nil {
 		for _, a := range anys {
-			fmt.Print(" ")
-			fmt.Print(a)
+			s, _ = str.StringOf(a)
+			str.Add(s)
 		}
 	}
-	fmt.Println()
+	fmt.Println(str.String())
 }
 
 func (logger FmtLogger) Info(any interface{}, anys ...interface{}) {
-	fmt.Print("<  Info> ")
-	fmt.Print(any)
+	str := strng.New("<  Info    > ")
+	str.TypesPrefix = false
+	str.AddSpaceWhenAdding = true
+	s, _ := str.StringOf(any)
+	str.Add(s)
 	if anys != nil {
 		for _, a := range anys {
-			fmt.Print(" ")
-			fmt.Print(a)
+			s, _ = str.StringOf(a)
+			str.Add(s)
 		}
 	}
-	fmt.Println()
+	fmt.Println(str.String())
 }
 
 func (logger FmtLogger) Warning(any interface{}, anys ...interface{}) {
-	fmt.Print("<   Warning> ")
-	fmt.Print(any)
+	str := strng.New("<   Warning > ")
+	str.TypesPrefix = false
+	str.AddSpaceWhenAdding = true
+	s, _ := str.StringOf(any)
+	str.Add(s)
 	if anys != nil {
 		for _, a := range anys {
-			fmt.Print(" ")
-			fmt.Print(a)
+			s, _ = str.StringOf(a)
+			str.Add(s)
 		}
 	}
-	fmt.Println()
+	fmt.Println(str.String())
 }
 
 func (logger FmtLogger) Error(any interface{}, anys ...interface{}) error {
-	str := strng.New("<    Error> ")
+	str := strng.New("<      Error > ")
 	str.TypesPrefix = false
 	str.AddSpaceWhenAdding = true
 	s, _ := str.StringOf(any)

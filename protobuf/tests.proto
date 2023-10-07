@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package tests_model;
+
+option java_multiple_files = true;
+option java_outer_classname = "TestsModel";
+option java_package = "com.my.simple.tests.model";
+option go_package = "github.com/saichler/my.simple/go/tests/model";
+
+message MyTestModel {
+  string myString = 1;
+}

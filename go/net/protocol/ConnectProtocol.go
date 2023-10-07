@@ -8,8 +8,8 @@ import (
 	"strconv"
 )
 
-func ConnectToAndValidateSecretAndKey(host, secret, key string, port int) (net.Conn, error) {
-	conn, err := net.Dial("tcp", host+":"+strconv.Itoa(port))
+func ConnectToAndValidateSecretAndKey(host, secret, key string, port int32) (net.Conn, error) {
+	conn, err := net.Dial("tcp", host+":"+strconv.Itoa(int(port)))
 	if err != nil {
 		return nil, err
 	}

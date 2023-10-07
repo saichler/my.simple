@@ -13,7 +13,7 @@ func Write(data []byte, conn net.Conn) error {
 		return errors.New("no Connection Available")
 	}
 	// Error is the data is too big
-	if len(data) > MAX_DATA_SIZE {
+	if len(data) > int(NetConfig.MaxDataSize) {
 		return errors.New("data is larger than MAX size allowed")
 	}
 	// Write the size of the data
@@ -38,7 +38,7 @@ func Read(conn net.Conn) ([]byte, error) {
 	// If the size is larger than the MAX Data Size, return an error
 	// this is to protect against overflowing the buffers
 	// When data to send is > the max data size, one needs to split the data into chunks at a higher level
-	if size > int64(MAX_DATA_SIZE) {
+	if size > NetConfig.MaxDataSize {
 		return nil, errors.New("Max Size Exceeded!")
 	}
 	// Read the bunch of bytes according to the size from the socket

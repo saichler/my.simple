@@ -2,6 +2,7 @@ package switching
 
 import (
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/saichler/my.simple/go/common"
 	port2 "github.com/saichler/my.simple/go/net/port"
@@ -13,7 +14,7 @@ import (
 
 type SwitchService struct {
 	uuid        string
-	port        int
+	port        int32
 	key         string
 	secret      string
 	socket      net.Listener
@@ -21,17 +22,18 @@ type SwitchService struct {
 	switchTable *SwitchTable
 }
 
-func newSwitchService(key, secret string, port int) *SwitchService {
+func NewSwitchService(key, secret string, port int32) *SwitchService {
 	switchService := &SwitchService{}
 	switchService.uuid = uuid.New().String()
 	switchService.key = key
 	switchService.secret = secret
 	switchService.port = port
 	switchService.switchTable = newSwitchTable()
+	switchService.active = true
 	return switchService
 }
 
-func (switchService *SwitchService) start() error {
+func (switchService *SwitchService) Start() error {
 	if switchService.port == 0 {
 		return errors.New("Switch Port does not have a port defined")
 	}
@@ -50,19 +52,21 @@ func (switchService *SwitchService) start() error {
 	for switchService.active {
 		logs.Info("Waiting for connections...")
 		conn, e := switchService.socket.Accept()
-		if e != nil {
+		if e != nil && switchService.active {
 			logs.Error("Failed to accept socket connection:", err)
 			continue
 		}
-		logs.Info("Accepted socket connection...")
-		go switchService.connect(conn)
+		if switchService.active {
+			logs.Info("Accepted socket connection...")
+			go switchService.connect(conn)
+		}
 	}
-	logs.Info("Switch Service has ended")
+	logs.Warning("Switch Service has ended")
 	return nil
 }
 
 func (switchService *SwitchService) bind() error {
-	socket, e := net.Listen("tcp", ":"+strconv.Itoa(switchService.port))
+	socket, e := net.Listen("tcp", ":"+strconv.Itoa(int(switchService.port)))
 	if e != nil {
 		return logs.Error("Unable to bind to port ", switchService.port, e.Error())
 	}
@@ -82,10 +86,21 @@ func (switchService *SwitchService) connect(conn net.Conn) {
 	switchService.switchTable.addPort(port)
 }
 
-func (switchService *SwitchService) DataReceived(data []byte, port common.Port) {
+func (switchService *SwitchService) Shutdown() {
+	switchService.active = false
+	switchService.socket.Close()
+}
 
+func (switchService *SwitchService) DataReceived(data []byte, port common.Port) {
+	source, destination, pri := protocol.HeaderOf(data)
+	fmt.Println(source, destination, pri.String())
+	p := switchService.switchTable.fetchPortByUuid(destination)
+	if p == nil {
+		logs.Error("Cannot find destination port for ", destination)
+		return
+	}
+	p.Send(data)
 }
 
 func (switchService *SwitchService) PortShutdown(port common.Port) {
-
 }
