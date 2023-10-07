@@ -22,7 +22,7 @@ type Port interface {
 	Shutdown()
 }
 
-type RawDataListener interface {
-	DataReceived([]byte, Port)
+type DatatListener interface {
 	PortShutdown(port Port)
+	HandleData([]byte, Port)
 }

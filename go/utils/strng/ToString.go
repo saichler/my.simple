@@ -94,6 +94,10 @@ func boolToString(value reflect.Value) (string, error) {
 
 // ToString of a pointer
 func ptrToString(value reflect.Value) (string, error) {
+	err, ok := value.Interface().(error)
+	if ok {
+		return err.Error(), nil
+	}
 	if value.IsNil() {
 		return "<Nil>", nil
 	}

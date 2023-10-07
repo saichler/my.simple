@@ -91,9 +91,14 @@ func (switchService *SwitchService) Shutdown() {
 	switchService.socket.Close()
 }
 
-func (switchService *SwitchService) DataReceived(data []byte, port common.Port) {
+func (switchService *SwitchService) HandleData(data []byte, port common.Port) {
 	source, destination, pri := protocol.HeaderOf(data)
 	fmt.Println(source, destination, pri.String())
+	if destination == switchService.uuid {
+		switchService.switchDataReceived(data, port)
+		return
+	}
+
 	p := switchService.switchTable.fetchPortByUuid(destination)
 	if p == nil {
 		logs.Error("Cannot find destination port for ", destination)
@@ -103,4 +108,7 @@ func (switchService *SwitchService) DataReceived(data []byte, port common.Port) 
 }
 
 func (switchService *SwitchService) PortShutdown(port common.Port) {
+}
+
+func (switchService *SwitchService) switchDataReceived(data []byte, port common.Port) {
 }

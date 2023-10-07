@@ -28,19 +28,7 @@ func (types *TypesImpl) RegisterTypeHandler(pb proto.Message, handler common.Typ
 	return nil
 }
 
-func (types *TypesImpl) Hanlde(packet *model.SecureMessage, port common.Port) (proto.Message, error) {
-	pbInstance, err := Types.new(packet.ProtoTypeName)
-	if err != nil {
-		return nil, err
-	}
-	err = proto.Unmarshal(packet.ProtoData, pbInstance)
-	if err != nil {
-		return nil, logs.Error("Unmarshal failed with:", err)
-	}
-	return Types.handle(pbInstance, packet.Action, port)
-}
-
-func (types *TypesImpl) handle(pb proto.Message, action model.Action, port common.Port) (proto.Message, error) {
+func (types *TypesImpl) Handle(pb proto.Message, action model.Action, port common.Port) (proto.Message, error) {
 	tName := reflect.ValueOf(pb).Elem().Type().Name()
 	types.mtx.Lock()
 	h, ok := types.typeName2TypeHandler[tName]

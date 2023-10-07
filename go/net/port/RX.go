@@ -1,9 +1,9 @@
 package port
 
 import (
-	"fmt"
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/net/protocol"
+	"github.com/saichler/my.simple/go/types"
 	"github.com/saichler/my.simple/go/utils/logs"
 )
 
@@ -53,11 +53,22 @@ func (port *PortImpl) notifyRawDataListener() {
 		data := port.rx.Next()
 		// If data is not nil
 		if data != nil {
-			if port.listener != nil {
-				port.listener.DataReceived(data, port)
+			// if there is a dataListener, this is a switch
+			if port.dataListener != nil {
+				port.dataListener.HandleData(data, port)
 			} else {
-				s, _, _ := protocol.HeaderOf(data)
-				fmt.Println(port.Name(), "Received message from", s)
+				msg, err := protocol.MessageOf(data)
+				if err != nil {
+					logs.Error(err)
+					continue
+				}
+				pb, err := protocol.ProtoOf(msg, port.key)
+				if err != nil {
+					logs.Error(err)
+					continue
+				}
+				// Otherwise call the handler per the action & the type
+				types.Types.Handle(pb, msg.Action, port)
 			}
 		}
 	}

@@ -2,6 +2,9 @@ package protocol
 
 import (
 	"github.com/saichler/my.simple/go/net/model"
+	"github.com/saichler/my.simple/go/types"
+	"github.com/saichler/my.simple/go/utils/security"
+	"google.golang.org/protobuf/proto"
 )
 
 func GenerateHeader(msg *model.SecureMessage) []byte {
@@ -29,4 +32,26 @@ func HeaderOf(data []byte) (string, string, model.Priority) {
 	}
 	pri := model.Priority(data[72])
 	return source, string(dest), pri
+}
+
+func MessageOf(data []byte) (*model.SecureMessage, error) {
+	msg := &model.SecureMessage{}
+	err := proto.Unmarshal(data[73:], msg)
+	return msg, err
+}
+
+func ProtoOf(msg *model.SecureMessage, key string) (proto.Message, error) {
+	data, err := security.Decode(msg.ProtoData, key)
+	if err != nil {
+		return nil, err
+	}
+
+	pbi, err := types.Types.New(msg.ProtoTypeName)
+	if err != nil {
+		return nil, err
+	}
+
+	pb := pbi.(proto.Message)
+	err = proto.Unmarshal(data, pb)
+	return pb, err
 }

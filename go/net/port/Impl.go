@@ -31,7 +31,7 @@ type PortImpl struct {
 	// is the port active
 	active bool
 	// The incoming data listener
-	listener common.RawDataListener
+	dataListener common.DatatListener
 	// The local/remote address, depending on if this port is the initiator of the connection
 	addr string
 	//port reconnect info, only valid if the port is the initiating side
@@ -54,7 +54,7 @@ type ReconnectInfo struct {
 }
 
 // Instantiate a new port with a connection
-func NewPortImpl(incomingConnection bool, con net.Conn, key, secret, _uuid string, listener common.RawDataListener) *PortImpl {
+func NewPortImpl(incomingConnection bool, con net.Conn, key, secret, _uuid string, dataListener common.DatatListener) *PortImpl {
 	port := &PortImpl{}
 	port.uuid = _uuid
 	if port.uuid == "" {
@@ -64,7 +64,7 @@ func NewPortImpl(incomingConnection bool, con net.Conn, key, secret, _uuid strin
 	port.active = true
 	port.key = key
 	port.secret = secret
-	port.listener = listener
+	port.dataListener = dataListener
 
 	if incomingConnection {
 		port.addr = con.RemoteAddr().String()
@@ -80,7 +80,7 @@ func NewPortImpl(incomingConnection bool, con net.Conn, key, secret, _uuid strin
 }
 
 // This is the method that the service port is using to connect to the switch for the VM/machine
-func ConnectTo(host, key, secret string, destPort int32, listener common.RawDataListener) (common.Port, error) {
+func ConnectTo(host, key, secret string, destPort int32, datalistener common.DatatListener) (common.Port, error) {
 
 	// Dial the destination and validate the secret and key
 	conn, err := protocol.ConnectToAndValidateSecretAndKey(host, secret, key, destPort)
@@ -89,7 +89,7 @@ func ConnectTo(host, key, secret string, destPort int32, listener common.RawData
 	}
 
 	// Instantiate the port
-	port := NewPortImpl(false, conn, key, secret, "", listener)
+	port := NewPortImpl(false, conn, key, secret, "", datalistener)
 
 	//Below attributes are only for the port initiating the connection
 	port.secret = secret
@@ -147,8 +147,8 @@ func (port *PortImpl) Shutdown() {
 	port.rx.Shutdown()
 	port.tx.Shutdown()
 
-	if port.listener != nil {
-		port.listener.PortShutdown(port)
+	if port.dataListener != nil {
+		port.dataListener.PortShutdown(port)
 	}
 }
 
