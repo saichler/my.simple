@@ -2,6 +2,10 @@ package switching
 
 import (
 	"github.com/saichler/my.simple/go/common"
+	"github.com/saichler/my.simple/go/net/model"
+	"github.com/saichler/my.simple/go/net/protocol"
+	"github.com/saichler/my.simple/go/utils/logs"
+	"google.golang.org/protobuf/proto"
 	"sync"
 )
 
@@ -17,6 +21,31 @@ func newSwitchTable() *SwitchTable {
 	switchTable.internalPorts = make(map[string]common.Port)
 	switchTable.externalPorts = make(map[string]common.Port)
 	return switchTable
+}
+
+func (switchTable *SwitchTable) allPortsList() []common.Port {
+	switchTable.mtx.RLock()
+	defer switchTable.mtx.RUnlock()
+	ports := make([]common.Port, 0)
+	for _, port := range switchTable.internalPorts {
+		ports = append(ports, port)
+	}
+	for _, port := range switchTable.externalPorts {
+		ports = append(ports, port)
+	}
+	return ports
+}
+
+func (switchTable *SwitchTable) broadcast(action model.Action, key string, pb proto.Message) {
+	ports := switchTable.allPortsList()
+	data, err := protocol.CreateMessageFor(model.Priority_P0, action, key, "_b", "_b", pb)
+	if err != nil {
+		logs.Error("Failed to send broadcast:", err)
+		return
+	}
+	for _, port := range ports {
+		port.Send(data)
+	}
 }
 
 func (switchTable *SwitchTable) addPort(port common.Port) {

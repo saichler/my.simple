@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/saichler/my.simple/go/common"
+	"github.com/saichler/my.simple/go/net/model"
 	port2 "github.com/saichler/my.simple/go/net/port"
 	"github.com/saichler/my.simple/go/net/protocol"
+	"github.com/saichler/my.simple/go/services/health"
 	"github.com/saichler/my.simple/go/utils/logs"
+	"google.golang.org/protobuf/proto"
 	"net"
 	"strconv"
 )
@@ -84,6 +87,7 @@ func (switchService *SwitchService) connect(conn net.Conn) {
 	port := port2.NewPortImpl(true, conn, switchService.key, switchService.secret, uuid, switchService)
 	port.Start()
 	switchService.switchTable.addPort(port)
+	switchService.switchTable.broadcast(model.Action_Action_Post, switchService.key, health.CloneHealth())
 }
 
 func (switchService *SwitchService) Shutdown() {
@@ -105,6 +109,10 @@ func (switchService *SwitchService) HandleData(data []byte, port common.Port) {
 		return
 	}
 	p.Send(data)
+}
+
+func (switchService *SwitchService) publish(pb proto.Message) {
+
 }
 
 func (switchService *SwitchService) PortShutdown(port common.Port) {

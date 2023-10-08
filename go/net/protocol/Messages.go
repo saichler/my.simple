@@ -5,7 +5,12 @@ import (
 	"github.com/saichler/my.simple/go/types"
 	"github.com/saichler/my.simple/go/utils/security"
 	"google.golang.org/protobuf/proto"
+	"reflect"
+	"sync/atomic"
 )
+
+// Running sequence number for the messages
+var sequence atomic.Int32
 
 func GenerateHeader(msg *model.SecureMessage) []byte {
 	header := make([]byte, 73)
@@ -54,4 +59,36 @@ func ProtoOf(msg *model.SecureMessage, key string) (proto.Message, error) {
 	pb := pbi.(proto.Message)
 	err = proto.Unmarshal(data, pb)
 	return pb, err
+}
+
+func CreateMessageFor(priority model.Priority, action model.Action, key, source, dest string, pb proto.Message) ([]byte, error) {
+	//first marshal the protobuf into bytes
+	data, err := proto.Marshal(pb)
+	if err != nil {
+		return nil, err
+	}
+	//Encode the data
+	encData, err := security.Encode(data, key)
+	if err != nil {
+		return nil, err
+	}
+	//create the wrapping message for the destination
+	msg := &model.SecureMessage{}
+	msg.Source = source
+	msg.Destination = dest
+	msg.Sequence = sequence.Add(1)
+	msg.Priority = priority
+	msg.ProtoData = encData
+	msg.ProtoTypeName = reflect.ValueOf(pb).Elem().Type().Name()
+	msg.Action = action
+	//Now serialize the message
+	msgData, err := proto.Marshal(msg)
+	if err != nil {
+		return nil, err
+	}
+	//Create the header for the switch
+	header := GenerateHeader(msg)
+	//Append the msgData to the header
+	header = append(header, msgData...)
+	return header, nil
 }

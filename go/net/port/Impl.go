@@ -9,7 +9,6 @@ import (
 	"github.com/saichler/my.simple/go/utils/strng"
 	"net"
 	"sync"
-	"sync/atomic"
 	"time"
 )
 
@@ -36,10 +35,10 @@ type PortImpl struct {
 	addr string
 	//port reconnect info, only valid if the port is the initiating side
 	reconnectInfo *ReconnectInfo
-	// Running sequence number for the messages
-	sequence atomic.Int32
 	// Is this port belongs to the switch
 	isSwitch bool
+	// created at
+	createdAt int64
 }
 
 type ReconnectInfo struct {
@@ -57,6 +56,7 @@ type ReconnectInfo struct {
 func NewPortImpl(incomingConnection bool, con net.Conn, key, secret, _uuid string, dataListener common.DatatListener) *PortImpl {
 	port := &PortImpl{}
 	port.uuid = _uuid
+	port.createdAt = time.Now().Unix()
 	if port.uuid == "" {
 		port.uuid = uuid.New().String()
 	}
@@ -212,4 +212,8 @@ func (port *PortImpl) Name() string {
 	name.Add(port.addr)
 	name.Add("]")
 	return name.String()
+}
+
+func (port *PortImpl) CreatedAt() int64 {
+	return port.createdAt
 }

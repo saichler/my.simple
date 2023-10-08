@@ -6,9 +6,7 @@ import (
 	"github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/net/protocol"
 	"github.com/saichler/my.simple/go/utils/logs"
-	"github.com/saichler/my.simple/go/utils/security"
 	"google.golang.org/protobuf/proto"
-	"reflect"
 )
 
 // loop of Writing data to socket
@@ -54,42 +52,14 @@ func (port *PortImpl) Send(data []byte) error {
 }
 
 // Do is wrapping a protobuf with a secure message and send it to the switch
-func (port *PortImpl) Do(action model.Action, destUuid string, pb proto.Message) error {
-	//first marshal the protobuf into bytes
-	data, err := proto.Marshal(pb)
+func (port *PortImpl) Do(action model.Action, dest string, pb proto.Message) error {
+	// Create message payload
+	data, err := protocol.CreateMessageFor(model.Priority_P0, action, port.key, port.uuid, dest, pb)
 	if err != nil {
+		logs.Error("Failed to create message:", err)
 		return err
 	}
-	//Encode the data
-	encData, err := security.Encode(data, port.key)
-	if err != nil {
-		return err
-	}
-
-	//create the wrapping message for the destination
-	msg := &model.SecureMessage{}
-	msg.Source = port.Uuid()
-	msg.Destination = destUuid
-	msg.Sequence = port.sequence.Add(1)
-	msg.Priority = model.Priority_P0
-	msg.ProtoData = encData
-	msg.ProtoTypeName = reflect.ValueOf(pb).Elem().Type().Name()
-	msg.Action = action
-
-	//Now serialize the message
-	msgData, err := proto.Marshal(msg)
-	if err != nil {
-		return err
-	}
-
-	//Create the header for the switch
-	header := protocol.GenerateHeader(msg)
-
-	//Append the msgData to the header
-	header = append(header, msgData...)
-
 	//Send the secure message to the switch
-	port.Send(header)
-
+	port.Send(data)
 	return nil
 }

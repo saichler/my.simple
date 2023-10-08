@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package health_model;
+
+option java_multiple_files = true;
+option java_outer_classname = "HealthModel";
+option java_package = "com.my.simple.services.health.model";
+option go_package = "github.com/saichler/my.simple/go/services/health/model";
+
+enum HealthStatus {
+  Health_Invalid = 0;
+  Health_Live = 1;
+  Health_Not_Responsive = 2;
+  Health_Evicted = 3;
+}
+
+message HealthCenter {
+  map<string, NodesHealth> nodes = 1;
+  int64 lastReportTime = 2;
+  map<string, NodeServices> services = 3;
+}
+
+message NodeServices {
+  repeated string providers_uuids = 1;
+}
+
+message NodesHealth {
+  string port_uuid = 1;
+  int64 createdAt = 2;
+  HealthStatus status = 3;
+  map<string, bool> services = 4;
+  HealthReport report = 5;
+}
+
+message HealthReport {
+  int64 report_time = 1;
+  int64 memory_usage = 2;
+}

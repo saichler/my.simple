@@ -20,6 +20,7 @@ type Port interface {
 	Name() string
 	Do(model.Action, string, proto.Message) error
 	Shutdown()
+	CreatedAt() int64
 }
 
 type DatatListener interface {
