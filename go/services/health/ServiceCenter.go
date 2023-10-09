@@ -19,7 +19,7 @@ type ServiceCenter struct {
 
 func newServiceCenter() *ServiceCenter {
 	sc := &ServiceCenter{}
-	types.Types.RegisterTypeHandler(&model.ServiceProvider{}, sc)
+	types.RegisterTypeHandler(&model.ServiceProvider{}, sc)
 	return sc
 }
 

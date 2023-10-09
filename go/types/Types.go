@@ -15,7 +15,7 @@ type TypesImpl struct {
 	mtx                  *sync.RWMutex
 }
 
-var Types = newTypes()
+var types = newTypes()
 
 func newTypes() *TypesImpl {
 	types := &TypesImpl{}
@@ -36,7 +36,11 @@ func (types *TypesImpl) registerType(t reflect.Type) error {
 	return nil
 }
 
-func (types *TypesImpl) Type(name string) (reflect.Type, error) {
+func Type(name string) (reflect.Type, error) {
+	return types.typ(name)
+}
+
+func (types *TypesImpl) typ(name string) (reflect.Type, error) {
 	types.mtx.RLock()
 	defer types.mtx.RUnlock()
 	typ, ok := types.typeName2Type[name]
@@ -46,7 +50,15 @@ func (types *TypesImpl) Type(name string) (reflect.Type, error) {
 	return typ, nil
 }
 
-func (types *TypesImpl) New(name string) (interface{}, error) {
+func NewProto(name string) (proto.Message, error) {
+	return types.newProto(name)
+}
+
+func NewInterface(name string) (interface{}, error) {
+	return types.newInterface(name)
+}
+
+func (types *TypesImpl) newInterface(name string) (interface{}, error) {
 	types.mtx.RLock()
 	defer types.mtx.RUnlock()
 	typ, ok := types.typeName2Type[name]
@@ -56,7 +68,7 @@ func (types *TypesImpl) New(name string) (interface{}, error) {
 	return reflect.New(typ).Interface(), nil
 }
 
-func (types *TypesImpl) new(t string) (proto.Message, error) {
+func (types *TypesImpl) newProto(t string) (proto.Message, error) {
 	if t == "" {
 		return nil, logs.Error("Cannot New with blank type")
 	}

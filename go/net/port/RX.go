@@ -68,7 +68,7 @@ func (port *PortImpl) notifyRawDataListener() {
 					continue
 				}
 				// Otherwise call the handler per the action & the type
-				types.Types.Handle(pb, msg.Action, port)
+				types.Handle(pb, msg.Action, port)
 			}
 		}
 	}

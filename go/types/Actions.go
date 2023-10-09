@@ -8,7 +8,11 @@ import (
 	"reflect"
 )
 
-func (types *TypesImpl) RegisterTypeHandler(pb proto.Message, handler common.TypeHandler) error {
+func RegisterTypeHandler(pb proto.Message, handler common.TypeHandler) error {
+	return types.registerTypeHandler(pb, handler)
+}
+
+func (types *TypesImpl) registerTypeHandler(pb proto.Message, handler common.TypeHandler) error {
 	if pb == nil {
 		return logs.Error("Cannot register handler with nil proto")
 	}
@@ -28,7 +32,11 @@ func (types *TypesImpl) RegisterTypeHandler(pb proto.Message, handler common.Typ
 	return nil
 }
 
-func (types *TypesImpl) Handle(pb proto.Message, action model.Action, port common.Port) (proto.Message, error) {
+func Handle(pb proto.Message, action model.Action, port common.Port) (proto.Message, error) {
+	return types.handle(pb, action, port)
+}
+
+func (types *TypesImpl) handle(pb proto.Message, action model.Action, port common.Port) (proto.Message, error) {
 	tName := reflect.ValueOf(pb).Elem().Type().Name()
 	types.mtx.Lock()
 	h, ok := types.typeName2TypeHandler[tName]

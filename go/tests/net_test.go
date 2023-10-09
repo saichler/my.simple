@@ -41,7 +41,7 @@ func (my *MyTestModelHandler) Get(pb proto.Message, port common.Port) (proto.Mes
 
 func TestPortsSwitch(t *testing.T) {
 
-	types.Types.RegisterTypeHandler(&model.MyTestModel{}, &MyTestModelHandler{})
+	types.RegisterTypeHandler(&model.MyTestModel{}, &MyTestModelHandler{})
 
 	sw := switching.NewSwitchService(key, secret, common.NetConfig.DefaultSwitchPort)
 	go sw.Start()

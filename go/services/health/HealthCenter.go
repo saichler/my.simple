@@ -27,28 +27,28 @@ func newHealthCenter() *HealthCenter {
 	hc.health = &model.HealthCenter{}
 	hc.health.Nodes = make(map[string]*model.NodesHealth)
 	hc.health.Providers = make(map[string]*model.ServiceProviders)
-	types.Types.RegisterTypeHandler(hc.health, hc)
+	types.RegisterTypeHandler(hc.health, hc)
 	return hc
 }
 
 func (h *HealthCenter) Post(pb proto.Message, port common.Port) (proto.Message, error) {
-	logs.Info("Health Center Report ", port.Name())
+	logs.Debug("Health Center Report port:", port.Name())
 	other := pb.(*model.HealthCenter)
 	h.mtx.L.Lock()
 	defer h.mtx.L.Unlock()
 
 	h.health.LastReportTime = other.LastReportTime
 	for k, v := range other.Nodes {
-		logs.Info("    ", port.Name(), " -> ", v.PortUuid)
+		logs.Debug("    ", port.Name(), " -> ", v.PortUuid)
 		h.health.Nodes[k] = v
 	}
 	if h.health.Providers == nil {
 		h.health.Providers = make(map[string]*model.ServiceProviders)
 	}
 	for k, v := range other.Providers {
-		logs.Info("    ", k, " -> ")
+		logs.Debug("    ", k, " -> ")
 		for _, uuid := range v.ProvidersUuids {
-			logs.Info("       ", uuid)
+			logs.Debug("       ", uuid)
 		}
 		h.health.Providers[k] = v
 	}

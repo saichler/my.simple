@@ -51,12 +51,11 @@ func ProtoOf(msg *model.SecureMessage, key string) (proto.Message, error) {
 		return nil, err
 	}
 
-	pbi, err := types.Types.New(msg.ProtoTypeName)
+	pb, err := types.NewProto(msg.ProtoTypeName)
 	if err != nil {
 		return nil, err
 	}
 
-	pb := pbi.(proto.Message)
 	err = proto.Unmarshal(data, pb)
 	return pb, err
 }
