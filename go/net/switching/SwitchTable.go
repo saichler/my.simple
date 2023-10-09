@@ -1,9 +1,11 @@
 package switching
 
 import (
+	"fmt"
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/net/protocol"
+	"github.com/saichler/my.simple/go/services/health"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"google.golang.org/protobuf/proto"
 	"sync"
@@ -37,6 +39,7 @@ func (switchTable *SwitchTable) allPortsList() []common.Port {
 }
 
 func (switchTable *SwitchTable) broadcast(action model.Action, key string, pb proto.Message) {
+	fmt.Println("Broadcast")
 	ports := switchTable.allPortsList()
 	data, err := protocol.CreateMessageFor(model.Priority_P0, action, key, "_b", "_b", pb)
 	if err != nil {
@@ -72,6 +75,7 @@ func (switchTable *SwitchTable) addPort(port common.Port) {
 		}
 		switchTable.externalPorts[port.Uuid()] = port
 	}
+	health.AssignService(port.Uuid(), health.Health_Center_Topic)
 }
 
 func (switchTable *SwitchTable) fetchPortByUuid(id string) common.Port {
