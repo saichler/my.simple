@@ -40,7 +40,7 @@ func (port *PortImpl) readFromSocket() {
 			break
 		}
 	}
-	logs.Info("Connection Read for ", port.Name(), " ended.")
+	logs.Debug("Connection Read for ", port.Name(), " ended.")
 	//Just in case, mark the port as shutdown so other thread will stop as well.
 	port.Shutdown()
 }
@@ -72,6 +72,6 @@ func (port *PortImpl) notifyRawDataListener() {
 			}
 		}
 	}
-	logs.Info("notify data listener for ", port.Name(), " Ended")
+	logs.Debug("notify data listener for ", port.Name(), " Ended")
 	port.Shutdown()
 }

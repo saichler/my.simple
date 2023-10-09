@@ -43,7 +43,7 @@ func (h *ServiceCenter) Get(pb proto.Message, port common.Port) (proto.Message, 
 	return nil, nil
 }
 
-func AssignService(uuid, topic string) {
+func AssignServiceTopicToProvider(uuid, topic string) {
 	healthCenter.mtx.L.Lock()
 	defer healthCenter.mtx.L.Unlock()
 
@@ -58,12 +58,21 @@ func AssignService(uuid, topic string) {
 		nodeHealth = &model.NodesHealth{}
 		nodeHealth.CreatedAt = time.Now().Unix()
 		nodeHealth.PortUuid = uuid
-		healthCenter.health.Nodes[uuid] = nodeHealth
 		nodeHealth.Report = &model.HealthReport{}
 		nodeHealth.Services = make(map[string]bool)
+		healthCenter.health.Nodes[uuid] = nodeHealth
 	}
+
 	nodeHealth.Services[topic] = true
 	nodeHealth.Status = model.HealthStatus_Health_Live
+
+	providers, ok := healthCenter.health.Providers[topic]
+	if !ok {
+		providers = &model.ServiceProviders{}
+		providers.ProvidersUuids = make([]string, 0)
+		healthCenter.health.Providers[topic] = providers
+	}
+	providers.ProvidersUuids = append(providers.ProvidersUuids, uuid)
 }
 
 /*

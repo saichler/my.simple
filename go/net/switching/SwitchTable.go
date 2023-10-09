@@ -38,10 +38,10 @@ func (switchTable *SwitchTable) allPortsList() []common.Port {
 	return ports
 }
 
-func (switchTable *SwitchTable) broadcast(action model.Action, key string, pb proto.Message) {
+func (switchTable *SwitchTable) broadcast(topic string, action model.Action, key, switchUuid string, pb proto.Message) {
 	fmt.Println("Broadcast")
 	ports := switchTable.allPortsList()
-	data, err := protocol.CreateMessageFor(model.Priority_P0, action, key, "_b", "_b", pb)
+	data, err := protocol.CreateMessageFor(model.Priority_P0, action, key, switchUuid, topic, pb)
 	if err != nil {
 		logs.Error("Failed to send broadcast:", err)
 		return
@@ -51,7 +51,7 @@ func (switchTable *SwitchTable) broadcast(action model.Action, key string, pb pr
 	}
 }
 
-func (switchTable *SwitchTable) addPort(port common.Port) {
+func (switchTable *SwitchTable) addPort(port common.Port, key, switchUuid string) {
 	switchTable.mtx.Lock()
 	defer switchTable.mtx.Unlock()
 	//check if this port is local to the machine, e.g. not belong to public subnet
@@ -75,7 +75,8 @@ func (switchTable *SwitchTable) addPort(port common.Port) {
 		}
 		switchTable.externalPorts[port.Uuid()] = port
 	}
-	health.AssignService(port.Uuid(), health.Health_Center_Topic)
+	health.AssignServiceTopicToProvider(port.Uuid(), health.Health_Center_Topic)
+	go switchTable.broadcast(health.Health_Center_Topic, model.Action_Action_Post, key, switchUuid, health.CloneHealth())
 }
 
 func (switchTable *SwitchTable) fetchPortByUuid(id string) common.Port {

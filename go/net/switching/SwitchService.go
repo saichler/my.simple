@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/saichler/my.simple/go/common"
-	"github.com/saichler/my.simple/go/net/model"
 	port2 "github.com/saichler/my.simple/go/net/port"
 	"github.com/saichler/my.simple/go/net/protocol"
-	"github.com/saichler/my.simple/go/services/health"
+	"github.com/saichler/my.simple/go/types"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"google.golang.org/protobuf/proto"
 	"net"
@@ -86,8 +85,11 @@ func (switchService *SwitchService) connect(conn net.Conn) {
 	}
 	port := port2.NewPortImpl(true, conn, switchService.key, switchService.secret, uuid, switchService)
 	port.Start()
-	switchService.switchTable.addPort(port)
-	switchService.switchTable.broadcast(model.Action_Action_Post, switchService.key, health.CloneHealth())
+	switchService.notifyNewPort(port)
+}
+
+func (switchService *SwitchService) notifyNewPort(port common.Port) {
+	go switchService.switchTable.addPort(port, switchService.key, switchService.uuid)
 }
 
 func (switchService *SwitchService) Shutdown() {
@@ -119,4 +121,17 @@ func (switchService *SwitchService) PortShutdown(port common.Port) {
 }
 
 func (switchService *SwitchService) switchDataReceived(data []byte, port common.Port) {
+	msg, err := protocol.MessageOf(data)
+	if err != nil {
+		logs.Error(err)
+		return
+	}
+	pb, err := protocol.ProtoOf(msg, switchService.key)
+	if err != nil {
+		logs.Error(err)
+		return
+	}
+	// Otherwise call the handler per the action & the type
+	types.Types.Handle(pb, msg.Action, port)
+
 }

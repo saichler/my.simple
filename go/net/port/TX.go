@@ -35,7 +35,7 @@ func (port *PortImpl) writeToSocket() {
 			break
 		}
 	}
-	logs.Info("Connection Write for ", port.Name(), " ended.")
+	logs.Debug("Connection Write for ", port.Name(), " ended.")
 	port.Shutdown()
 }
 

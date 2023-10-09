@@ -11,7 +11,7 @@ func CloneHealth() *model.HealthCenter {
 	clone := &model.HealthCenter{}
 	clone.LastReportTime = time.Now().Unix()
 	clone.Nodes = cloneNodesHealthMap()
-	clone.Services = cloneServicesMap()
+	clone.Providers = cloneProvidersMap()
 	return clone
 }
 
@@ -36,18 +36,18 @@ func cloneNodesHealth(nh *model.NodesHealth) *model.NodesHealth {
 	return clone
 }
 
-func cloneServicesMap() map[string]*model.NodeServices {
-	cloneMap := make(map[string]*model.NodeServices)
-	if healthCenter.health.Services != nil {
-		for k, v := range healthCenter.health.Services {
-			cloneMap[k] = cloneNodeServices(v)
+func cloneProvidersMap() map[string]*model.ServiceProviders {
+	cloneMap := make(map[string]*model.ServiceProviders)
+	if healthCenter.health.Providers != nil {
+		for k, v := range healthCenter.health.Providers {
+			cloneMap[k] = cloneServiceProviders(v)
 		}
 	}
 	return cloneMap
 }
 
-func cloneNodeServices(ns *model.NodeServices) *model.NodeServices {
-	clone := &model.NodeServices{}
+func cloneServiceProviders(ns *model.ServiceProviders) *model.ServiceProviders {
+	clone := &model.ServiceProviders{}
 	clone.ProvidersUuids = make([]string, 0)
 	for _, v := range ns.ProvidersUuids {
 		clone.ProvidersUuids = append(clone.ProvidersUuids, v)

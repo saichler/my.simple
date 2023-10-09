@@ -109,7 +109,6 @@ func ConnectTo(host, key, secret string, destPort int32, datalistener common.Dat
 	//We have only one go routing per each because we want to keep the order of incoming and outgoing messages
 
 	port.Start()
-
 	return port, nil
 }
 
@@ -165,7 +164,7 @@ func (port *PortImpl) attemptToReconnect() {
 	}
 	for {
 		time.Sleep(time.Second * 5)
-		logs.Info("Connection issues, trying to reconnect to switch")
+		logs.Warning("Connection issues, trying to reconnect to switch")
 
 		err := port.reconnect()
 		if err == nil {

@@ -2,6 +2,7 @@ package health
 
 import (
 	"github.com/saichler/my.simple/go/common"
+	model2 "github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/services/health/model"
 	"github.com/saichler/my.simple/go/types"
 	"github.com/saichler/my.simple/go/utils/logs"
@@ -25,7 +26,7 @@ func newHealthCenter() *HealthCenter {
 	hc.mtx = sync.NewCond(&sync.Mutex{})
 	hc.health = &model.HealthCenter{}
 	hc.health.Nodes = make(map[string]*model.NodesHealth)
-	hc.health.Services = make(map[string]*model.NodeServices)
+	hc.health.Providers = make(map[string]*model.ServiceProviders)
 	types.Types.RegisterTypeHandler(hc.health, hc)
 	return hc
 }
@@ -38,7 +39,18 @@ func (h *HealthCenter) Post(pb proto.Message, port common.Port) (proto.Message, 
 
 	h.health.LastReportTime = other.LastReportTime
 	for k, v := range other.Nodes {
+		logs.Info("    ", port.Name(), " -> ", v.PortUuid)
 		h.health.Nodes[k] = v
+	}
+	if h.health.Providers == nil {
+		h.health.Providers = make(map[string]*model.ServiceProviders)
+	}
+	for k, v := range other.Providers {
+		logs.Info("    ", k, " -> ")
+		for _, uuid := range v.ProvidersUuids {
+			logs.Info("       ", uuid)
+		}
+		h.health.Providers[k] = v
 	}
 	return nil, nil
 }
@@ -56,5 +68,7 @@ func (h *HealthCenter) Delete(pb proto.Message, port common.Port) (proto.Message
 }
 
 func (h *HealthCenter) Get(pb proto.Message, port common.Port) (proto.Message, error) {
+	health := CloneHealth()
+	port.Do(model2.Action_Action_Post, port.Uuid(), health)
 	return nil, nil
 }

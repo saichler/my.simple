@@ -17,10 +17,10 @@ enum HealthStatus {
 message HealthCenter {
   map<string, NodesHealth> nodes = 1;
   int64 lastReportTime = 2;
-  map<string, NodeServices> services = 3;
+  map<string, ServiceProviders> providers = 3;
 }
 
-message NodeServices {
+message ServiceProviders {
   repeated string providers_uuids = 1;
 }
 
