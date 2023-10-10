@@ -7,6 +7,7 @@ import (
 	"github.com/saichler/my.simple/go/types"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"google.golang.org/protobuf/proto"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -83,4 +84,14 @@ func AddPort(port common.Port) {
 		p.CreatedAt = time.Now().Unix()
 		healthCenter.health.Ports[port.Uuid()] = p
 	}
+}
+
+func CreateReport(portUuid string, stat model.HealthStatus) *model.Report {
+	report := &model.Report{}
+	report.PortUuid = portUuid
+	report.ReportTime = time.Now().Unix()
+	report.Status = stat
+	mem := &runtime.MemStats{}
+	report.MemoryUsage = mem.TotalAlloc - mem.Frees
+	return report
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/saichler/my.simple/go/common"
 	port2 "github.com/saichler/my.simple/go/net/port"
 	"github.com/saichler/my.simple/go/net/protocol"
+	"github.com/saichler/my.simple/go/services/health"
 	"github.com/saichler/my.simple/go/types"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"google.golang.org/protobuf/proto"
@@ -100,17 +101,34 @@ func (switchService *SwitchService) Shutdown() {
 func (switchService *SwitchService) HandleData(data []byte, port common.Port) {
 	source, destination, pri := protocol.HeaderOf(data)
 	fmt.Println(source, destination, pri.String())
+	//The destination is the switch
 	if destination == switchService.uuid {
 		switchService.switchDataReceived(data, port)
 		return
 	}
 
+	uuidList := health.ServiceUuids(destination)
+	if uuidList != nil {
+		switchService.sendToPorts(uuidList, data)
+		return
+	}
+
+	//The destination is a single port
 	p := switchService.switchTable.fetchPortByUuid(destination)
 	if p == nil {
 		logs.Error("Cannot find destination port for ", destination)
 		return
 	}
 	p.Send(data)
+}
+
+func (switchService *SwitchService) sendToPorts(uuids []string, data []byte) {
+	for _, uuid := range uuids {
+		port := switchService.switchTable.fetchPortByUuid(uuid)
+		if port != nil {
+			port.Send(data)
+		}
+	}
 }
 
 func (switchService *SwitchService) publish(pb proto.Message) {

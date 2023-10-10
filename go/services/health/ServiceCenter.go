@@ -4,6 +4,7 @@ import (
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/services/health/model"
 	"github.com/saichler/my.simple/go/types"
+	"github.com/saichler/my.simple/go/utils/logs"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -23,6 +24,11 @@ func newServiceCenter() *ServiceCenter {
 }
 
 func (h *ServiceCenter) Post(pb proto.Message, port common.Port) (proto.Message, error) {
+	report := pb.(*model.Report)
+	healthCenter.mtx.L.Lock()
+	defer healthCenter.mtx.L.Unlock()
+	logs.Debug("Received report from ", report.PortUuid)
+	healthCenter.health.Reports[report.PortUuid] = report
 	return nil, nil
 }
 
@@ -42,7 +48,7 @@ func (h *ServiceCenter) Get(pb proto.Message, port common.Port) (proto.Message, 
 	return nil, nil
 }
 
-func AssignServiceTopicToProvider(uuid, topic string) {
+func AddService(topic, uuid string) {
 	healthCenter.mtx.L.Lock()
 	defer healthCenter.mtx.L.Unlock()
 	var port *model.Port
@@ -61,4 +67,18 @@ func AssignServiceTopicToProvider(uuid, topic string) {
 		}
 		service.PortUuids = append(service.PortUuids, uuid)
 	}
+}
+
+func ServiceUuids(topic string) []string {
+	healthCenter.mtx.L.Lock()
+	defer healthCenter.mtx.L.Unlock()
+	uuids := healthCenter.health.Services[topic]
+	if uuids == nil {
+		return nil
+	}
+	result := make([]string, len(uuids.PortUuids))
+	for i, v := range uuids.PortUuids {
+		result[i] = v
+	}
+	return result
 }

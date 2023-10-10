@@ -3,7 +3,10 @@ package port
 import (
 	"github.com/google/uuid"
 	"github.com/saichler/my.simple/go/common"
+	model2 "github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/net/protocol"
+	"github.com/saichler/my.simple/go/services/health"
+	"github.com/saichler/my.simple/go/services/health/model"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"github.com/saichler/my.simple/go/utils/queues"
 	"github.com/saichler/my.simple/go/utils/strng"
@@ -119,6 +122,8 @@ func (port *PortImpl) Start() {
 	go port.writeToSocket()
 	// Start loop notifying the raw data listener on new incoming data
 	go port.notifyRawDataListener()
+
+	go port.reportHealthStatus()
 	logs.Info(port.Name(), "Started!")
 }
 
@@ -215,4 +220,12 @@ func (port *PortImpl) Name() string {
 
 func (port *PortImpl) CreatedAt() int64 {
 	return port.createdAt
+}
+
+func (port *PortImpl) reportHealthStatus() {
+	for port.active {
+		time.Sleep(time.Second * 5)
+		report := health.CreateReport(port.uuid, model.HealthStatus_Health_Live)
+		port.Do(model2.Action_Action_Post, health.Health_Center_Topic, report)
+	}
 }
