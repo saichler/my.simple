@@ -5,7 +5,6 @@ import (
 	"github.com/saichler/my.simple/go/services/health/model"
 	"github.com/saichler/my.simple/go/types"
 	"google.golang.org/protobuf/proto"
-	"time"
 )
 
 var serviceCenter = newServiceCenter()
@@ -19,7 +18,7 @@ type ServiceCenter struct {
 
 func newServiceCenter() *ServiceCenter {
 	sc := &ServiceCenter{}
-	types.RegisterTypeHandler(&model.ServiceProvider{}, sc)
+	types.RegisterTypeHandler(&model.Report{}, sc)
 	return sc
 }
 
@@ -46,45 +45,20 @@ func (h *ServiceCenter) Get(pb proto.Message, port common.Port) (proto.Message, 
 func AssignServiceTopicToProvider(uuid, topic string) {
 	healthCenter.mtx.L.Lock()
 	defer healthCenter.mtx.L.Unlock()
-
-	var nodeHealth *model.NodesHealth
-	for uid, nh := range healthCenter.health.Nodes {
+	var port *model.Port
+	for uid, p := range healthCenter.health.Ports {
 		if uid == uuid {
-			nodeHealth = nh
+			port = p
 			break
 		}
 	}
-	if nodeHealth == nil {
-		nodeHealth = &model.NodesHealth{}
-		nodeHealth.CreatedAt = time.Now().Unix()
-		nodeHealth.PortUuid = uuid
-		nodeHealth.Report = &model.HealthReport{}
-		nodeHealth.Services = make(map[string]bool)
-		healthCenter.health.Nodes[uuid] = nodeHealth
+	if port != nil {
+		service, ok := healthCenter.health.Services[topic]
+		if !ok {
+			service = &model.Service{}
+			service.PortUuids = make([]string, 0)
+			healthCenter.health.Services[topic] = service
+		}
+		service.PortUuids = append(service.PortUuids, uuid)
 	}
-
-	nodeHealth.Services[topic] = true
-	nodeHealth.Status = model.HealthStatus_Health_Live
-
-	providers, ok := healthCenter.health.Providers[topic]
-	if !ok {
-		providers = &model.ServiceProviders{}
-		providers.ProvidersUuids = make([]string, 0)
-		healthCenter.health.Providers[topic] = providers
-	}
-	providers.ProvidersUuids = append(providers.ProvidersUuids, uuid)
 }
-
-/*
-func (h *ServiceCenter) service(serviceTopic string) string {
-	ServiceCenter.mtx.L.Lock()
-	defer ServiceCenter.mtx.L.Unlock()
-	providers := h.health.Services[serviceTopic]
-	if providers == nil {
-		return ""
-	}
-	if providers.ProvidersUuids == nil || len(providers.ProvidersUuids) == 0 {
-		return ""
-	}
-	return providers.ProvidersUuids[0]
-}*/

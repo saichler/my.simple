@@ -75,6 +75,7 @@ func (switchTable *SwitchTable) addPort(port common.Port, key, switchUuid string
 		}
 		switchTable.externalPorts[port.Uuid()] = port
 	}
+	health.AddPort(port)
 	health.AssignServiceTopicToProvider(port.Uuid(), health.Health_Center_Topic)
 	go switchTable.broadcast(health.Health_Center_Topic, model.Action_Action_Post, key, switchUuid, health.CloneHealth())
 }

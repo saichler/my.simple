@@ -8,6 +8,7 @@ import (
 	"github.com/saichler/my.simple/go/utils/logs"
 	"google.golang.org/protobuf/proto"
 	"sync"
+	"time"
 )
 
 type HealthCenter struct {
@@ -25,8 +26,9 @@ func newHealthCenter() *HealthCenter {
 	hc := &HealthCenter{}
 	hc.mtx = sync.NewCond(&sync.Mutex{})
 	hc.health = &model.HealthCenter{}
-	hc.health.Nodes = make(map[string]*model.NodesHealth)
-	hc.health.Providers = make(map[string]*model.ServiceProviders)
+	hc.health.Ports = make(map[string]*model.Port)
+	hc.health.Services = make(map[string]*model.Service)
+	hc.health.Reports = make(map[string]*model.Report)
 	types.RegisterTypeHandler(hc.health, hc)
 	return hc
 }
@@ -37,20 +39,20 @@ func (h *HealthCenter) Post(pb proto.Message, port common.Port) (proto.Message, 
 	h.mtx.L.Lock()
 	defer h.mtx.L.Unlock()
 
-	h.health.LastReportTime = other.LastReportTime
-	for k, v := range other.Nodes {
-		logs.Debug("    ", port.Name(), " -> ", v.PortUuid)
-		h.health.Nodes[k] = v
+	for k, v := range other.Ports {
+		logs.Debug("     Port:", k, " -> ", v.PortUuid)
+		h.health.Ports[k] = v
 	}
-	if h.health.Providers == nil {
-		h.health.Providers = make(map[string]*model.ServiceProviders)
-	}
-	for k, v := range other.Providers {
-		logs.Debug("    ", k, " -> ")
-		for _, uuid := range v.ProvidersUuids {
+	for k, v := range other.Services {
+		logs.Debug("     Service:", k, " -> ")
+		for _, uuid := range v.PortUuids {
 			logs.Debug("       ", uuid)
 		}
-		h.health.Providers[k] = v
+		h.health.Services[k] = v
+	}
+	for k, v := range other.Reports {
+		logs.Debug("      Reports:", k, " ->", v.PortUuid)
+		h.health.Reports[k] = v
 	}
 	return nil, nil
 }
@@ -71,4 +73,14 @@ func (h *HealthCenter) Get(pb proto.Message, port common.Port) (proto.Message, e
 	health := CloneHealth()
 	port.Do(model2.Action_Action_Post, port.Uuid(), health)
 	return nil, nil
+}
+
+func AddPort(port common.Port) {
+	p, ok := healthCenter.health.Ports[port.Uuid()]
+	if !ok {
+		p = &model.Port{}
+		p.PortUuid = port.Uuid()
+		p.CreatedAt = time.Now().Unix()
+		healthCenter.health.Ports[port.Uuid()] = p
+	}
 }

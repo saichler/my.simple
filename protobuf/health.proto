@@ -15,29 +15,23 @@ enum HealthStatus {
 }
 
 message HealthCenter {
-  map<string, NodesHealth> nodes = 1;
-  int64 lastReportTime = 2;
-  map<string, ServiceProviders> providers = 3;
+  map<string, Port> ports = 1;
+  map<string, Service> services = 2;
+  map<string, Report> reports = 3;
 }
 
-message ServiceProviders {
-  repeated string providers_uuids = 1;
+message Service {
+  repeated string port_uuids = 1;
 }
 
-message NodesHealth {
+message  Port {
   string port_uuid = 1;
   int64 createdAt = 2;
+}
+
+message Report {
+  string port_uuid = 1;
+  int64 report_time = 2;
   HealthStatus status = 3;
-  map<string, bool> services = 4;
-  HealthReport report = 5;
-}
-
-message HealthReport {
-  int64 report_time = 1;
-  uint64 memory_usage = 2;
-}
-
-message ServiceProvider {
-  string topic = 1;
-  string providerUuid = 2;
+  uint64 memory_usage = 4;
 }
