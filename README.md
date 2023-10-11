@@ -1,12 +1,35 @@
-# my.simple
-Simple, Maintainable solutions to everyday software development challenges
-Let's make it simple... K8s, microservices, cloud, security, networking, high availability, quality & maintainability. Software engineers tent to complex things, over engineering is an epic pandemic & companies spend, who knows how many trillions of $, money on continuesly re-inventint the wheel of infra structure and maintaining it. In a nutshell, money is mostly spent on the "How?" that has beeen done before. my.simple is just a set of components that is designed to extremely simplify Horizontal Scaling, High Availability, Security & common challenges when building an application using kubernetes, VMs or even baremetal with the concept of Simple, Secure & Maintainable as a top priority so the money will be spent where it should.
+# my.simple - Simplifying Microservices & Kubernetes Deve
+**Stateless/Stateful, Active/Active, Active/Passive, Security, High Availability, Horizontal Scaling, API, Kubernetes, Microservices.** All those big words usually popup during planning of a distributed application... 
+**The problem starts during implementation!** 
 
-## Let's start with some basic infra utilities...
+Over-engineering, Over-complexity & trying to re-use & push past, bloated, code of a single process application into a container is an **epic scale pandemic**, 
+causing companies and the industry to spend trillions of $, re-inventing a **complex, money pit & unmaintainable "wheels"** that should have been simple...
 
-### [The strgs (strings) package](https://github.com/saichler/my.simple/tree/main/go/utils/strng)
-Efficient string concatenation & type included ToString & From String methods to enable instance->string->instance seamless conversions.
+### So let's do that properly & Make It Simple... ### 
+Join in this step-by-step journey of building an example application using **my.simple** infra. There is a lot... Will cover the **"What?s"** and deep dive to **my.simple "How?s"**, that will save you a huge amount of effort, time & money and allow you to concentrate on what really matters... **Your business.**  
 
-### [The queues package](https://github.com/saichler/my.simple/tree/main/go/utils/queues)
-Efficient queues in a multiple go routine (thread) environment. Built to be fast and serve the Process 2 Process communication messaging system.
+## Example Applications ##
+There are two nerratives we need to cover, stateless application & statefull applications. 
+Will develop both, following the thumb rules for each one and how its challenges are solved within **my.simple**. 
 
+### We will start with basic, very common, Infra
+* [String conversions & concatenation](https://github.com/saichler/my.simple/tree/main/go/utils/strng)
+* Loggin
+* [Blocking Queues](https://github.com/saichler/my.simple/tree/main/go/utils/queues)
+* Encrypt/Decrypt data
+
+### We will continue with
+* Protobuf Actions & Types
+* Microservices Secure Networking
+* Stateles Services
+
+### Pluggable Data Stores & ORM
+* Pluggable ORM & Data storing
+
+### Stateful Services
+* Leader/Follower elections
+* Cache Sync
+* Stateful distributed Transactions
+
+### Maintainability
+* Automation & Regression Testing
