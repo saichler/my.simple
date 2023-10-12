@@ -14,9 +14,11 @@ Will develop both, following the thumb rules for each one and how its challenges
 
 ### We will start with basic, very common, Infra
 * [String conversions & concatenation](https://github.com/saichler/my.simple/tree/main/go/utils/strng)
-* Loggin
-* [Blocking Queues](https://github.com/saichler/my.simple/tree/main/go/utils/queues)
-* Encrypt/Decrypt data
+* [Logs & Logging](https://github.com/saichler/my.simple/tree/main/go/utils/logs)
+* [Blocking Sync Queues](https://github.com/saichler/my.simple/tree/main/go/utils/queues)
+* [Sync Maps](https://github.com/saichler/my.simple/tree/main/go/utils/maps)
+* [Struct Type Registry](https://github.com/saichler/my.simple/tree/main/go/utils/registry)
+* [Encrypt/Decrypt data](https://github.com/saichler/my.simple/tree/main/go/utils/security)
 
 ### We will continue with
 * Protobuf Actions & Types

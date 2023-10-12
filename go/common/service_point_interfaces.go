@@ -2,7 +2,7 @@ package common
 
 import "google.golang.org/protobuf/proto"
 
-type TypeHandler interface {
+type ServicePointHandler interface {
 	Post(proto.Message, Port) (proto.Message, error)
 	Put(proto.Message, Port) (proto.Message, error)
 	Patch(proto.Message, Port) (proto.Message, error)

@@ -1,46 +1,43 @@
-package types
+package service_point
 
 import (
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/utils/logs"
+	"github.com/saichler/my.simple/go/utils/maps"
+	"github.com/saichler/my.simple/go/utils/registry"
 	"google.golang.org/protobuf/proto"
 	"reflect"
 )
 
-func RegisterTypeHandler(pb proto.Message, handler common.TypeHandler) error {
-	return types.registerTypeHandler(pb, handler)
+type ServicePoints struct {
+	structName2ServicePoint *maps.String2ServicePointMap
 }
 
-func (types *TypesImpl) registerTypeHandler(pb proto.Message, handler common.TypeHandler) error {
+var servicePoints = newServicePoints()
+
+func newServicePoints() *ServicePoints {
+	sp := &ServicePoints{}
+	sp.structName2ServicePoint = maps.NewString2ServicePointMap()
+	return sp
+}
+
+func RegisterServicePoint(pb proto.Message, handler common.ServicePointHandler) error {
 	if pb == nil {
-		return logs.Error("Cannot register handler with nil proto")
+		return logs.Error("cannot register handler with nil proto")
 	}
-	t := reflect.ValueOf(pb).Elem().Type()
+	typ := reflect.ValueOf(pb).Elem().Type()
 	if handler == nil {
-		return logs.Error("Cannot register nil handler for type ", t.Name())
+		return logs.Error("cannot register nil handler for type ", typ.Name())
 	}
-
-	err := types.registerType(common.TypeOf(pb))
-	if err != nil {
-		return err
-	}
-
-	types.mtx.Lock()
-	defer types.mtx.Unlock()
-	types.typeName2TypeHandler[t.Name()] = handler
+	registry.RegisterStructType(typ)
+	servicePoints.structName2ServicePoint.Put(typ.Name(), handler)
 	return nil
 }
 
 func Handle(pb proto.Message, action model.Action, port common.Port) (proto.Message, error) {
-	return types.handle(pb, action, port)
-}
-
-func (types *TypesImpl) handle(pb proto.Message, action model.Action, port common.Port) (proto.Message, error) {
 	tName := reflect.ValueOf(pb).Elem().Type().Name()
-	types.mtx.Lock()
-	h, ok := types.typeName2TypeHandler[tName]
-	types.mtx.Unlock()
+	h, ok := servicePoints.structName2ServicePoint.Get(tName)
 	if !ok {
 		return nil, logs.Error("Cannot find handler for type ", tName)
 	}

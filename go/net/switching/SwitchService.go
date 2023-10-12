@@ -8,7 +8,7 @@ import (
 	port2 "github.com/saichler/my.simple/go/net/port"
 	"github.com/saichler/my.simple/go/net/protocol"
 	"github.com/saichler/my.simple/go/services/health"
-	"github.com/saichler/my.simple/go/types"
+	"github.com/saichler/my.simple/go/services/service_point"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"google.golang.org/protobuf/proto"
 	"net"
@@ -150,6 +150,6 @@ func (switchService *SwitchService) switchDataReceived(data []byte, port common.
 		return
 	}
 	// Otherwise call the handler per the action & the type
-	types.Handle(pb, msg.Action, port)
+	service_point.Handle(pb, msg.Action, port)
 
 }

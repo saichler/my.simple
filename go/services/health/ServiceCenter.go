@@ -3,7 +3,7 @@ package health
 import (
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/services/health/model"
-	"github.com/saichler/my.simple/go/types"
+	"github.com/saichler/my.simple/go/services/service_point"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"google.golang.org/protobuf/proto"
 )
@@ -19,7 +19,7 @@ type ServiceCenter struct {
 
 func newServiceCenter() *ServiceCenter {
 	sc := &ServiceCenter{}
-	types.RegisterTypeHandler(&model.Report{}, sc)
+	service_point.RegisterServicePoint(&model.Report{}, sc)
 	return sc
 }
 

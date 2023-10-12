@@ -2,7 +2,7 @@ package protocol
 
 import (
 	"github.com/saichler/my.simple/go/net/model"
-	"github.com/saichler/my.simple/go/types"
+	"github.com/saichler/my.simple/go/utils/registry"
 	"github.com/saichler/my.simple/go/utils/security"
 	"google.golang.org/protobuf/proto"
 	"reflect"
@@ -51,7 +51,7 @@ func ProtoOf(msg *model.SecureMessage, key string) (proto.Message, error) {
 		return nil, err
 	}
 
-	pb, err := types.NewProto(msg.ProtoTypeName)
+	pb, err := registry.NewProtobufInstance(msg.ProtoTypeName)
 	if err != nil {
 		return nil, err
 	}

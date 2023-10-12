@@ -6,8 +6,8 @@ import (
 	model2 "github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/net/port"
 	"github.com/saichler/my.simple/go/net/switching"
+	"github.com/saichler/my.simple/go/services/service_point"
 	"github.com/saichler/my.simple/go/tests/model"
-	"github.com/saichler/my.simple/go/types"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"github.com/saichler/my.simple/go/utils/security"
 	"google.golang.org/protobuf/proto"
@@ -41,7 +41,7 @@ func (my *MyTestModelHandler) Get(pb proto.Message, port common.Port) (proto.Mes
 
 func TestPortsSwitch(t *testing.T) {
 
-	types.RegisterTypeHandler(&model.MyTestModel{}, &MyTestModelHandler{})
+	service_point.RegisterServicePoint(&model.MyTestModel{}, &MyTestModelHandler{})
 
 	sw := switching.NewSwitchService(key, secret, common.NetConfig.DefaultSwitchPort)
 	go sw.Start()

@@ -4,7 +4,7 @@ import (
 	"github.com/saichler/my.simple/go/common"
 	model2 "github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/services/health/model"
-	"github.com/saichler/my.simple/go/types"
+	"github.com/saichler/my.simple/go/services/service_point"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"google.golang.org/protobuf/proto"
 	"runtime"
@@ -30,7 +30,7 @@ func newHealthCenter() *HealthCenter {
 	hc.health.Ports = make(map[string]*model.Port)
 	hc.health.Services = make(map[string]*model.Service)
 	hc.health.Reports = make(map[string]*model.Report)
-	types.RegisterTypeHandler(hc.health, hc)
+	service_point.RegisterServicePoint(hc.health, hc)
 	return hc
 }
 
