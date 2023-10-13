@@ -34,10 +34,10 @@ func (switchTable *SwitchTable) allPortsList() []common.Port {
 	return ports
 }
 
-func (switchTable *SwitchTable) broadcast(topic string, action model.Action, key, switchUuid string, pb proto.Message) {
+func (switchTable *SwitchTable) broadcast(topic string, action model.Action, switchUuid string, pb proto.Message) {
 	fmt.Println("Broadcast")
 	ports := switchTable.allPortsList()
-	data, err := protocol.CreateMessageFor(model.Priority_P0, action, key, switchUuid, topic, pb)
+	data, err := protocol.CreateMessageFor(model.Priority_P0, action, switchUuid, topic, pb)
 	if err != nil {
 		logs.Error("Failed to send broadcast:", err)
 		return
@@ -47,7 +47,7 @@ func (switchTable *SwitchTable) broadcast(topic string, action model.Action, key
 	}
 }
 
-func (switchTable *SwitchTable) addPort(port common.Port, key, switchUuid string) {
+func (switchTable *SwitchTable) addPort(port common.Port, switchUuid string) {
 	//check if this port is local to the machine, e.g. not belong to public subnet
 	isLocal := ipSegment.isLocal(port.Addr())
 	// If it is local, add it to the internal map
@@ -71,7 +71,7 @@ func (switchTable *SwitchTable) addPort(port common.Port, key, switchUuid string
 	}
 	health.AddPort(port)
 	health.AddService(health.Health_Center_Topic, port.Uuid())
-	go switchTable.broadcast(health.Health_Center_Topic, model.Action_Action_Post, key, switchUuid, health.CloneHealth())
+	go switchTable.broadcast(health.Health_Center_Topic, model.Action_Action_Post, switchUuid, health.CloneHealth())
 }
 
 func (switchTable *SwitchTable) fetchPortByUuid(id string) common.Port {

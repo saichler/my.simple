@@ -18,7 +18,7 @@ Will develop both, following the thumb rules for each one and how its challenges
 * [Blocking Sync Queues](https://github.com/saichler/my.simple/tree/main/go/utils/queues)
 * [Sync Maps](https://github.com/saichler/my.simple/tree/main/go/utils/maps)
 * [Struct Type Registry](https://github.com/saichler/my.simple/tree/main/go/utils/registry)
-* [Encrypt/Decrypt data](https://github.com/saichler/my.simple/tree/main/go/utils/security)
+* [Security](https://github.com/saichler/my.simple/tree/main/go/security)
 
 ### We will continue with
 * Protobuf Actions & Types

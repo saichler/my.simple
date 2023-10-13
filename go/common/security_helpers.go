@@ -1,4 +1,4 @@
-package security
+package common
 
 import (
 	"crypto/aes"
@@ -22,7 +22,7 @@ func GenerateAES256Key() string {
 	return string(key)
 }
 
-func Encode(dataToEncode []byte, key string) (string, error) {
+func Encrypt(dataToEncode []byte, key string) (string, error) {
 	k := []byte(key)
 	block, err := aes.NewCipher(k)
 	if err != nil {
@@ -43,7 +43,7 @@ func Encode(dataToEncode []byte, key string) (string, error) {
 	return base64.StdEncoding.EncodeToString(cipherdata), nil
 }
 
-func Decode(stringToDecode, key string) ([]byte, error) {
+func Decrypt(stringToDecode, key string) ([]byte, error) {
 	encData, err := base64.StdEncoding.DecodeString(stringToDecode)
 	if err != nil {
 		return nil, err

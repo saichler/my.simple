@@ -1,9 +1,9 @@
 package protocol
 
 import (
+	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/utils/registry"
-	"github.com/saichler/my.simple/go/utils/security"
 	"google.golang.org/protobuf/proto"
 	"reflect"
 	"sync/atomic"
@@ -45,8 +45,8 @@ func MessageOf(data []byte) (*model.SecureMessage, error) {
 	return msg, err
 }
 
-func ProtoOf(msg *model.SecureMessage, key string) (proto.Message, error) {
-	data, err := security.Decode(msg.ProtoData, key)
+func ProtoOf(msg *model.SecureMessage) (proto.Message, error) {
+	data, err := common.MySecurityProvider.Decrypt(msg.ProtoData)
 	if err != nil {
 		return nil, err
 	}
@@ -60,14 +60,14 @@ func ProtoOf(msg *model.SecureMessage, key string) (proto.Message, error) {
 	return pb, err
 }
 
-func CreateMessageFor(priority model.Priority, action model.Action, key, source, dest string, pb proto.Message) ([]byte, error) {
+func CreateMessageFor(priority model.Priority, action model.Action, source, dest string, pb proto.Message) ([]byte, error) {
 	//first marshal the protobuf into bytes
 	data, err := proto.Marshal(pb)
 	if err != nil {
 		return nil, err
 	}
 	//Encode the data
-	encData, err := security.Encode(data, key)
+	encData, err := common.MySecurityProvider.Encrypt(data)
 	if err != nil {
 		return nil, err
 	}

@@ -16,9 +16,8 @@ func (port *PortImpl) readFromSocket() {
 
 		//If therer is an error
 		if err != nil {
-			// If the secret is not blank, it means that this port is
-			// initating the connection, so try to reconnect
-			if port.secret != "" {
+			// If this is not a port from the switch side
+			if !port.isSwitch {
 				// Attempt to reconnect
 				port.attemptToReconnect()
 				// And try to read the data again
@@ -62,7 +61,7 @@ func (port *PortImpl) notifyRawDataListener() {
 					logs.Error(err)
 					continue
 				}
-				pb, err := protocol.ProtoOf(msg, port.key)
+				pb, err := protocol.ProtoOf(msg)
 				if err != nil {
 					logs.Error(err)
 					continue

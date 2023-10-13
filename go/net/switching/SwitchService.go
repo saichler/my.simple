@@ -18,18 +18,14 @@ import (
 type SwitchService struct {
 	uuid        string
 	port        int32
-	key         string
-	secret      string
 	socket      net.Listener
 	active      bool
 	switchTable *SwitchTable
 }
 
-func NewSwitchService(key, secret string, port int32) *SwitchService {
+func NewSwitchService(port int32) *SwitchService {
 	switchService := &SwitchService{}
 	switchService.uuid = uuid.New().String()
-	switchService.key = key
-	switchService.secret = secret
 	switchService.port = port
 	switchService.switchTable = newSwitchTable()
 	switchService.active = true
@@ -39,12 +35,6 @@ func NewSwitchService(key, secret string, port int32) *SwitchService {
 func (switchService *SwitchService) Start() error {
 	if switchService.port == 0 {
 		return errors.New("Switch Port does not have a port defined")
-	}
-	if switchService.secret == "" {
-		return errors.New("Switch Port does not have a secret")
-	}
-	if switchService.key == "" {
-		return errors.New("Switch Port does not have a key")
 	}
 
 	err := switchService.bind()
@@ -79,18 +69,18 @@ func (switchService *SwitchService) bind() error {
 }
 
 func (switchService *SwitchService) connect(conn net.Conn) {
-	uuid, err := protocol.Incoming(conn, switchService.key, switchService.secret, switchService.uuid)
+	uuid, err := protocol.Incoming(conn, switchService.uuid)
 	if err != nil {
 		logs.Error("Failed to connect:", err.Error())
 		return
 	}
-	port := port2.NewPortImpl(true, conn, switchService.key, switchService.secret, uuid, switchService)
+	port := port2.NewPortImpl(true, conn, uuid, switchService)
 	port.Start()
 	switchService.notifyNewPort(port)
 }
 
 func (switchService *SwitchService) notifyNewPort(port common.Port) {
-	go switchService.switchTable.addPort(port, switchService.key, switchService.uuid)
+	go switchService.switchTable.addPort(port, switchService.uuid)
 }
 
 func (switchService *SwitchService) Shutdown() {
@@ -144,7 +134,7 @@ func (switchService *SwitchService) switchDataReceived(data []byte, port common.
 		logs.Error(err)
 		return
 	}
-	pb, err := protocol.ProtoOf(msg, switchService.key)
+	pb, err := protocol.ProtoOf(msg)
 	if err != nil {
 		logs.Error(err)
 		return

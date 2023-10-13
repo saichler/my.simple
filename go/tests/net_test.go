@@ -6,17 +6,16 @@ import (
 	model2 "github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/net/port"
 	"github.com/saichler/my.simple/go/net/switching"
+	security2 "github.com/saichler/my.simple/go/security"
 	"github.com/saichler/my.simple/go/services/service_point"
 	"github.com/saichler/my.simple/go/tests/model"
 	"github.com/saichler/my.simple/go/utils/logs"
-	"github.com/saichler/my.simple/go/utils/security"
 	"google.golang.org/protobuf/proto"
 	"testing"
 	"time"
 )
 
-var key = security.GenerateAES256Key()
-var secret = "testing..1..2..3"
+var securityProvider = security2.NewShallowSecurityProvider(common.GenerateAES256Key(), "testing 1..2..3")
 
 type MyTestModelHandler struct {
 }
@@ -43,18 +42,18 @@ func TestPortsSwitch(t *testing.T) {
 
 	service_point.RegisterServicePoint(&model.MyTestModel{}, &MyTestModelHandler{})
 
-	sw := switching.NewSwitchService(key, secret, common.NetConfig.DefaultSwitchPort)
+	sw := switching.NewSwitchService(common.NetConfig.DefaultSwitchPort)
 	go sw.Start()
 	time.Sleep(time.Millisecond * 100)
 
-	p1, err := port.ConnectTo("127.0.0.1", key, secret, common.NetConfig.DefaultSwitchPort, nil)
+	p1, err := port.ConnectTo("127.0.0.1", common.NetConfig.DefaultSwitchPort, nil)
 	if err != nil {
 		t.Fail()
-		logs.Error(err)
+		logs.Error("err:", err.Error())
 		return
 	}
 
-	p2, err := port.ConnectTo("127.0.0.1", key, secret, common.NetConfig.DefaultSwitchPort, nil)
+	p2, err := port.ConnectTo("127.0.0.1", common.NetConfig.DefaultSwitchPort, nil)
 	if err != nil {
 		t.Fail()
 		logs.Error(err)

@@ -16,10 +16,6 @@ import (
 )
 
 type PortImpl struct {
-	// The encryption key
-	key string
-	// The secret of this connection
-	secret string
 	// generated UUID for the port
 	uuid string
 	// Once connected, what is the other side uuid
@@ -56,7 +52,7 @@ type ReconnectInfo struct {
 }
 
 // Instantiate a new port with a connection
-func NewPortImpl(incomingConnection bool, con net.Conn, key, secret, _uuid string, dataListener common.DatatListener) *PortImpl {
+func NewPortImpl(incomingConnection bool, con net.Conn, _uuid string, dataListener common.DatatListener) *PortImpl {
 	port := &PortImpl{}
 	port.uuid = _uuid
 	port.createdAt = time.Now().Unix()
@@ -65,8 +61,6 @@ func NewPortImpl(incomingConnection bool, con net.Conn, key, secret, _uuid strin
 	}
 	port.conn = con
 	port.active = true
-	port.key = key
-	port.secret = secret
 	port.dataListener = dataListener
 
 	if incomingConnection {
@@ -83,19 +77,18 @@ func NewPortImpl(incomingConnection bool, con net.Conn, key, secret, _uuid strin
 }
 
 // This is the method that the service port is using to connect to the switch for the VM/machine
-func ConnectTo(host, key, secret string, destPort int32, datalistener common.DatatListener) (common.Port, error) {
+func ConnectTo(host string, destPort int32, datalistener common.DatatListener) (common.Port, error) {
 
 	// Dial the destination and validate the secret and key
-	conn, err := protocol.ConnectToAndValidateSecretAndKey(host, secret, key, destPort)
+	conn, err := protocol.ConnectToAndValidateSecretAndKey(host, destPort)
 	if err != nil {
 		return nil, err
 	}
 
 	// Instantiate the port
-	port := NewPortImpl(false, conn, key, secret, "", datalistener)
+	port := NewPortImpl(false, conn, "", datalistener)
 
 	//Below attributes are only for the port initiating the connection
-	port.secret = secret
 	port.reconnectInfo = &ReconnectInfo{
 		host:         host,
 		port:         destPort,
@@ -103,7 +96,7 @@ func ConnectTo(host, key, secret string, destPort int32, datalistener common.Dat
 	}
 
 	// Request the connecting port to send over its uuid
-	zuuid, err := protocol.ExchangeUuid(port.uuid, port.key, conn)
+	zuuid, err := protocol.ExchangeUuid(port.uuid, conn)
 	if err != nil {
 		return nil, err
 	}
@@ -187,13 +180,13 @@ func (port *PortImpl) attemptToReconnect() {
 
 func (port *PortImpl) reconnect() error {
 	// Dial the destination and validate the secret and key
-	conn, err := protocol.ConnectToAndValidateSecretAndKey(port.reconnectInfo.host, port.secret, port.key, port.reconnectInfo.port)
+	conn, err := protocol.ConnectToAndValidateSecretAndKey(port.reconnectInfo.host, port.reconnectInfo.port)
 	if err != nil {
 		return err
 	}
 
 	// Request the connecting port to send over its uuid
-	zuuid, err := protocol.ExchangeUuid(port.uuid, port.key, conn)
+	zuuid, err := protocol.ExchangeUuid(port.uuid, conn)
 	if err != nil {
 		return err
 	}

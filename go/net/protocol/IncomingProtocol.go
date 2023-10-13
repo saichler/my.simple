@@ -3,24 +3,23 @@ package protocol
 import (
 	"errors"
 	"github.com/saichler/my.simple/go/common"
-	"github.com/saichler/my.simple/go/utils/security"
 	"net"
 )
 
-func Incoming(conn net.Conn, key, secret, uuid string) (string, error) {
+func Incoming(conn net.Conn, uuid string) (string, error) {
 	initData, err := common.Read(conn)
 	if err != nil {
 		conn.Close()
 		return "", err
 	}
 
-	data, err := security.Decode(string(initData), key)
+	data, err := common.MySecurityProvider.Decrypt(string(initData))
 	if err != nil {
 		conn.Close()
 		return "", err
 	}
 
-	if string(data) != secret {
+	if !common.MySecurityProvider.IsSecret(string(data)) {
 		conn.Close()
 		return "", errors.New("Incorrect Secret/Key, aborting connection")
 	}
@@ -37,13 +36,15 @@ func Incoming(conn net.Conn, key, secret, uuid string) (string, error) {
 		return "", err
 	}
 
-	data, err = security.Decode(string(initData), key)
+	data, err = common.MySecurityProvider.Decrypt(string(initData))
 	if err != nil {
 		conn.Close()
 		return "", err
 	}
 
 	portUuid := string(data)
+
+	// @TODO - need to encrypt this as well
 
 	err = common.Write([]byte(uuid), conn)
 	if err != nil {

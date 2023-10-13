@@ -30,5 +30,7 @@ func (logger FmtLogger) Warning(any interface{}, anys ...interface{}) {
 }
 
 func (logger FmtLogger) Error(any interface{}, anys ...interface{}) error {
-	return errors.New(ErrorToString(any, anys))
+	errStrng := ErrorToString(any, anys)
+	fmt.Println(errStrng)
+	return errors.New(errStrng)
 }

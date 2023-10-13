@@ -3,17 +3,16 @@ package protocol
 import (
 	"errors"
 	"github.com/saichler/my.simple/go/common"
-	"github.com/saichler/my.simple/go/utils/security"
 	"net"
 	"strconv"
 )
 
-func ConnectToAndValidateSecretAndKey(host, secret, key string, port int32) (net.Conn, error) {
+func ConnectToAndValidateSecretAndKey(host string, port int32) (net.Conn, error) {
 	conn, err := net.Dial("tcp", host+":"+strconv.Itoa(int(port)))
 	if err != nil {
 		return nil, err
 	}
-	data, err := security.Encode([]byte(secret), key)
+	data, err := common.MySecurityProvider.EncryptedSecret()
 	if err != nil {
 		return nil, err
 	}
@@ -30,8 +29,8 @@ func ConnectToAndValidateSecretAndKey(host, secret, key string, port int32) (net
 	return conn, err
 }
 
-func ExchangeUuid(uuid, key string, conn net.Conn) (string, error) {
-	data, err := security.Encode([]byte(uuid), key)
+func ExchangeUuid(uuid string, conn net.Conn) (string, error) {
+	data, err := common.MySecurityProvider.Encrypt([]byte(uuid))
 	if err != nil {
 		return "", err
 	}

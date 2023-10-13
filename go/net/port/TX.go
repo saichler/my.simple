@@ -21,9 +21,8 @@ func (port *PortImpl) writeToSocket() {
 			err := common.Write(data, port.conn)
 			// If there is an error
 			if err != nil {
-				// If the port has a secret, it means it is the initiating port, so try to reconnect
-				// and send the data.
-				if port.secret != "" {
+				// If this is not a port on the switch, then try to reconnect.
+				if !port.isSwitch {
 					port.attemptToReconnect()
 					err = common.Write(data, port.conn)
 				} else {
@@ -54,7 +53,7 @@ func (port *PortImpl) Send(data []byte) error {
 // Do is wrapping a protobuf with a secure message and send it to the switch
 func (port *PortImpl) Do(action model.Action, dest string, pb proto.Message) error {
 	// Create message payload
-	data, err := protocol.CreateMessageFor(model.Priority_P0, action, port.key, port.uuid, dest, pb)
+	data, err := protocol.CreateMessageFor(model.Priority_P0, action, port.uuid, dest, pb)
 	if err != nil {
 		logs.Error("Failed to create message:", err)
 		return err
