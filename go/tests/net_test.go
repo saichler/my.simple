@@ -64,6 +64,7 @@ func TestPortsSwitch(t *testing.T) {
 	m := &model.MyTestModel{}
 	m.MyString = "Hello World"
 
+	time.Sleep(time.Millisecond * 100)
 	err = p1.Do(model2.Action_Action_Get, p2.Uuid(), m)
 
 	time.Sleep(time.Second * 10)

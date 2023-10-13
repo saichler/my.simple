@@ -27,5 +27,5 @@ func (s2t *String2TypeMap) Get(key string) (reflect.Type, bool) {
 }
 
 func (s2t *String2TypeMap) Contains(key string) bool {
-	return s2t.Contains(key)
+	return s2t.impl.Contains(key)
 }

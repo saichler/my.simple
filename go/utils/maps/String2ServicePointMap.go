@@ -27,5 +27,5 @@ func (mp *String2ServicePointMap) Get(key string) (common.ServicePointHandler, b
 }
 
 func (mp *String2ServicePointMap) Contains(key string) bool {
-	return mp.Contains(key)
+	return mp.impl.Contains(key)
 }
