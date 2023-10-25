@@ -1,4 +1,4 @@
-# my.simple - Simplifying Microservices & Kubernetes Deve
+# my.simple - Simplifying, Expediting Microservices & Kubernetes Development
 **Stateless/Stateful, Active/Active, Active/Passive, Security, High Availability, Horizontal Scaling, API, Kubernetes, Microservices.** All those big words usually popup during planning of a distributed application... 
 **The problem starts during implementation!** 
 
