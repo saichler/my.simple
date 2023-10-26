@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"fmt"
 	"github.com/saichler/my.simple/go/common"
 	model2 "github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/net/port"
@@ -10,37 +9,16 @@ import (
 	"github.com/saichler/my.simple/go/services/service_point"
 	"github.com/saichler/my.simple/go/tests/model"
 	"github.com/saichler/my.simple/go/utils/logs"
-	"google.golang.org/protobuf/proto"
 	"testing"
 	"time"
 )
 
 var securityProvider = security2.NewShallowSecurityProvider(common.GenerateAES256Key(), "testing 1..2..3")
 
-type MyTestModelHandler struct {
-}
-
-func (my *MyTestModelHandler) Post(pb proto.Message, port common.Port) (proto.Message, error) {
-	return nil, nil
-}
-func (my *MyTestModelHandler) Put(pb proto.Message, port common.Port) (proto.Message, error) {
-	return nil, nil
-}
-func (my *MyTestModelHandler) Patch(pb proto.Message, port common.Port) (proto.Message, error) {
-	return nil, nil
-}
-func (my *MyTestModelHandler) Delete(pb proto.Message, port common.Port) (proto.Message, error) {
-	return nil, nil
-}
-func (my *MyTestModelHandler) Get(pb proto.Message, port common.Port) (proto.Message, error) {
-	mmm := pb.(*model.MyTestModel)
-	fmt.Println(mmm.MyString)
-	return nil, nil
-}
-
 func TestPortsSwitch(t *testing.T) {
-
-	service_point.RegisterServicePoint(&model.MyTestModel{}, &MyTestModelHandler{})
+	mh := &model.MyTestModelHandler{}
+	mh.Expected = "Hello Test"
+	service_point.RegisterServicePoint(&model.MyTestModel{}, mh)
 
 	sw := switching.NewSwitchService(common.NetConfig.DefaultSwitchPort)
 	go sw.Start()
@@ -61,12 +39,16 @@ func TestPortsSwitch(t *testing.T) {
 	}
 
 	m := &model.MyTestModel{}
-	m.MyString = "Hello World"
+	m.MyString = mh.Expected
 
 	time.Sleep(time.Millisecond * 100)
 	err = p1.Do(model2.Action_Action_Get, p2.Uuid(), m)
 
 	time.Sleep(time.Second * 10)
+
+	if !mh.Passed {
+		t.Fail()
+	}
 
 	p1.Shutdown()
 	p2.Shutdown()
