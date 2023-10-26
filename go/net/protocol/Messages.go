@@ -1,7 +1,7 @@
 package protocol
 
 import (
-	"github.com/saichler/my.simple/go/common"
+	"github.com/saichler/my.security/go/sec_common"
 	"github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/utils/registry"
 	"google.golang.org/protobuf/proto"
@@ -46,7 +46,7 @@ func MessageOf(data []byte) (*model.SecureMessage, error) {
 }
 
 func ProtoOf(msg *model.SecureMessage) (proto.Message, error) {
-	data, err := common.MySecurityProvider.Decrypt(msg.ProtoData)
+	data, err := sec_common.MySecurityProvider.Decrypt(msg.ProtoData)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func CreateMessageFor(priority model.Priority, action model.Action, source, dest
 		return nil, err
 	}
 	//Encode the data
-	encData, err := common.MySecurityProvider.Encrypt(data)
+	encData, err := sec_common.MySecurityProvider.Encrypt(data)
 	if err != nil {
 		return nil, err
 	}

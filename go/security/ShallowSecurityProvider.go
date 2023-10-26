@@ -1,6 +1,7 @@
 package security
 
 import "github.com/saichler/my.simple/go/common"
+import "github.com/saichler/my.security/go/sec_common"
 
 type ShallowSecurityProvider struct {
 	secret string
@@ -11,7 +12,7 @@ func NewShallowSecurityProvider(key, secret string) *ShallowSecurityProvider {
 	sp := &ShallowSecurityProvider{}
 	sp.key = key
 	sp.secret = secret
-	common.MySecurityProvider = sp
+	sec_common.MySecurityProvider = sp
 	return sp
 }
 

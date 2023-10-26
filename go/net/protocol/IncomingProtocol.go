@@ -2,6 +2,7 @@ package protocol
 
 import (
 	"errors"
+	"github.com/saichler/my.security/go/sec_common"
 	"github.com/saichler/my.simple/go/common"
 	"net"
 )
@@ -13,13 +14,13 @@ func Incoming(conn net.Conn, uuid string) (string, error) {
 		return "", err
 	}
 
-	data, err := common.MySecurityProvider.Decrypt(string(initData))
+	data, err := sec_common.MySecurityProvider.Decrypt(string(initData))
 	if err != nil {
 		conn.Close()
 		return "", err
 	}
 
-	if !common.MySecurityProvider.IsSecret(string(data)) {
+	if !sec_common.MySecurityProvider.IsSecret(string(data)) {
 		conn.Close()
 		return "", errors.New("Incorrect Secret/Key, aborting connection")
 	}
@@ -36,7 +37,7 @@ func Incoming(conn net.Conn, uuid string) (string, error) {
 		return "", err
 	}
 
-	data, err = common.MySecurityProvider.Decrypt(string(initData))
+	data, err = sec_common.MySecurityProvider.Decrypt(string(initData))
 	if err != nil {
 		conn.Close()
 		return "", err
