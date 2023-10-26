@@ -9,6 +9,11 @@ container is an **epic scale pandemic**,
 causing companies and the industry to spend trillions of $, re-inventing a **complex, money pit & unmaintainable "
 wheels"** that should have been simple...
 
+## What is my.simple?
+**My simple is an abstracted, agnostic & coherent full stack framework.** 
+In a nutshell, it means that the challenge was not just to write the implementation for each component in a simple way, it was also all about making them **agnostic**.
+Turns out that **Agnostic as a guideline** outputs a simple & scalable solution to each challenge... And there are many!
+
 ### So let's do that properly & Make It Simple... ### 
 
 Join in this step-by-step journey of building an example application using **my.simple** infra. There is a lot... Will
