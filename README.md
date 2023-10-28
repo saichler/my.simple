@@ -10,23 +10,15 @@ causing companies and the industry to spend trillions of $, re-inventing a **com
 wheels"** that should have been simple...
 
 ## What is my.simple?
-**My simple is an abstracted, agnostic & coherent full stack framework.** 
+**My simple is an abstracted, agnostic & coherent full stack framework with integrated Security.** 
 In a nutshell, it means that the challenge was not just to write the implementation for each component in a simple way, it was also all about making them **agnostic**.
 Turns out that **Agnostic as a guideline** outputs a simple & scalable solution to each challenge... And there are many!
 
-### So let's do that properly & Make It Simple... ### 
+## So let's do that properly & Make It Simple... 
 
-Join in this step-by-step journey of building an example application using **my.simple** infra. There is a lot... Will
-cover the **"What?s"** and deep dive to **my.simple "How?s"**, that will save you a huge amount of effort, time & money
-and allow you to concentrate on what really matters... **Your business.**
-
-## Example Applications ##
-
-There are two nerratives we need to cover, stateless application & statefull applications.
-Will develop both, following the thumb rules for each one and how its challenges are solved within **my.simple**.
-
-### We will start with basic, very common, Infra
-
+### Basic Building Blocks
+The basic building blocks are a must-have for any application. 
+They implement the most basic design patterns used inside any microservice and expedite development.
 * [String conversions & concatenation](https://github.com/saichler/my.simple/tree/main/go/utils/strng)
 * [Logs & Logging](https://github.com/saichler/my.simple/tree/main/go/utils/logs)
 * [Blocking Sync Queues](https://github.com/saichler/my.simple/tree/main/go/utils/queues)
@@ -34,10 +26,15 @@ Will develop both, following the thumb rules for each one and how its challenges
 * [Struct Type Registry](https://github.com/saichler/my.simple/tree/main/go/utils/registry)
 * [Security](https://github.com/saichler/my.simple/tree/main/go/security)
 
-### We will continue with
+### Process 2 Process Secure Networking
+One of the biggest challenges of MicroServices, one that usually pose the biggest pain point, "Troubles"/Challenges is the Process 2 Process communication.
+In other words, "How will my MicroServices **Communicate, Interact & Share data** with each other?"
+A single mistake in this area will crete a very big headache, pose challenges that should not have been there, worsen dramatically the engineers work/life balance and will cause the company Hundreds of Millions of dollars in maintenance.
+**[my.simple Secure Networking](https://github.com/saichler/my.simple/tree/main/go/net)** is giving a seamless & simple, secure communication between your MicroServices.
+
+### Protocol buffers & 
 
 * Protobuf Actions & Types
-* Microservices Secure Networking
 * Stateles Services
 
 ### Pluggable Data Stores & ORM
@@ -53,3 +50,12 @@ Will develop both, following the thumb rules for each one and how its challenges
 ### Maintainability
 
 * Automation & Regression Testing
+
+## Example Applications ##
+
+There are two nerratives we need to cover, stateless application & statefull applications.
+Will develop both, following the thumb rules for each one and how its challenges are solved within **my.simple**.
+
+Join in this step-by-step journey of building an example application using **my.simple** infra. There is a lot... Will
+cover the **"What?s"** and deep dive to **my.simple "How?s"**, that will save you a huge amount of effort, time & money
+and allow you to concentrate on what really matters... **Your business.**
