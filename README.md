@@ -1,4 +1,27 @@
-# my.simple - Simplifying, Expediting Microservices & Kubernetes Development
+# my.simple - Real **fullstack** software **wheels** to better your work/life & business balance  
+## Engineers way of thinking is mostly concentrated on the **How?**
+![alt text](https://github.com/saichler/my.simple/blob/main/girrafe.png)
+
+This question is originally from a line of questioning dedicated to discover if one can simplify a challenge. 
+Engineers will start planning, how big is the giraffe?, how big is the refrigerator? & etc...
+## However, the most important, overlooked, question is the **What?**
+What is the ROI in placing a giraffe into a refrigerator? 
+What, in my end users business, will improve by placing a giraffe into a refrigerator?
+Those line of questions are mostly overlooked by the software engineers/architects, 
+which leads to ventures that cause companies, which write software, to waste **Billions of $** without any ROI.
+## But life isn't perfect, to say the least, on the **How?** either
+**Do not invent the wheel!** As engineers, we all know that... However, as engineers, we tent to, intentionally or subconsciously, identify the **wheel** incorrectly.
+A simple example for wrongly identifying the **wheel** is **API**. 
+Most, if not all, engineers will identify the **wheel** as the protocol... Restful, GRPC, KAFKA. However, with an analogy to **Language**, those are only the **alphabet** of the language.
+The real **wheel** here is the way processes query and share their data/models with each other, AKA the **language**.
+
+Engineers tent to reuse the same **alphabet**, while every time re-inventing a different **language**.
+It is **unimaginable** how much, wasted, time & money was invested just on this common mistake.
+Teams, having long meetings, discussing and implementing, API between their processes over & over again in an agonising, costly & repetitive pattern, re-inventing the **wheel** over & over again.
+
+**Remember, this is just one example... They are many more, throughout the software stack**
+
+## my.simple 
 
 **Stateless/Stateful, Active/Active, Active/Passive, Security, High Availability, Horizontal Scaling, API, Kubernetes,
 Microservices.** All those big words usually popup during planning of a distributed application...
