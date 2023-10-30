@@ -8,23 +8,23 @@ import (
 var Log common.Logger = NewFmtLogger()
 
 func Trace(any interface{}, anys ...interface{}) {
-	Log.Trace(any, anys)
+	Log.Trace(any, anys...)
 }
 
 func Debug(any interface{}, anys ...interface{}) {
-	Log.Debug(any, anys)
+	Log.Debug(any, anys...)
 }
 
 func Info(any interface{}, anys ...interface{}) {
-	Log.Info(any, anys)
+	Log.Info(any, anys...)
 }
 
 func Warning(any interface{}, anys ...interface{}) {
-	Log.Warning(any, anys)
+	Log.Warning(any, anys...)
 }
 
 func Error(any interface{}, anys ...interface{}) error {
-	return Log.Error(any, anys)
+	return Log.Error(any, anys...)
 }
 
 func toString(tag string, any interface{}, anys ...interface{}) string {
@@ -43,21 +43,21 @@ func toString(tag string, any interface{}, anys ...interface{}) string {
 }
 
 func TraceToString(any interface{}, anys ...interface{}) string {
-	return toString("Tr ->", any, anys)
+	return toString("Tr ->", any, anys...)
 }
 
 func DebugToString(any interface{}, anys ...interface{}) string {
-	return toString(" Dg ->", any, anys)
+	return toString(" Dg ->", any, anys...)
 }
 
 func InfoToString(any interface{}, anys ...interface{}) string {
-	return toString("  In ->", any, anys)
+	return toString("  In ->", any, anys...)
 }
 
 func WarningToString(any interface{}, anys ...interface{}) string {
-	return toString("   Wr ->", any, anys)
+	return toString("   Wr ->", any, anys...)
 }
 
 func ErrorToString(any interface{}, anys ...interface{}) string {
-	return toString("    Er ->", any, anys)
+	return toString("    Er ->", any, anys...)
 }

@@ -14,23 +14,23 @@ func NewFmtLogger() *FmtLogger {
 }
 
 func (logger FmtLogger) Trace(any interface{}, anys ...interface{}) {
-	fmt.Println(TraceToString(any, anys))
+	fmt.Println(TraceToString(any, anys...))
 }
 
 func (logger FmtLogger) Debug(any interface{}, anys ...interface{}) {
-	fmt.Println(DebugToString(any, anys))
+	fmt.Println(DebugToString(any, anys...))
 }
 
 func (logger FmtLogger) Info(any interface{}, anys ...interface{}) {
-	fmt.Println(InfoToString(any, anys))
+	fmt.Println(InfoToString(any, anys...))
 }
 
 func (logger FmtLogger) Warning(any interface{}, anys ...interface{}) {
-	fmt.Println(WarningToString(any, anys))
+	fmt.Println(WarningToString(any, anys...))
 }
 
 func (logger FmtLogger) Error(any interface{}, anys ...interface{}) error {
-	errStrng := ErrorToString(any, anys)
+	errStrng := ErrorToString(any, anys...)
 	fmt.Println(errStrng)
 	return errors.New(errStrng)
 }
