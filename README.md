@@ -1,27 +1,38 @@
-# my.simple - Real **fullstack** software **wheels** to better your work/life & business balance  
+# my.simple
+#**Fullstack** software building blocks for better work/life & business balance  
 ## Engineers way of thinking is mostly concentrated on the **How?**
 ![alt text](https://github.com/saichler/my.simple/blob/main/girrafe.png)
 
 This question is originally from a line of questioning dedicated to discover if one can simplify a challenge. 
-Engineers will start planning, how big is the giraffe?, how big is the refrigerator? & etc...
+**Immediately**,Engineers will start planning... "How big is the giraffe?" "How big is the refrigerator?" "How...? ..."
 ## However, the most important, overlooked, question is the **What?**
-What is the ROI in placing a giraffe into a refrigerator? 
-What, in my end users business, will improve by placing a giraffe into a refrigerator?
+"What is the ROI in placing a giraffe into a refrigerator?" 
+"What business will improve by placing a giraffe into a refrigerator?"
+
 Those line of questions are mostly overlooked by the software engineers/architects, 
-which leads to ventures that cause companies, which write software, to waste **Billions of $** without any ROI.
+which leads to "ventures" that cause companies, writing software, to waste **Billions of $** without any true ROI.
+
 ## But life isn't perfect, to say the least, on the **How?** either
 **Do not invent the wheel!** As engineers, we all know that... However, as engineers, we tent to, intentionally or subconsciously, identify the **wheel** incorrectly.
-A simple example for wrongly identifying the **wheel** is **API**. 
-Most, if not all, engineers will identify the **wheel** as the protocol... Restful, GRPC, KAFKA. However, with an analogy to **Language**, those are only the **alphabet** of the language.
-The real **wheel** here is the way processes query and share their data/models with each other, AKA the **language**.
+### The API as an example
+**API** has the most common mistake in identifying the **wheel**... 
+Most, if not all, engineers will identify the **wheel** as the **protocol**. **Restful**, **GRPC**, **KAFKA**, **NATS**,... 
+However, with an analogy to **Language**, **protocols** are only the **alphabet** of the language.
+The **wheel/language** in this analogy is the way **processes/microservices** concurrently query, share & update each other with data, models & updates.
 
-Engineers tent to reuse the same **alphabet**, while every time re-inventing a different **language**.
-It is **unimaginable** how much, wasted, time & money was invested just on this common mistake.
-Teams, having long meetings, discussing and implementing, API between their processes over & over again in an agonising, costly & repetitive pattern, re-inventing the **wheel** over & over again.
+**API definition of a process/microservice is like re-inventing a language over & over again, every time...**
+The process of "You send me that, I will reply with this, I will update you with that" is a **huge time & money pit** when developing a microservice base application.
+Just imagine how much effort, time & money is spent in that area, and that is without maintenance, versioning & backward compatability...
 
-**Remember, this is just one example... They are many more, throughout the software stack**
+**Remember, this is just one example... They are many more, throughout the software stack**.
 
-## my.simple 
+# my.simple 
+Throughout the software stack of building a microservice based application, 
+there are some **building blocks** & challenges that can be encapsulated into
+a **single, agnostic components** that can be used to remove, the money pits, infra challenges
+and allow the team to concentrate on the business logic.
+##So what is **my.simple**?
+Exactly that! 
 
 **Stateless/Stateful, Active/Active, Active/Passive, Security, High Availability, Horizontal Scaling, API, Kubernetes,
 Microservices.** All those big words usually popup during planning of a distributed application...
