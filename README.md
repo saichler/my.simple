@@ -68,7 +68,7 @@ and allow the team to concentrate on the business logic.
 
 ##So what is **my.simple**?
 A collection of coherent, while agnostic, components that can extremely expedite the building of a microservice based application.
-Years of fullstack experience, experimenting & coherence analysis will materialize in this repository.
+Years of fullstack experience, experimenting & coherence analysis were materialize in this repository.
 
 
 **Stateless/Stateful, Active/Active, Active/Passive, Security, High Availability, Horizontal Scaling, API, Kubernetes,
