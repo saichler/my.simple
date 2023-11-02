@@ -1,5 +1,39 @@
 # my.simple
-#**Fullstack** software building blocks for better work/life & business balance  
+#**Fullstack** software building blocks for better work/life & business balance
+## Overview
+In a nutshell, **Software Development** is being treated & manage as any other industry out there.
+However, some of the very basic management & work/life practices, alongside though to be true paradoxes, are simply not true for **Software Development**.
+Via **Coherent Analysis**, **Design Decomposition** & **Out-of-the-Box** thinking, Software Development, done right, can solve paradoxes and extremely better work/life balance.
+
+### The Employee Paradox
+* The incentive of the Company: The **Employee** will **work more** for the wage.
+* The incentive of the Employee: **Work less** for the wage.
+
+### Not True for Software Development! 
+### The company incentive is for the engineer to deliver Quality Code
+Because quality code is good for the business:
+* Lower MTTR on bugs
+* Lower maintenance cost
+* More deliveries in a shorter time
+* Happy Customers
+
+### The employee incentive is to deliver Quality Code
+Because quality code is good for work/live balance:
+* Less time spent on bugs
+* Less time spent on maintenance
+* More deliveries in a shorter time
+* Happy Company
+
+**E.g. Writing quality code creates a pattern where over time you Work Less & Do More**
+
+### So how to "Work Less & Do More"?
+If you wait a moment and think about it... If you follow the following thumb rules:
+* Make it Simple
+* Make it Encapsulated
+* Make it Coherent
+* Make it Agnostic
+* Make it Optimized
+
 ## Engineers way of thinking is mostly concentrated on the **How?**
 ![alt text](https://github.com/saichler/my.simple/blob/main/girrafe.png)
 
@@ -28,11 +62,14 @@ Just imagine how much effort, time & money is spent in that area, and that is wi
 
 # my.simple 
 Throughout the software stack of building a microservice based application, 
-there are some **building blocks** & challenges that can be encapsulated into
-a **single, agnostic components** that can be used to remove, the money pits, infra challenges
+there are some **building blocks & challenges** that can be encapsulated into
+a **single, agnostic & simple components** that can be used to remove, the money pits, infra challenges
 and allow the team to concentrate on the business logic.
+
 ##So what is **my.simple**?
-Exactly that! 
+A collection of coherent, while agnostic, components that can extremely expedite the building of a microservice based application.
+Years of fullstack experience, experimenting & coherence analysis will materialize in this repository.
+
 
 **Stateless/Stateful, Active/Active, Active/Passive, Security, High Availability, Horizontal Scaling, API, Kubernetes,
 Microservices.** All those big words usually popup during planning of a distributed application...
