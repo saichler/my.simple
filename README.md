@@ -95,6 +95,7 @@ They implement the most basic design patterns used inside any microservice and e
 * [Blocking Sync Queues](https://github.com/saichler/my.simple/tree/main/go/utils/queues)
 * [Sync Maps](https://github.com/saichler/my.simple/tree/main/go/utils/maps)
 * [Struct Type Registry](https://github.com/saichler/my.simple/tree/main/go/utils/registry)
+* [Protobuf Object](https://github.com/saichler/my.simple/tree/main/go/utils/protobuf_object)
 * [Security](https://github.com/saichler/my.simple/tree/main/go/security)
 
 ### Process 2 Process Secure Networking
