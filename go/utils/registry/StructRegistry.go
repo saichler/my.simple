@@ -20,6 +20,14 @@ func newStructRegistry() *StructRegistryImpl {
 	return sr
 }
 
+func RegisterStruct(any interface{}) bool {
+	v := reflect.ValueOf(any)
+	if v.Kind() == reflect.Ptr {
+		return RegisterStructType(v.Elem().Type())
+	}
+	return RegisterStructType(v.Type())
+}
+
 func RegisterStructType(t reflect.Type) bool {
 	return structRegistry.structName2Type.Put(t.Name(), t)
 }
