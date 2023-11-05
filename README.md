@@ -11,7 +11,11 @@ Via **Coherent Analysis**, **Design Decomposition** & **Out-of-the-Box** thinkin
 # Simple Is A State Of Mind, my.simple is proving that...
 Deep dive into my.simple [story](https://github.com/saichler/my.simple/blob/main/docs) or continue on to the components & building blocks.
 
+. @TODO - Add a link to an example project using my.simple here that does <Employee Database Module>
+
 ## So let's Make It Simple... 
+
+.
 
 ## Basic Building Blocks
 The basic building blocks are a must-have for any application. 
