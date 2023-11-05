@@ -9,4 +9,21 @@ option go_package = "github.com/saichler/my.simple/go/tests/model";
 
 message MyTestModel {
   string myString = 1;
+  int32 myInt32 = 2;
+  int64 myInt64 = 3;
+  float myFloat32 = 4;
+  double myFloat64 = 5;
+  MyTestSubModelSingle mySingle = 6;
+  repeated string myStringSlice = 7;
+  repeated int32 myInt32Slice = 8;
+  repeated MyTestSubModelSingle myModelSlice = 9;
+  map<string,string> MyString2StringMap = 10;
+  map<int32,int64> MyInt32ToInt64Map = 11;
+  map<string,MyTestSubModelSingle> MyString2ModelMap = 12;
+  bool myBool = 13;
+}
+
+message MyTestSubModelSingle {
+  string myString = 1;
+  int64 myInt64 = 2;
 }

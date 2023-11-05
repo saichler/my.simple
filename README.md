@@ -95,7 +95,6 @@ They implement the most basic design patterns used inside any microservice and e
 * [Blocking Sync Queues](https://github.com/saichler/my.simple/tree/main/go/utils/queues)
 * [Sync Maps](https://github.com/saichler/my.simple/tree/main/go/utils/maps)
 * [Struct Type Registry](https://github.com/saichler/my.simple/tree/main/go/utils/registry)
-* [Protobuf Object](https://github.com/saichler/my.simple/tree/main/go/utils/protobuf_object)
 * [Security](https://github.com/saichler/my.simple/tree/main/go/security)
 
 ### Process 2 Process Secure Networking
@@ -104,10 +103,13 @@ In other words, "How will my MicroServices **Communicate, Interact & Share data*
 A single mistake in this area will crete a very big headache, pose challenges that should not have been there, worsen dramatically the engineers work/life balance and will cause the company Hundreds of Millions of dollars in maintenance.
 **[my.simple Secure Networking](https://github.com/saichler/my.simple/tree/main/go/net)** is giving a seamless & simple, secure communication between your MicroServices.
 
-### Protocol buffers & 
+### Introspection & Deep Cloning
+The process of deep analysis & cloning a tree/graph models at runtime without having the model at compile time is called [Interospection]().
+The is extremely usable in agnostic handling of **Delta Notifications**, **ORM (Object Relation Mapping)** &**Generic Distributed Cache**.
 
-* Protobuf Actions & Types
-* Stateles Services
+### Protocol buffers & Services
+* [Protobuf Object](https://github.com/saichler/my.simple/tree/main/go/utils/protobuf_object)
+* Protobuf Service Points
 
 ### Pluggable Data Stores & ORM
 

@@ -35,7 +35,7 @@ func (pm *PortMap) Contains(key string) bool {
 }
 
 func (pm *PortMap) PortList() []common.Port {
-	return pm.impl.valuesAsList(portType).([]common.Port)
+	return pm.impl.valuesAsList(portType, nil).([]common.Port)
 }
 
 func (pm *PortMap) Iterate(do func(k, v interface{})) {
