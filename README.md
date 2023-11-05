@@ -1,5 +1,5 @@
 # my.simple
-#**Fullstack** software building blocks for better work/life & business balance
+# Fullstack software building blocks for better work/life & business balance
 ## Overview
 In a nutshell, **Software Development** is being treated & manage as any other industry out there.
 However, some of the very basic management & work/life practices, alongside though to be true paradoxes, are simply not true for **Software Development**.
