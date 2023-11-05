@@ -87,7 +87,7 @@ Turns out that **Agnostic as a guideline** outputs a simple & scalable solution 
 
 ## So let's do that properly & Make It Simple... 
 
-### Basic Building Blocks
+## Basic Building Blocks
 The basic building blocks are a must-have for any application. 
 They implement the most basic design patterns used inside any microservice and expedite development.
 * [String conversions & concatenation](https://github.com/saichler/my.simple/tree/main/go/utils/strng)
@@ -97,17 +97,17 @@ They implement the most basic design patterns used inside any microservice and e
 * [Struct Type Registry](https://github.com/saichler/my.simple/tree/main/go/utils/registry)
 * [Security](https://github.com/saichler/my.simple/tree/main/go/security)
 
-### Process 2 Process Secure Networking
+## Process 2 Process Secure Networking
 One of the biggest challenges of MicroServices, one that usually pose the biggest pain point, "Troubles"/Challenges is the Process 2 Process communication.
 In other words, "How will my MicroServices **Communicate, Interact & Share data** with each other?"
 A single mistake in this area will crete a very big headache, pose challenges that should not have been there, worsen dramatically the engineers work/life balance and will cause the company Hundreds of Millions of dollars in maintenance.
 **[my.simple Secure Networking](https://github.com/saichler/my.simple/tree/main/go/net)** is giving a seamless & simple, secure communication between your MicroServices.
 
-### Introspection & Deep Cloning
-The process of deep analysis & cloning a tree/graph models at runtime without having the model at compile time is called [Interospection]().
+## Introspection & Deep Cloning
+The process of deep analysis & cloning a tree/graph models at runtime without having the model at compile time is called [Introspection](https://github.com/saichler/my.simple/tree/main/go/introspect).
 The is extremely usable in agnostic handling of **Delta Notifications**, **ORM (Object Relation Mapping)** &**Generic Distributed Cache**.
 
-### Protocol buffers & Services
+## Protocol buffers & Services
 * [Protobuf Object](https://github.com/saichler/my.simple/tree/main/go/utils/protobuf_object)
 * Protobuf Service Points
 
