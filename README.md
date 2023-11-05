@@ -35,7 +35,7 @@ If you wait a moment and think about it... If you follow the following thumb rul
 * Make it Optimized
 
 ## Engineers way of thinking is mostly concentrated on the **How?**
-![alt text](https://github.com/saichler/my.simple/blob/main/girrafe.png)
+![alt text](https://github.com/saichler/my.simple/blob/main/giraffe.png)
 
 This question is originally from a line of questioning dedicated to discover if one can simplify a challenge. 
 **Immediately**,Engineers will start planning... "How big is the giraffe?" "How big is the refrigerator?" "How...? ..."
