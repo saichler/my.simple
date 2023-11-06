@@ -48,6 +48,10 @@ func (h *ServiceCenter) Get(pb proto.Message, port common.Port) (proto.Message, 
 	return nil, nil
 }
 
+func (h *ServiceCenter) EndPoint() string {
+	return "/service-center"
+}
+
 func AddService(topic, uuid string) {
 	healthCenter.mtx.L.Lock()
 	defer healthCenter.mtx.L.Unlock()

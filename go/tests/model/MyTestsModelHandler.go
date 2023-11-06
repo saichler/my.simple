@@ -31,3 +31,6 @@ func (my *MyTestModelHandler) Get(pb proto.Message, port common.Port) (proto.Mes
 	}
 	return nil, nil
 }
+func (my *MyTestModelHandler) EndPoint() string {
+	return "/test"
+}

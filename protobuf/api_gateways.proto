@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package api_gateway_model;
+
+option java_multiple_files = true;
+option java_outer_classname = "ApiGatewaysModel";
+option java_package = "com.my.simple.api_gateways.model";
+option go_package = "github.com/saichler/my.simple/go/api_gateways/model";
+
+message RestFulGatewayConfig {
+  string host = 1;
+  int32 port = 2;
+  string crt = 3;
+  string key = 4;
+  bool authentication = 5;
+}

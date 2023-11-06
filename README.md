@@ -42,6 +42,9 @@ The is extremely usable in agnostic handling of **Delta Notifications**, **ORM (
 * [Protobuf Object](https://github.com/saichler/my.simple/tree/main/go/utils/protobuf_object)
 * Protobuf Service Points
 
+## API Gateways
+Dynamic, Secured, [API Gateways](https://github.com/saichler/my.simple/tree/main/go/api_gateways) that avoids multiple implementations, bugs & maintenance.
+
 ### Pluggable Data Stores & ORM
 
 * Pluggable ORM & Data storing

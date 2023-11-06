@@ -76,6 +76,10 @@ func (h *HealthCenter) Get(pb proto.Message, port common.Port) (proto.Message, e
 	return nil, nil
 }
 
+func (h *HealthCenter) EndPoint() string {
+	return "/health"
+}
+
 func AddPort(port common.Port) {
 	p, ok := healthCenter.health.Ports[port.Uuid()]
 	if !ok {
