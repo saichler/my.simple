@@ -4,7 +4,6 @@ import (
 	"github.com/saichler/my.simple/go/common"
 	model2 "github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/services/health/model"
-	"github.com/saichler/my.simple/go/services/service_point"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"google.golang.org/protobuf/proto"
 	"runtime"
@@ -13,24 +12,26 @@ import (
 )
 
 type HealthCenter struct {
-	health *model.HealthCenter
-	mtx    *sync.Cond
+	health       *model.HealthCenter
+	mtx          *sync.Cond
+	introspect   common.IIntrospect
+	servicePoint common.IServicePoints
 }
-
-var healthCenter = newHealthCenter()
 
 const (
 	Health_Center_Topic = "Healh Center"
 )
 
-func newHealthCenter() *HealthCenter {
+func NewHealthCenter(introspect common.IIntrospect, servicePoints common.IServicePoints) *HealthCenter {
 	hc := &HealthCenter{}
 	hc.mtx = sync.NewCond(&sync.Mutex{})
+	hc.introspect = introspect
+	hc.servicePoint = servicePoints
 	hc.health = &model.HealthCenter{}
 	hc.health.Ports = make(map[string]*model.Port)
 	hc.health.Services = make(map[string]*model.Service)
 	hc.health.Reports = make(map[string]*model.Report)
-	service_point.RegisterServicePoint(hc.health, hc)
+	hc.servicePoint.RegisterServicePoint(hc.health, hc, hc.introspect.Registry())
 	return hc
 }
 
@@ -71,7 +72,7 @@ func (h *HealthCenter) Delete(pb proto.Message, port common.Port) (proto.Message
 }
 
 func (h *HealthCenter) Get(pb proto.Message, port common.Port) (proto.Message, error) {
-	health := CloneHealth()
+	health := h.Clone()
 	port.Do(model2.Action_Action_Post, port.Uuid(), health)
 	return nil, nil
 }
@@ -80,14 +81,65 @@ func (h *HealthCenter) EndPoint() string {
 	return "/health"
 }
 
-func AddPort(port common.Port) {
-	p, ok := healthCenter.health.Ports[port.Uuid()]
+func (h *HealthCenter) AddPort(port common.Port) {
+	h.mtx.L.Lock()
+	defer h.mtx.L.Unlock()
+	p, ok := h.health.Ports[port.Uuid()]
 	if !ok {
 		p = &model.Port{}
 		p.PortUuid = port.Uuid()
 		p.CreatedAt = time.Now().Unix()
-		healthCenter.health.Ports[port.Uuid()] = p
+		h.health.Ports[port.Uuid()] = p
 	}
+}
+
+func (h *HealthCenter) ApplyReport(report *model.Report) {
+	h.mtx.L.Lock()
+	defer h.mtx.L.Unlock()
+	logs.Debug("Received report from ", report.PortUuid)
+	h.health.Reports[report.PortUuid] = report
+}
+
+func (h *HealthCenter) AddService(topic, uuid string) {
+	h.mtx.L.Lock()
+	defer h.mtx.L.Unlock()
+	var port *model.Port
+	for uid, p := range h.health.Ports {
+		if uid == uuid {
+			port = p
+			break
+		}
+	}
+	if port != nil {
+		service, ok := h.health.Services[topic]
+		if !ok {
+			service = &model.Service{}
+			service.PortUuids = make([]string, 0)
+			h.health.Services[topic] = service
+		}
+		service.PortUuids = append(service.PortUuids, uuid)
+	}
+}
+
+func (h *HealthCenter) ServiceUuids(topic string) []string {
+	h.mtx.L.Lock()
+	defer h.mtx.L.Unlock()
+	uuids := h.health.Services[topic]
+	if uuids == nil {
+		return nil
+	}
+	result := make([]string, len(uuids.PortUuids))
+	for i, v := range uuids.PortUuids {
+		result[i] = v
+	}
+	return result
+}
+
+func (h *HealthCenter) Clone() *model.HealthCenter {
+	h.mtx.L.Lock()
+	defer h.mtx.L.Unlock()
+	clone := h.introspect.Clone(h.health)
+	return clone.(*model.HealthCenter)
 }
 
 func CreateReport(portUuid string, stat model.HealthStatus) *model.Report {

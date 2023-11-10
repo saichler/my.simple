@@ -2,15 +2,15 @@ package tests
 
 import (
 	"fmt"
+	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/instance"
-	"github.com/saichler/my.simple/go/introspect"
 	model2 "github.com/saichler/my.simple/go/introspect/model"
 	"github.com/saichler/my.simple/go/tests/model"
 	"testing"
 )
 
 func instanceOf(id string, root interface{}, t *testing.T) (interface{}, bool) {
-	ins, err := instance.InstanceOf(id, introspect.DefaultIntrospect)
+	ins, err := instance.InstanceOf(id, common.Introspect)
 	if err != nil {
 		t.Fail()
 		fmt.Println("failed with id: ", id, err)
@@ -27,13 +27,13 @@ func instanceOf(id string, root interface{}, t *testing.T) (interface{}, bool) {
 }
 
 func TestInstance(t *testing.T) {
-	node, err := introspect.Inspect(&model.MyTestModel{})
+	node, err := common.Introspect.Inspect(&model.MyTestModel{})
 	if err != nil {
 		fmt.Println("1", err)
 		t.Fail()
 		return
 	}
-	introspect.AddDecorator(model2.DecoratorType_Primary, []string{"MyString"}, node)
+	common.Introspect.AddDecorator(model2.DecoratorType_Primary, []string{"MyString"}, node)
 
 	id := "mytestmodel<{24}Hello>"
 	v, ok := instanceOf(id, nil, t)

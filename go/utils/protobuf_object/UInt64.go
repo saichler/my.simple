@@ -2,7 +2,7 @@ package protobuf_object
 
 type UInt64 struct{}
 
-func (_type *UInt64) add(any interface{}) ([]byte, int) {
+func (_type *UInt64) Add(any interface{}) ([]byte, int) {
 	i := any.(uint64)
 	bytes := make([]byte, 8)
 	bytes[0] = byte((i >> 56) & 0xff)
@@ -16,7 +16,7 @@ func (_type *UInt64) add(any interface{}) ([]byte, int) {
 	return bytes, 8
 }
 
-func (_type *UInt64) get(data []byte, location int) (interface{}, int) {
+func (_type *UInt64) Get(data []byte, location int) (interface{}, int) {
 	var result uint64
 	result = uint64(0xff&data[location])<<56 |
 		uint64(0xff&data[location+1])<<48 |

@@ -1,7 +1,6 @@
 package instance
 
 import (
-	"github.com/saichler/my.simple/go/utils/registry"
 	"reflect"
 )
 
@@ -103,12 +102,21 @@ func (inst *Instance) GetValue(any reflect.Value) []reflect.Value {
 
 func (inst *Instance) Get(any interface{}) (interface{}, error) {
 	if any == nil {
-		n, err := registry.NewInstance(inst.node.TypeName)
+		if inst == nil {
+			panic("nil inst")
+		}
+		if inst.introspect == nil {
+			panic("nil introspect")
+		}
+		if inst.introspect.Registry() == nil {
+			panic("nil registry")
+		}
+		n, err := inst.introspect.Registry().NewInstance(inst.node.TypeName)
 		if err != nil {
 			return nil, err
 		}
 		if inst.key != nil {
-			SetPrimaryKey(inst.node, n, inst.key)
+			inst.SetPrimaryKey(inst.node, n, inst.key)
 		}
 		return n, nil
 	}

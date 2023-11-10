@@ -2,7 +2,7 @@ package protobuf_object
 
 type Int64 struct{}
 
-func (_type *Int64) add(any interface{}) ([]byte, int) {
+func (_type *Int64) Add(any interface{}) ([]byte, int) {
 	i := any.(int64)
 	data := make([]byte, 8)
 	data[0] = byte((i >> 56) & 0xff)
@@ -16,7 +16,7 @@ func (_type *Int64) add(any interface{}) ([]byte, int) {
 	return data, 8
 }
 
-func (_type *Int64) get(data []byte, location int) (interface{}, int) {
+func (_type *Int64) Get(data []byte, location int) (interface{}, int) {
 	var result int64
 	result = int64(0xff&data[location])<<56 |
 		int64(0xff&data[location+1])<<48 |

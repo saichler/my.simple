@@ -1,10 +1,10 @@
 package tests
 
 import (
+	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/tests/model"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"github.com/saichler/my.simple/go/utils/protobuf_object"
-	"github.com/saichler/my.simple/go/utils/registry"
 	"strconv"
 	"testing"
 )
@@ -139,7 +139,7 @@ func TestPbString(t *testing.T) {
 func TestProto(t *testing.T) {
 	val := &model.MyTestModel{}
 	val.MyString = "MyString"
-	registry.RegisterStruct(val)
+	common.Registry.RegisterStruct(val)
 	dval, err := testType(val)
 	if err != nil {
 		t.Fail()
@@ -199,7 +199,7 @@ func TestSliceOfProto(t *testing.T) {
 	proto2 := &model.MyTestModel{}
 	proto2.MyString = "UUID-2"
 
-	registry.RegisterStruct(proto1)
+	common.Registry.RegisterStruct(proto1)
 
 	val := []*model.MyTestModel{proto1, proto2}
 	dval, err := testType(val)
@@ -255,7 +255,7 @@ func TestSliceOfProtoWithNil(t *testing.T) {
 	proto2 := &model.MyTestModel{}
 	proto2.MyString = "UUID-2"
 
-	registry.RegisterStruct(proto1)
+	common.Registry.RegisterStruct(proto1)
 
 	val := []*model.MyTestModel{proto1, nil, proto2}
 	dval, err := testType(val)
@@ -332,7 +332,7 @@ func TestMapOfString2Proto(t *testing.T) {
 	proto2 := &model.MyTestModel{}
 	proto2.MyString = "UUID-2"
 
-	registry.RegisterStruct(proto1)
+	common.Registry.RegisterStruct(proto1)
 
 	val := make(map[string]*model.MyTestModel)
 
@@ -364,7 +364,7 @@ func TestMapOfString2ProtoWithNil(t *testing.T) {
 	proto2 := &model.MyTestModel{}
 	proto2.MyString = "UUID-2"
 
-	registry.RegisterStruct(proto1)
+	common.Registry.RegisterStruct(proto1)
 
 	val := make(map[string]*model.MyTestModel)
 

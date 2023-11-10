@@ -6,7 +6,6 @@ import (
 	"github.com/saichler/my.simple/go/net/port"
 	"github.com/saichler/my.simple/go/net/switching"
 	security2 "github.com/saichler/my.simple/go/security"
-	"github.com/saichler/my.simple/go/services/service_point"
 	"github.com/saichler/my.simple/go/tests/model"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"testing"
@@ -18,20 +17,20 @@ var securityProvider = security2.NewShallowSecurityProvider(common.GenerateAES25
 func TestPortsSwitch(t *testing.T) {
 	mh := &model.MyTestModelHandler{}
 	mh.Expected = "Hello Test"
-	service_point.RegisterServicePoint(&model.MyTestModel{}, mh)
+	common.ServicePoints.RegisterServicePoint(&model.MyTestModel{}, mh, common.Registry)
 
-	sw := switching.NewSwitchService(common.NetConfig.DefaultSwitchPort)
+	sw := switching.NewSwitchService(common.NetConfig.DefaultSwitchPort, common.Registry, common.HealthCenter, common.ServicePoints)
 	go sw.Start()
 	time.Sleep(time.Millisecond * 100)
 
-	p1, err := port.ConnectTo("127.0.0.1", common.NetConfig.DefaultSwitchPort, nil)
+	p1, err := port.ConnectTo("127.0.0.1", common.NetConfig.DefaultSwitchPort, nil, common.Registry, common.ServicePoints)
 	if err != nil {
 		t.Fail()
 		logs.Error("err:", err.Error())
 		return
 	}
 
-	p2, err := port.ConnectTo("127.0.0.1", common.NetConfig.DefaultSwitchPort, nil)
+	p2, err := port.ConnectTo("127.0.0.1", common.NetConfig.DefaultSwitchPort, nil, common.Registry, common.ServicePoints)
 	if err != nil {
 		t.Fail()
 		logs.Error(err)

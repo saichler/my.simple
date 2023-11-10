@@ -2,9 +2,9 @@ package tests
 
 import (
 	"fmt"
+	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/idql/idql_parser"
 	"github.com/saichler/my.simple/go/idql/idql_query"
-	"github.com/saichler/my.simple/go/introspect"
 	"testing"
 )
 
@@ -24,10 +24,10 @@ func TestFetchParse(t *testing.T) {
 
 func TestFetchQuery(t *testing.T) {
 	test := createTestModelInstance(1)
-	introspect.Inspect(test)
+	common.Introspect.Inspect(test)
 
 	request := "fetch mytestmodel only mysingle.mystring, mysingle.myint64 criteria mysingle.mystring='string-sub-1'"
-	fetch, err := idql_query.NewFetch(request, introspect.DefaultIntrospect)
+	fetch, err := idql_query.NewFetch(request, common.Introspect)
 	if err != nil {
 		fmt.Println(err)
 		t.Fail()

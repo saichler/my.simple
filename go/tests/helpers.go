@@ -1,10 +1,15 @@
 package tests
 
 import (
+	"github.com/saichler/my.simple/go/defaults"
 	"github.com/saichler/my.simple/go/tests/model"
 	"strconv"
 	"time"
 )
+
+func init() {
+	defaults.ApplyDefaults()
+}
 
 func createTestModelInstance(index int) *model.MyTestModel {
 	tag := strconv.Itoa(index)

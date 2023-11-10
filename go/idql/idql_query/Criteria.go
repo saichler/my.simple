@@ -3,6 +3,7 @@ package idql_query
 import (
 	"bytes"
 	"errors"
+	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/idql/idql_parser"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
@@ -35,7 +36,7 @@ func (criteria *Criteria) String() string {
 	return s.String()
 }
 
-func newCriteria(pCriteria *idql_parser.Criteria, elementType string) (*Criteria, error) {
+func newCriteria(pCriteria *idql_parser.Criteria, elementType string, introspect common.IIntrospect) (*Criteria, error) {
 	if pCriteria == nil {
 		return nil, nil
 	}
@@ -43,7 +44,7 @@ func newCriteria(pCriteria *idql_parser.Criteria, elementType string) (*Criteria
 	criteria.symbol = pCriteria.Symbol()
 
 	if pCriteria.CriteriaSymbol() != nil {
-		criteriaSymbol, e := newCriteriaSymbol(pCriteria.CriteriaSymbol(), elementType)
+		criteriaSymbol, e := newCriteriaSymbol(pCriteria.CriteriaSymbol(), elementType, introspect)
 		if e != nil {
 			return nil, e
 		}
@@ -51,7 +52,7 @@ func newCriteria(pCriteria *idql_parser.Criteria, elementType string) (*Criteria
 	}
 
 	if criteria.subCriteria != nil {
-		subCriteria, e := newCriteria(pCriteria.SubCriteria(), elementType)
+		subCriteria, e := newCriteria(pCriteria.SubCriteria(), elementType, introspect)
 		if e != nil {
 			return nil, e
 		}
@@ -59,7 +60,7 @@ func newCriteria(pCriteria *idql_parser.Criteria, elementType string) (*Criteria
 	}
 
 	if pCriteria.NextCriteria() != nil {
-		nextCriteria, e := newCriteria(pCriteria.NextCriteria(), elementType)
+		nextCriteria, e := newCriteria(pCriteria.NextCriteria(), elementType, introspect)
 		if e != nil {
 			return nil, e
 		}

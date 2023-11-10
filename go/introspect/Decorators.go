@@ -5,7 +5,7 @@ import (
 	"github.com/saichler/my.simple/go/utils/strng"
 )
 
-func AddDecorator(decoratorType model.DecoratorType, any interface{}, node *model.Node) error {
+func (i *Introspect) AddDecorator(decoratorType model.DecoratorType, any interface{}, node *model.Node) error {
 	s := &strng.String{TypesPrefix: true}
 	str, err := s.StringOf(any)
 	if node.Decorators == nil {
@@ -15,7 +15,7 @@ func AddDecorator(decoratorType model.DecoratorType, any interface{}, node *mode
 	return err
 }
 
-func DecoratorOf(decoratorType model.DecoratorType, node *model.Node) (interface{}, error) {
+func (i *Introspect) DecoratorOf(decoratorType model.DecoratorType, node *model.Node) (interface{}, error) {
 	decValue := node.Decorators[int32(decoratorType)]
 	v, err := strng.InstanceOf(decValue)
 	return v, err

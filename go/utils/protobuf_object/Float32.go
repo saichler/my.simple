@@ -6,7 +6,7 @@ import (
 
 type Float32 struct{}
 
-func (_type *Float32) add(any interface{}) ([]byte, int) {
+func (_type *Float32) Add(any interface{}) ([]byte, int) {
 	f := any.(float32)
 	i := math.Float32bits(f)
 
@@ -19,7 +19,7 @@ func (_type *Float32) add(any interface{}) ([]byte, int) {
 	return bytes, 4
 }
 
-func (_type *Float32) get(data []byte, location int) (interface{}, int) {
+func (_type *Float32) Get(data []byte, location int) (interface{}, int) {
 	var result uint32
 	v1 := uint32(data[location]) << 24
 	v2 := uint32(data[location+1]) << 16

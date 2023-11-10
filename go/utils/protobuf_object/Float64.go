@@ -6,7 +6,7 @@ import (
 
 type Float64 struct{}
 
-func (_type *Float64) add(any interface{}) ([]byte, int) {
+func (_type *Float64) Add(any interface{}) ([]byte, int) {
 	f := any.(float64)
 	i := math.Float64bits(f)
 	bytes := make([]byte, 8)
@@ -21,7 +21,7 @@ func (_type *Float64) add(any interface{}) ([]byte, int) {
 	return bytes, 8
 }
 
-func (_type *Float64) get(data []byte, location int) (interface{}, int) {
+func (_type *Float64) Get(data []byte, location int) (interface{}, int) {
 	var result uint64
 	result = uint64(0xff&data[location])<<56 |
 		uint64(0xff&data[location+1])<<48 |

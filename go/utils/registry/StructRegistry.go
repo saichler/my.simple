@@ -12,39 +12,37 @@ type StructRegistryImpl struct {
 	structName2Type *maps.String2TypeMap
 }
 
-var structRegistry = newStructRegistry()
-
-func newStructRegistry() *StructRegistryImpl {
+func NewStructRegistry() *StructRegistryImpl {
 	sr := &StructRegistryImpl{}
 	sr.structName2Type = maps.NewString2TypeMao()
 	return sr
 }
 
-func RegisterStruct(any interface{}) bool {
+func (r *StructRegistryImpl) RegisterStruct(any interface{}) bool {
 	v := reflect.ValueOf(any)
 	if v.Kind() == reflect.Ptr {
-		return RegisterStructType(v.Elem().Type())
+		return r.RegisterStructType(v.Elem().Type())
 	}
-	return RegisterStructType(v.Type())
+	return r.RegisterStructType(v.Type())
 }
 
-func RegisterStructType(t reflect.Type) bool {
-	return structRegistry.structName2Type.Put(t.Name(), t)
+func (r *StructRegistryImpl) RegisterStructType(t reflect.Type) bool {
+	return r.structName2Type.Put(t.Name(), t)
 }
 
-func TypeByName(name string) (reflect.Type, error) {
-	value, ok := structRegistry.structName2Type.Get(name)
+func (r *StructRegistryImpl) TypeByName(name string) (reflect.Type, error) {
+	value, ok := r.structName2Type.Get(name)
 	if !ok {
 		return nil, errors.New("Unknown Struct Type: " + name)
 	}
 	return value, nil
 }
 
-func NewProtobufInstance(t string) (proto.Message, error) {
+func (r *StructRegistryImpl) NewProtobufInstance(t string) (proto.Message, error) {
 	if t == "" {
 		return nil, logs.Error("cannot create a new protobuf instance from blank type name")
 	}
-	typ, ok := structRegistry.structName2Type.Get(t)
+	typ, ok := r.structName2Type.Get(t)
 	if !ok {
 		return nil, logs.Error("Struct Type ", t, " is not registered")
 	}
@@ -59,8 +57,8 @@ func NewProtobufInstance(t string) (proto.Message, error) {
 	return pb, nil
 }
 
-func NewInstance(name string) (interface{}, error) {
-	typ, ok := structRegistry.structName2Type.Get(name)
+func (r *StructRegistryImpl) NewInstance(name string) (interface{}, error) {
+	typ, ok := r.structName2Type.Get(name)
 	if !ok {
 		return nil, errors.New("Unknown Struct Type: " + name)
 	}

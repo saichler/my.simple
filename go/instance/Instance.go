@@ -2,36 +2,42 @@ package instance
 
 import (
 	"errors"
-	"github.com/saichler/my.simple/go/introspect"
+	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/introspect/model"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"strings"
 )
 
 type Instance struct {
-	parent *Instance
-	node   *model.Node
-	key    interface{}
-	value  interface{}
-	id     string
+	parent     *Instance
+	node       *model.Node
+	key        interface{}
+	value      interface{}
+	id         string
+	introspect common.IIntrospect
 }
 
-func NewInstance(node *model.Node, parent *Instance, key interface{}, value interface{}) *Instance {
+func NewDefaultInstance(node *model.Node, parent *Instance, key interface{}, value interface{}) *Instance {
+	return NewInstance(node, parent, key, value, common.Introspect)
+}
+
+func NewInstance(node *model.Node, parent *Instance, key interface{}, value interface{}, introspect common.IIntrospect) *Instance {
 	i := &Instance{}
 	i.parent = parent
 	i.node = node
 	i.key = key
 	i.value = value
+	i.introspect = introspect
 	return i
 }
 
-func InstanceOf(instanceId string, i *introspect.Introspect) (*Instance, error) {
+func InstanceOf(instanceId string, i common.IIntrospect) (*Instance, error) {
 	instanceKey := NodeKey(instanceId)
 	node, ok := i.Node(instanceKey)
 	if !ok {
 		return nil, errors.New("Unknown attribute " + instanceKey)
 	}
-	return newInstance(node, instanceId)
+	return newInstance(node, instanceId, i)
 }
 
 func (inst *Instance) Parent() *Instance {
@@ -128,15 +134,16 @@ func NodeKey(instanceId string) string {
 	return buff.String()
 }
 
-func newInstance(node *model.Node, instancePath string) (*Instance, error) {
+func newInstance(node *model.Node, instancePath string, introspect common.IIntrospect) (*Instance, error) {
 	inst := &Instance{}
 	inst.node = node
+	inst.introspect = introspect
 	if node.Parent != nil {
 		prefix, err := inst.setKeyValue(instancePath)
 		if err != nil {
 			return nil, err
 		}
-		pi, err := newInstance(node.Parent, prefix)
+		pi, err := newInstance(node.Parent, prefix, introspect)
 		if err != nil {
 			return nil, err
 		}

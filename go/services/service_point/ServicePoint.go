@@ -5,7 +5,6 @@ import (
 	"github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"github.com/saichler/my.simple/go/utils/maps"
-	"github.com/saichler/my.simple/go/utils/registry"
 	"google.golang.org/protobuf/proto"
 	"reflect"
 )
@@ -14,15 +13,13 @@ type ServicePoints struct {
 	structName2ServicePoint *maps.String2ServicePointMap
 }
 
-var servicePoints = newServicePoints()
-
-func newServicePoints() *ServicePoints {
+func NewServicePoints() *ServicePoints {
 	sp := &ServicePoints{}
 	sp.structName2ServicePoint = maps.NewString2ServicePointMap()
 	return sp
 }
 
-func RegisterServicePoint(pb proto.Message, handler common.ServicePointHandler) error {
+func (servicePoints *ServicePoints) RegisterServicePoint(pb proto.Message, handler common.ServicePointHandler, registry common.IRegistry) error {
 	if pb == nil {
 		return logs.Error("cannot register handler with nil proto")
 	}
@@ -35,7 +32,7 @@ func RegisterServicePoint(pb proto.Message, handler common.ServicePointHandler) 
 	return nil
 }
 
-func Handle(pb proto.Message, action model.Action, port common.Port) (proto.Message, error) {
+func (servicePoints *ServicePoints) Handle(pb proto.Message, action model.Action, port common.Port) (proto.Message, error) {
 	tName := reflect.ValueOf(pb).Elem().Type().Name()
 	h, ok := servicePoints.structName2ServicePoint.Get(tName)
 	if !ok {

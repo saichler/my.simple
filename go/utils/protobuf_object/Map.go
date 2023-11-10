@@ -4,18 +4,18 @@ import "reflect"
 
 type Map struct{}
 
-func (_type *Map) add(any interface{}) ([]byte, int) {
+func (_type *Map) Add(any interface{}) ([]byte, int) {
 	if any == nil {
-		sizeBytes, _ := sizeObjectType.add(int32(-1))
+		sizeBytes, _ := sizeObjectType.Add(int32(-1))
 		return sizeBytes, 4
 	}
 	mapp := reflect.ValueOf(any)
 	if mapp.Len() == 0 {
-		sizeBytes, _ := sizeObjectType.add(int32(-1))
+		sizeBytes, _ := sizeObjectType.Add(int32(-1))
 		return sizeBytes, 4
 	}
 
-	s, _ := sizeObjectType.add(int32(mapp.Len()))
+	s, _ := sizeObjectType.Add(int32(mapp.Len()))
 	keys := mapp.MapKeys()
 
 	for _, key := range keys {
@@ -28,8 +28,8 @@ func (_type *Map) add(any interface{}) ([]byte, int) {
 	return s, len(s)
 }
 
-func (_type *Map) get(data []byte, location int) (interface{}, int) {
-	l, _ := sizeObjectType.get(data, location)
+func (_type *Map) Get(data []byte, location int) (interface{}, int) {
+	l, _ := sizeObjectType.Get(data, location)
 	size := l.(int32)
 	if size == -1 || size == 0 {
 		return nil, 4

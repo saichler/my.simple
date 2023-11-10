@@ -3,7 +3,6 @@ package port
 import (
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/net/protocol"
-	"github.com/saichler/my.simple/go/services/service_point"
 	"github.com/saichler/my.simple/go/utils/logs"
 )
 
@@ -61,13 +60,13 @@ func (port *PortImpl) notifyRawDataListener() {
 					logs.Error(err)
 					continue
 				}
-				pb, err := protocol.ProtoOf(msg)
+				pb, err := protocol.ProtoOf(msg, port.registry)
 				if err != nil {
 					logs.Error(err)
 					continue
 				}
 				// Otherwise call the handler per the action & the type
-				service_point.Handle(pb, msg.Action, port)
+				port.servicePoints.Handle(pb, msg.Action, port)
 			}
 		}
 	}

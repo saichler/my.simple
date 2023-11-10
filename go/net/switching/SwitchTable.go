@@ -14,12 +14,14 @@ import (
 type SwitchTable struct {
 	internalPorts *maps.PortMap
 	externalPorts *maps.PortMap
+	health        common.IHealthCeter
 }
 
-func newSwitchTable() *SwitchTable {
+func newSwitchTable(health common.IHealthCeter) *SwitchTable {
 	switchTable := &SwitchTable{}
 	switchTable.internalPorts = maps.NewPortMap()
 	switchTable.externalPorts = maps.NewPortMap()
+	switchTable.health = health
 	return switchTable
 }
 
@@ -69,9 +71,9 @@ func (switchTable *SwitchTable) addPort(port common.Port, switchUuid string) {
 		}
 		switchTable.externalPorts.Put(port.Uuid(), port)
 	}
-	health.AddPort(port)
-	health.AddService(health.Health_Center_Topic, port.Uuid())
-	go switchTable.broadcast(health.Health_Center_Topic, model.Action_Action_Post, switchUuid, health.CloneHealth())
+	switchTable.health.AddPort(port)
+	switchTable.health.AddService(health.Health_Center_Topic, port.Uuid())
+	go switchTable.broadcast(health.Health_Center_Topic, model.Action_Action_Post, switchUuid, switchTable.health.Clone())
 }
 
 func (switchTable *SwitchTable) fetchPortByUuid(id string) common.Port {

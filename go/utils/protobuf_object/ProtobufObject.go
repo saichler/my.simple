@@ -1,12 +1,13 @@
 package protobuf_object
 
 import (
+	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"reflect"
 	"sync"
 )
 
-var protobufObjectTypes = make(map[reflect.Kind]ProtobufObjectType)
+var protobufObjectTypes = make(map[reflect.Kind]common.ProtobufObjectType)
 var sizeObjectType = &Int32{}
 var stringObjectType = &String{}
 var mtx = &sync.Mutex{}
@@ -14,11 +15,6 @@ var mtx = &sync.Mutex{}
 type ProtobufObject struct {
 	data     []byte
 	location int
-}
-
-type ProtobufObjectType interface {
-	add(interface{}) ([]byte, int)
-	get([]byte, int) (interface{}, int)
 }
 
 func init() {
@@ -64,7 +60,7 @@ func (obj *ProtobufObject) Add(any interface{}) error {
 		return logs.Error("Did not find any Object for kind", kind.String())
 	}
 	obj.addKind(kind)
-	b, l := et.add(any)
+	b, l := et.Add(any)
 	obj.location += l
 	obj.data = append(obj.data, b...)
 	return nil
@@ -78,19 +74,19 @@ func (obj *ProtobufObject) Get() (interface{}, error) {
 	if !ok {
 		return nil, logs.Error("Did not find any Object for kind", kind.String())
 	}
-	d, l := et.get(obj.data, obj.location)
+	d, l := et.Get(obj.data, obj.location)
 	obj.location += l
 	return d, nil
 }
 
 func (obj *ProtobufObject) addKind(kind reflect.Kind) {
-	b, l := sizeObjectType.add(int32(kind))
+	b, l := sizeObjectType.Add(int32(kind))
 	obj.location += l
 	obj.data = append(obj.data, b...)
 }
 
 func (obj *ProtobufObject) getKind() reflect.Kind {
-	i, l := sizeObjectType.get(obj.data, obj.location)
+	i, l := sizeObjectType.Get(obj.data, obj.location)
 	obj.location += l
 	return reflect.Kind(i.(int32))
 }

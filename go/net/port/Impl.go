@@ -38,6 +38,10 @@ type PortImpl struct {
 	isSwitch bool
 	// created at
 	createdAt int64
+	//The used registry
+	registry common.IRegistry
+	//Service Points
+	servicePoints common.IServicePoints
 }
 
 type ReconnectInfo struct {
@@ -52,9 +56,11 @@ type ReconnectInfo struct {
 }
 
 // Instantiate a new port with a connection
-func NewPortImpl(incomingConnection bool, con net.Conn, _uuid string, dataListener common.DatatListener) *PortImpl {
+func NewPortImpl(incomingConnection bool, con net.Conn, _uuid string, dataListener common.DatatListener, registry common.IRegistry, servicePoints common.IServicePoints) *PortImpl {
 	port := &PortImpl{}
 	port.uuid = _uuid
+	port.registry = registry
+	port.servicePoints = servicePoints
 	port.createdAt = time.Now().Unix()
 	if port.uuid == "" {
 		port.uuid = uuid.New().String()
@@ -77,7 +83,7 @@ func NewPortImpl(incomingConnection bool, con net.Conn, _uuid string, dataListen
 }
 
 // This is the method that the service port is using to connect to the switch for the VM/machine
-func ConnectTo(host string, destPort int32, datalistener common.DatatListener) (common.Port, error) {
+func ConnectTo(host string, destPort int32, datalistener common.DatatListener, registry common.IRegistry, servicePoints common.IServicePoints) (common.Port, error) {
 
 	// Dial the destination and validate the secret and key
 	conn, err := protocol.ConnectToAndValidateSecretAndKey(host, destPort)
@@ -86,7 +92,7 @@ func ConnectTo(host string, destPort int32, datalistener common.DatatListener) (
 	}
 
 	// Instantiate the port
-	port := NewPortImpl(false, conn, "", datalistener)
+	port := NewPortImpl(false, conn, "", datalistener, registry, servicePoints)
 
 	//Below attributes are only for the port initiating the connection
 	port.reconnectInfo = &ReconnectInfo{

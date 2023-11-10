@@ -4,18 +4,18 @@ import "reflect"
 
 type Slice struct{}
 
-func (_type *Slice) add(any interface{}) ([]byte, int) {
+func (_type *Slice) Add(any interface{}) ([]byte, int) {
 	if any == nil {
-		sizeBytes, _ := sizeObjectType.add(int32(-1))
+		sizeBytes, _ := sizeObjectType.Add(int32(-1))
 		return sizeBytes, 4
 	}
 	slice := reflect.ValueOf(any)
 	if slice.Len() == 0 {
-		sizeBytes, _ := sizeObjectType.add(int32(-1))
+		sizeBytes, _ := sizeObjectType.Add(int32(-1))
 		return sizeBytes, 4
 	}
 
-	s, _ := sizeObjectType.add(int32(slice.Len()))
+	s, _ := sizeObjectType.Add(int32(slice.Len()))
 
 	data, ok := any.([]byte)
 	if ok {
@@ -32,8 +32,8 @@ func (_type *Slice) add(any interface{}) ([]byte, int) {
 	return s, len(s)
 }
 
-func (_type *Slice) get(data []byte, location int) (interface{}, int) {
-	l, _ := sizeObjectType.get(data, location)
+func (_type *Slice) Get(data []byte, location int) (interface{}, int) {
+	l, _ := sizeObjectType.Get(data, location)
 	size := l.(int32)
 	if size == -1 || size == 0 {
 		return nil, 4

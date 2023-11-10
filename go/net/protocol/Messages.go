@@ -2,8 +2,8 @@ package protocol
 
 import (
 	"github.com/saichler/my.security/go/sec_common"
+	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/net/model"
-	"github.com/saichler/my.simple/go/utils/registry"
 	"google.golang.org/protobuf/proto"
 	"reflect"
 	"sync/atomic"
@@ -45,7 +45,7 @@ func MessageOf(data []byte) (*model.SecureMessage, error) {
 	return msg, err
 }
 
-func ProtoOf(msg *model.SecureMessage) (proto.Message, error) {
+func ProtoOf(msg *model.SecureMessage, registry common.IRegistry) (proto.Message, error) {
 	data, err := sec_common.MySecurityProvider.Decrypt(msg.ProtoData)
 	if err != nil {
 		return nil, err

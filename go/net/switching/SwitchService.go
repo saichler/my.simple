@@ -7,8 +7,6 @@ import (
 	"github.com/saichler/my.simple/go/common"
 	port2 "github.com/saichler/my.simple/go/net/port"
 	"github.com/saichler/my.simple/go/net/protocol"
-	"github.com/saichler/my.simple/go/services/health"
-	"github.com/saichler/my.simple/go/services/service_point"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"google.golang.org/protobuf/proto"
 	"net"
@@ -16,19 +14,23 @@ import (
 )
 
 type SwitchService struct {
-	uuid        string
-	port        int32
-	socket      net.Listener
-	active      bool
-	switchTable *SwitchTable
+	uuid          string
+	port          int32
+	socket        net.Listener
+	active        bool
+	switchTable   *SwitchTable
+	registry      common.IRegistry
+	servicePoints common.IServicePoints
 }
 
-func NewSwitchService(port int32) *SwitchService {
+func NewSwitchService(port int32, registry common.IRegistry, health common.IHealthCeter, servicePoints common.IServicePoints) *SwitchService {
 	switchService := &SwitchService{}
 	switchService.uuid = uuid.New().String()
 	switchService.port = port
-	switchService.switchTable = newSwitchTable()
+	switchService.servicePoints = servicePoints
+	switchService.switchTable = newSwitchTable(health)
 	switchService.active = true
+	switchService.registry = registry
 	return switchService
 }
 
@@ -74,7 +76,7 @@ func (switchService *SwitchService) connect(conn net.Conn) {
 		logs.Error("Failed to connect:", err.Error())
 		return
 	}
-	port := port2.NewPortImpl(true, conn, uuid, switchService)
+	port := port2.NewPortImpl(true, conn, uuid, switchService, switchService.registry, switchService.servicePoints)
 	port.Start()
 	switchService.notifyNewPort(port)
 }
@@ -97,7 +99,7 @@ func (switchService *SwitchService) HandleData(data []byte, port common.Port) {
 		return
 	}
 
-	uuidList := health.ServiceUuids(destination)
+	uuidList := switchService.switchTable.health.ServiceUuids(destination)
 	if uuidList != nil {
 		switchService.sendToPorts(uuidList, data)
 		return
@@ -134,12 +136,12 @@ func (switchService *SwitchService) switchDataReceived(data []byte, port common.
 		logs.Error(err)
 		return
 	}
-	pb, err := protocol.ProtoOf(msg)
+	pb, err := protocol.ProtoOf(msg, switchService.registry)
 	if err != nil {
 		logs.Error(err)
 		return
 	}
 	// Otherwise call the handler per the action & the type
-	service_point.Handle(pb, msg.Action, port)
+	switchService.servicePoints.Handle(pb, msg.Action, port)
 
 }

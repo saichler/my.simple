@@ -2,26 +2,26 @@ package idql_query
 
 import (
 	"errors"
+	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/idql/idql_parser"
-	"github.com/saichler/my.simple/go/introspect"
 	"reflect"
 	"strings"
 )
 
 type Fetch struct {
-	pFetch       *idql_parser.Fetch
-	criteria     *Criteria
-	only         []string
-	introspector *introspect.Introspect
+	pFetch     *idql_parser.Fetch
+	criteria   *Criteria
+	only       []string
+	introspect common.IIntrospect
 }
 
-func NewFetch(request string, introspector *introspect.Introspect) (*Fetch, error) {
+func NewFetch(request string, introspect common.IIntrospect) (*Fetch, error) {
 	pFetch, err := idql_parser.NewFetch(request)
 	if err != nil {
 		return nil, err
 	}
 	fetch := &Fetch{}
-	fetch.introspector = introspector
+	fetch.introspect = introspect
 	fetch.pFetch = pFetch
 	err = fetch.validateElement()
 	if err != nil {
@@ -33,7 +33,7 @@ func NewFetch(request string, introspector *introspect.Introspect) (*Fetch, erro
 		return nil, err
 	}
 
-	criteria, err := newCriteria(pFetch.Criteria(), fetch.pFetch.ElementType())
+	criteria, err := newCriteria(pFetch.Criteria(), fetch.pFetch.ElementType(), introspect)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func NewFetch(request string, introspector *introspect.Introspect) (*Fetch, erro
 }
 
 func (fetch *Fetch) validateElement() error {
-	_, ok := fetch.introspector.Node(fetch.pFetch.ElementType())
+	_, ok := fetch.introspect.Node(fetch.pFetch.ElementType())
 	if ok {
 		return nil
 	}
@@ -57,12 +57,12 @@ func (fetch *Fetch) validateOnly() error {
 	only := fetch.pFetch.Only()
 	for _, att := range only {
 		if strings.HasPrefix(att, fetch.pFetch.ElementType()) {
-			_, ok := fetch.introspector.Node(att)
+			_, ok := fetch.introspect.Node(att)
 			if !ok {
 				return errors.New("Unknown Only request for " + att)
 			}
 		} else {
-			_, ok := fetch.introspector.Node(fetch.pFetch.ElementType() + "." + att)
+			_, ok := fetch.introspect.Node(fetch.pFetch.ElementType() + "." + att)
 			if !ok {
 				return errors.New("Unknown Only request for " + att)
 			}

@@ -3,6 +3,7 @@ package idql_query
 import (
 	"bytes"
 	"errors"
+	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/idql/idql_parser"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
@@ -14,17 +15,17 @@ type CriteriaSymbol struct {
 	nextCriteriaSymbol *CriteriaSymbol
 }
 
-func newCriteriaSymbol(pCriteriaSymbol *idql_parser.CriteriaSymbol, elementType string) (*CriteriaSymbol, error) {
+func newCriteriaSymbol(pCriteriaSymbol *idql_parser.CriteriaSymbol, elementType string, introspect common.IIntrospect) (*CriteriaSymbol, error) {
 	criteriaSymbol := &CriteriaSymbol{}
 	criteriaSymbol.symbol = pCriteriaSymbol.Symbol()
-	varSymbol, e := newVarSymbol(pCriteriaSymbol.VarSymbol(), elementType)
+	varSymbol, e := newVarSymbol(pCriteriaSymbol.VarSymbol(), elementType, introspect)
 	if e != nil {
 		return nil, e
 	}
 	criteriaSymbol.varSymbol = varSymbol
 
 	if pCriteriaSymbol.NextCriteriaSymbol() != nil {
-		n, e := newCriteriaSymbol(pCriteriaSymbol.NextCriteriaSymbol(), elementType)
+		n, e := newCriteriaSymbol(pCriteriaSymbol.NextCriteriaSymbol(), elementType, introspect)
 		if e != nil {
 			return nil, e
 		}

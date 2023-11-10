@@ -3,10 +3,10 @@ package idql_query
 import (
 	"errors"
 	"fmt"
+	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/idql/idql_parser"
 	"github.com/saichler/my.simple/go/idql/idql_query/symbol_impl"
 	"github.com/saichler/my.simple/go/instance"
-	"github.com/saichler/my.simple/go/introspect"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
 	"strings"
@@ -92,7 +92,7 @@ func (varSymbol *VarSymbol) Simple() string {
 	return s.String()
 }
 
-func newVarSymbol(pVarSymbol *idql_parser.VarSymbol, elementType string) (*VarSymbol, error) {
+func newVarSymbol(pVarSymbol *idql_parser.VarSymbol, elementType string, introspect common.IIntrospect) (*VarSymbol, error) {
 	varSymbol := &VarSymbol{}
 	varSymbol.symbol = pVarSymbol.Symbol()
 	varSymbol.aSide = pVarSymbol.ASide()
@@ -113,9 +113,9 @@ func newVarSymbol(pVarSymbol *idql_parser.VarSymbol, elementType string) (*VarSy
 		s.Add(zSide)
 		zSide = s.String()
 	}
-	aSideInstance, aSideErr := instance.InstanceOf(aSide, introspect.DefaultIntrospect)
+	aSideInstance, aSideErr := instance.InstanceOf(aSide, introspect)
 	varSymbol.aSideInstance = aSideInstance
-	zSideInstance, zSideErr := instance.InstanceOf(zSide, introspect.DefaultIntrospect)
+	zSideInstance, zSideErr := instance.InstanceOf(zSide, introspect)
 	varSymbol.zSideInstance = zSideInstance
 
 	if aSideErr != nil && zSideErr != nil {

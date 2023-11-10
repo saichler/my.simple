@@ -10,8 +10,6 @@ type Cloner struct {
 	cloners map[reflect.Kind]func(reflect.Value, string, map[string]reflect.Value) reflect.Value
 }
 
-var defaultCloner = newCloner()
-
 func newCloner() *Cloner {
 	cloner := &Cloner{}
 	cloner.initCloners()
@@ -34,10 +32,6 @@ func (cloner *Cloner) initCloners() {
 	cloner.cloners[reflect.Uint64] = cloner.uint64Cloner
 	cloner.cloners[reflect.Float32] = cloner.float32Cloner
 	cloner.cloners[reflect.Float64] = cloner.float64Cloner
-}
-
-func Clone(any interface{}) interface{} {
-	return defaultCloner.Clone(any)
 }
 
 func (Cloner *Cloner) Clone(any interface{}) interface{} {
