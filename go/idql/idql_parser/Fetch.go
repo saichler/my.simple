@@ -25,7 +25,7 @@ type Fetch struct {
 func NewFetch(request string) (*Fetch, error) {
 	fetch := &Fetch{}
 	fetch.request = request
-	parsed := ParseFetch(request)
+	parsed := parseFetch(request)
 	_fetch := parsed[FETCH]
 	_fetch = strings.TrimSpace(_fetch)
 	if _fetch == "" {

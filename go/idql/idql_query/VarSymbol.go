@@ -2,8 +2,11 @@ package idql_query
 
 import (
 	"errors"
+	"fmt"
 	"github.com/saichler/my.simple/go/idql/idql_parser"
 	"github.com/saichler/my.simple/go/idql/idql_query/symbol_impl"
+	"github.com/saichler/my.simple/go/instance"
+	"github.com/saichler/my.simple/go/introspect"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
 	"strings"
@@ -11,10 +14,10 @@ import (
 
 type VarSymbol struct {
 	aSide         string
-	aSideInstance *introspect2.Instance
+	aSideInstance *instance.Instance
 	symbol        idql_parser.Symbol
 	zSide         string
-	zSideInstance *introspect2.Instance
+	zSideInstance *instance.Instance
 }
 
 type VarSymbolImpl interface {
@@ -37,13 +40,21 @@ func init() {
 func (varSymbol *VarSymbol) String() string {
 	s := &strng.String{}
 	if varSymbol.aSideInstance != nil {
-		s.Add(varSymbol.aSideInstance.InstanceId())
+		id, err := varSymbol.aSideInstance.InstanceId()
+		if err != nil {
+			fmt.Println("Error Aside ToString instanceId")
+		}
+		s.Add(id)
 	} else {
 		s.Add(varSymbol.aSide)
 	}
 	s.Add(varSymbol.symbol.String())
 	if varSymbol.zSideInstance != nil {
-		s.Add(varSymbol.zSideInstance.InstanceId())
+		id, err := varSymbol.zSideInstance.InstanceId()
+		if err != nil {
+			fmt.Println("Error Zside ToString instanceId")
+		}
+		s.Add(id)
 	} else {
 		s.Add(varSymbol.zSide)
 	}
@@ -102,9 +113,9 @@ func newVarSymbol(pVarSymbol *idql_parser.VarSymbol, elementType string) (*VarSy
 		s.Add(zSide)
 		zSide = s.String()
 	}
-	aSideInstance, aSideErr := introspect2.Introspector.InstanceOf(aSide)
+	aSideInstance, aSideErr := instance.InstanceOf(aSide, introspect.DefaultIntrospect)
 	varSymbol.aSideInstance = aSideInstance
-	zSideInstance, zSideErr := introspect2.Introspector.InstanceOf(zSide)
+	zSideInstance, zSideErr := instance.InstanceOf(zSide, introspect.DefaultIntrospect)
 	varSymbol.zSideInstance = zSideInstance
 
 	if aSideErr != nil && zSideErr != nil {
@@ -146,11 +157,11 @@ func (varSymbol *VarSymbol) isForType(typeName string) bool {
 	return false
 }
 
-func (varSymbol *VarSymbol) ASideInstance() *introspect2.Instance {
+func (varSymbol *VarSymbol) ASideInstance() *instance.Instance {
 	return varSymbol.aSideInstance
 }
 
-func (varSymbol *VarSymbol) ZSideInstance() *introspect2.Instance {
+func (varSymbol *VarSymbol) ZSideInstance() *instance.Instance {
 	return varSymbol.zSideInstance
 }
 

@@ -5,15 +5,15 @@ import (
 	"strings"
 )
 
-func ParseFetch(fetch string) map[string]string {
+func parseFetch(fetch string) map[string]string {
 	result := make(map[string]string)
 	fetch = ToLower(strings.TrimSpace(fetch))
 	for reservedWord, _ := range reserved {
 		openB := false
 		openQ := false
 		openV := false
-		word := strng.String{}
-		value := strng.String{}
+		word := strng.New("")
+		value := strng.New("")
 
 		for _, c := range fetch {
 			if c == '{' {
@@ -44,7 +44,7 @@ func ParseFetch(fetch string) map[string]string {
 			if !openB && !openQ && !openV {
 				word.Add(string(c))
 				if word.Len() > len(reservedWord) {
-					temp := strng.String{}
+					temp := strng.New("")
 					temp.AddBytes(word.Bytes()[1:])
 					word = temp
 				}
