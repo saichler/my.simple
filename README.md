@@ -42,6 +42,10 @@ The is extremely usable in agnostic handling of **Delta Notifications**, **ORM (
 * [Protobuf Object](https://github.com/saichler/my.simple/tree/main/go/utils/protobuf_object)
 * Protobuf Service Points
 
+## Metadata driven getter/setter for nested tree/graph models
+[Instance](https://github.com/saichler/my.simple/tree/main/go/instance) is a metadata driven utility for updating **Delta** pieces of data in a nested tree/graph model instances. 
+With a few lines of code, one can generically receive and update values inside an internal distribute cache copy.
+
 ## API Gateways
 Dynamic, Secured, [API Gateways](https://github.com/saichler/my.simple/tree/main/go/api_gateways) that avoids multiple implementations, bugs & maintenance.
 

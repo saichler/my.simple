@@ -52,3 +52,17 @@ func (s *String) IsBlank() bool {
 	s.init()
 	return s.buff.Len() == 0
 }
+
+// Len return the length of the current string
+func (s *String) Len() int {
+	return s.buff.Len()
+}
+
+// Bytes return the bytes of the string
+func (s *String) Bytes() []byte {
+	return s.buff.Bytes()
+}
+
+func (s *String) AddBytes(bytes []byte) {
+	s.buff.Write(bytes)
+}

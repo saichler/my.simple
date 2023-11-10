@@ -24,4 +24,15 @@ message Node {
   bool is_slice = 7;
   //The cached key so we won't need to calculate it all the time.
   string cached_key = 8;
+  //Decorators
+  map<int32, string> decorators = 9;
+}
+
+enum DecoratorType {
+  Invalid = 0;
+  Primary = 1;
+  Unique = 2;
+  NonUnique = 3;
+  Title = 4;
+  Editor = 5;
 }

@@ -39,3 +39,11 @@ func addAttribute(node *model.Node, _type reflect.Type, _fieldName string) *mode
 	}
 	return subNode
 }
+
+func Kind(node *model.Node) reflect.Kind {
+	t, err := registry.TypeByName(node.TypeName)
+	if err != nil {
+		panic(err.Error())
+	}
+	return t.Kind()
+}

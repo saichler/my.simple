@@ -2,6 +2,7 @@ package tests
 
 import (
 	"fmt"
+	"github.com/saichler/my.simple/go/api_gateways"
 	"github.com/saichler/my.simple/go/api_gateways/model"
 	"github.com/saichler/my.simple/go/common"
 	"testing"
@@ -10,13 +11,13 @@ import (
 
 func TestRestfulServer(t *testing.T) {
 	common.CreateDefaultTestCertificate()
-	config := &model.RestServerConfig{
+	config := &model.RestFulGatewayConfig{
 		Host: "127.0.0.1",
 		Port: 8980,
 		Crt:  "/tmp/test-crt.crt",
 		Key:  "/tmp/test-crt.crtKey",
 	}
-	server, err := api_gateways.NewRestServer(config)
+	server, err := apigateways.NewRestFulGateway(config)
 	if err != nil {
 		t.Fail()
 		fmt.Println(err)
