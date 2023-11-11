@@ -3,9 +3,9 @@ package defaults
 import (
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/introspect"
+	"github.com/saichler/my.simple/go/registry"
 	"github.com/saichler/my.simple/go/services/health"
 	"github.com/saichler/my.simple/go/services/service_point"
-	"github.com/saichler/my.simple/go/utils/registry"
 )
 
 func ApplyDefaults() {

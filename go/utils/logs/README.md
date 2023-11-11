@@ -1,6 +1,17 @@
 # Logs & Logging
 
-Yet another logging interface, trying to encapsulate visual attributes to logs so mixed debug,info,warning,error messages will be indented differently so the viewer can spot easily the errors over the debugs, info & etc.
+## Overview
+Logging, although seems as a straight forward component, has its challenges:
+* How to reduce/take away the impact of logging from your running code?
+* How to log to multiple persistence layers with no impact to your running code?
+* How to format the log, so it will be visualizing enough to distinguish between Debug & Error?
+* Flexible log line format.
+
+## Logger Queue & Format
+The Logger queue is offloading the formatting and persisting of a log line to 
+a different thread/go routine task so the impact of logging will now be observed by the running thread.
+
+## Default Log Line Format
 
 formatting is like so:
 ````

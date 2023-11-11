@@ -24,7 +24,7 @@ They implement the most basic design patterns used inside any microservice and e
 * [Logs & Logging](https://github.com/saichler/my.simple/tree/main/go/utils/logs)
 * [Blocking Sync Queues](https://github.com/saichler/my.simple/tree/main/go/utils/queues)
 * [Sync Maps](https://github.com/saichler/my.simple/tree/main/go/utils/maps)
-* [Struct Type Registry](https://github.com/saichler/my.simple/tree/main/go/utils/registry)
+* [Struct Type Registry](https://github.com/saichler/my.simple/tree/main/go/registry)
 And
 * [Security](https://github.com/saichler/my.simple/tree/main/go/security)
 

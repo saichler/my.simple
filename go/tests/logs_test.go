@@ -5,6 +5,7 @@ import (
 	"github.com/saichler/my.simple/go/utils/logs"
 	"os"
 	"testing"
+	"time"
 )
 
 const (
@@ -30,6 +31,9 @@ func TestLog(t *testing.T) {
 	logs.Info("info", "info")
 	logs.Warning("warning", "warning")
 	err = logs.Error("error", "error")
+	for !logs.Empty() {
+		time.Sleep(time.Millisecond * 50)
+	}
 	os.Stdout = oldFile
 	if err.Error() != "    Er -> error error" {
 		fmt.Println("'"+err.Error()+"'", "is not", "'    Er -> error error'")
