@@ -79,11 +79,7 @@ func (inst *Instance) setKeyValue(instanceId string) (string, error) {
 	}
 
 	v := suffix[bbIndex+1 : len(suffix)-1]
-	value, err := strng.FromString(v)
-	if err != nil {
-		return "", err
-	}
-	inst.key = value.Interface()
+	inst.key = strng.FromString(v).Interface()
 	return prefix, nil
 }
 
@@ -107,12 +103,8 @@ func (inst *Instance) InstanceId() (string, error) {
 
 	if inst.key != nil {
 		keyStr := strng.String{TypesPrefix: true}
-		keyStrVal, err := keyStr.StringOf(inst.key)
-		if err != nil {
-			return "", err
-		}
 		buff.Add("<")
-		buff.Add(keyStrVal)
+		buff.Add(keyStr.StringOf(inst.key))
 		buff.Add(">")
 	}
 	inst.id = buff.String()
@@ -152,11 +144,7 @@ func newInstance(node *model.Node, instancePath string, introspect common.IIntro
 		index1 := strings.Index(instancePath, "<")
 		index2 := strings.Index(instancePath, ">")
 		if index1 != -1 && index2 != -1 && index2 > index1 {
-			keyVal, err := strng.FromString(instancePath[index1+1 : index2])
-			if err != nil {
-				return nil, err
-			}
-			inst.key = keyVal.Interface()
+			inst.key = strng.FromString(instancePath[index1+1 : index2]).Interface()
 		}
 	}
 	return inst, nil

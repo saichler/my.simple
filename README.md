@@ -1,15 +1,16 @@
 # my.simple
-# Fullstack software building blocks for better work/life & business balance
+# Fullstack Building Blocks for Model Driven Application Development
+# Work Less & Do More - Better Work/Life balance enhancing your business
 ## Overview
 In a nutshell, **Software Development** is being treated & manage as any other industry out there.
-However, some of the very basic management & work/life practices, alongside though to be true paradoxes, are simply not true for **Software Development**.
+However, some of the very basic management & work/life practices, alongside thought to be true paradoxes, are simply not true for **Software Development**.
 Via **Coherent Analysis**, **Design Decomposition** & **Out-of-the-Box** thinking, Software Development, done right, can solve paradoxes and extremely better work/life balance.
 
 ## Help from a Giraffe
 ![alt text](https://github.com/saichler/my.simple/blob/main/giraffe.png)
 
-# Simple Is A State Of Mind, my.simple is proving that...
-Deep dive into my.simple [story](https://github.com/saichler/my.simple/blob/main/docs) or continue on to the components & building blocks.
+# Simple Is A State Of Mind
+Deep dive into my.simple [story](https://github.com/saichler/my.simple/blob/main/docs) or continue on to the components & building blocks of Model Driven Programing.
 
 . @TODO - Add a link to an example project using my.simple here that does <Employee Database Module>
 
@@ -44,7 +45,7 @@ To avoid reinventing the language, we converged to English, it is time to conver
 [IDQL](https://github.com/saichler/my.simple/tree/main/go/idql), so the wheel will not be invented everytime on every project.
 
 ## Protocol buffers & Services
-* [Protobuf Object](https://github.com/saichler/my.simple/tree/main/go/utils/protobuf_object)
+* [Protobuf Object](https://github.com/saichler/my.simple/tree/main/go/protobuf_object)
 * Protobuf Service Points
 
 ## Metadata driven getter/setter for nested tree/graph models

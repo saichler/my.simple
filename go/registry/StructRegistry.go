@@ -15,7 +15,16 @@ type StructRegistryImpl struct {
 func NewStructRegistry() *StructRegistryImpl {
 	sr := &StructRegistryImpl{}
 	sr.structName2Type = maps.NewString2TypeMao()
+	sr.registerPrimitives()
 	return sr
+}
+
+func (r *StructRegistryImpl) registerPrimitives() {
+	r.RegisterStructType(reflect.TypeOf(int8(0)))
+	r.RegisterStructType(reflect.TypeOf(int16(0)))
+	r.RegisterStructType(reflect.TypeOf(int32(0)))
+	r.RegisterStructType(reflect.TypeOf(int64(0)))
+	r.RegisterStructType(reflect.TypeOf(""))
 }
 
 func (r *StructRegistryImpl) RegisterStruct(any interface{}) bool {

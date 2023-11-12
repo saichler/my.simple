@@ -1,7 +1,6 @@
 package instance
 
 import (
-	"fmt"
 	"github.com/saichler/my.simple/go/introspect/model"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"reflect"
@@ -20,7 +19,7 @@ func (inst *Instance) Set(any interface{}, value interface{}) (interface{}, erro
 			any = newAny
 		}
 		if inst.key != nil {
-			inst.SetPrimaryKey(inst.node, any, inst.key.([]interface{}))
+			inst.SetPrimaryKey(inst.node, any, inst.key)
 		}
 		return any, nil
 	}
@@ -125,14 +124,12 @@ func (inst *Instance) SetPrimaryKey(node *model.Node, any interface{}, anyKey in
 		value = value.Elem()
 	}
 
-	f, err := inst.introspect.DecoratorOf(model.DecoratorType_Primary, node)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fields := f.([]string)
-	for i, attr := range fields {
-		fld := value.FieldByName(attr)
-		fld.Set(reflect.ValueOf(fieldsValues[i]))
+	f := inst.introspect.DecoratorOf(model.DecoratorType_Primary, node)
+	if f != nil {
+		fields := f.([]string)
+		for i, attr := range fields {
+			fld := value.FieldByName(attr)
+			fld.Set(reflect.ValueOf(fieldsValues[i]))
+		}
 	}
 }

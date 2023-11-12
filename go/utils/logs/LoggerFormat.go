@@ -6,11 +6,11 @@ func toString(tag string, any interface{}, anys ...interface{}) string {
 	str := strng.New(tag)
 	str.TypesPrefix = false
 	str.AddSpaceWhenAdding = true
-	s, _ := str.StringOf(any)
+	s := str.StringOf(any)
 	str.Add(s)
 	if anys != nil {
 		for _, a := range anys {
-			s, _ = str.StringOf(a)
+			s = str.StringOf(a)
 			str.Add(s)
 		}
 	}

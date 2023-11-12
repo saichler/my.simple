@@ -10,11 +10,15 @@ type String struct {
 }
 
 // New construct a new String instance and initialize the buff with the input string
-func New(s string) *String {
-	_String := &String{}
-	_String.init()
-	_String.buff.WriteString(s)
-	return _String
+func New(anys ...interface{}) *String {
+	s := &String{}
+	s.init()
+	if anys != nil {
+		for _, any := range anys {
+			s.Add(s.StringOf(any))
+		}
+	}
+	return s
 }
 
 // init initialize the buff if needed
@@ -65,4 +69,14 @@ func (s *String) Bytes() []byte {
 
 func (s *String) AddBytes(bytes []byte) {
 	s.buff.Write(bytes)
+}
+
+func (s *String) Panic(anys ...interface{}) {
+	if anys != nil {
+		for _, any := range anys {
+			s.Add(s.StringOf(any))
+		}
+	}
+	s.Add("\nPlease email stack trace to saichler@gmail.com")
+	panic(s.String())
 }

@@ -35,4 +35,5 @@ enum DecoratorType {
   NonUnique = 3;
   Title = 4;
   Editor = 5;
+  Deep = 6;
 }

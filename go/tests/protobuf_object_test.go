@@ -2,9 +2,9 @@ package tests
 
 import (
 	"github.com/saichler/my.simple/go/common"
+	"github.com/saichler/my.simple/go/protobuf_object"
 	"github.com/saichler/my.simple/go/tests/model"
 	"github.com/saichler/my.simple/go/utils/logs"
-	"github.com/saichler/my.simple/go/utils/protobuf_object"
 	"strconv"
 	"testing"
 )

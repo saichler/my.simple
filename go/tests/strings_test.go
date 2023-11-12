@@ -2,6 +2,7 @@ package tests
 
 import (
 	"fmt"
+	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
 	"strings"
@@ -28,23 +29,19 @@ func checkToString(any interface{}, ex string, t *testing.T) bool {
 }
 
 func checkToFromString(any interface{}, ex, ex2 string, t *testing.T) bool {
-	s, e := Str.StringOf(any)
-	if e != nil {
-		t.Fail()
-		fmt.Println("error:", e)
-		return false
-	}
-	fs, e := strng.FromString(s)
+	s := Str.StringOf(any)
+	fs := strng.InstanceOf(s)
+	reflect.DeepEqual(any, fs)
 	// Until struct is implemented, skip it
-	if e != nil && !strings.Contains(s, ",25") {
+	if !reflect.DeepEqual(any, fs) && !strings.Contains(s, ",25") {
 		t.Fail()
-		fmt.Println("error from string:", s, e, fs)
+		fmt.Println("error from string:", reflect.DeepEqual(any, fs), ":", any, ":", fs, s)
 		return false
 	}
 
 	_ex := strng.Kind2String(reflect.ValueOf(any)).Add(ex).String()
 	_ex2 := strng.Kind2String(reflect.ValueOf(any)).Add(ex2).String()
-	if s != _ex && s != _ex2 {
+	if s != _ex && s != _ex2 && s != ex {
 		t.Fail()
 		fmt.Println("Expected String to be '" + ex + "' but got '" + s + "'")
 		return false
@@ -104,7 +101,8 @@ func TestToString(t *testing.T) {
 		return
 	}
 	type test struct{}
-	if ok := checkToString(&test{}, "<tests.test Value>", t); !ok {
+	common.Registry.RegisterStruct(&test{})
+	if ok := checkToString(&test{}, "{22,25}test", t); !ok {
 		return
 	}
 	st := &test{}
@@ -133,12 +131,7 @@ func TestToString(t *testing.T) {
 }
 
 func TestFromStringPtr(t *testing.T) {
-	s, e := strng.InstanceOf("{22,24}test")
-	if e != nil {
-		t.Fail()
-		fmt.Println(e)
-		return
-	}
+	s := strng.InstanceOf("{22,24}test")
 	s1 := *s.(*string)
 	if s1 != "test" {
 		t.Fail()
@@ -148,12 +141,7 @@ func TestFromStringPtr(t *testing.T) {
 }
 
 func TestFromStringInt(t *testing.T) {
-	v, e := strng.InstanceOf("{2}5")
-	if e != nil {
-		t.Fail()
-		fmt.Println(e)
-		return
-	}
+	v := strng.InstanceOf("{2}5")
 	r := v.(int)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Int {
 		t.Fail()
@@ -163,12 +151,7 @@ func TestFromStringInt(t *testing.T) {
 }
 
 func TestFromStringInt8(t *testing.T) {
-	v, e := strng.InstanceOf("{3}5")
-	if e != nil {
-		t.Fail()
-		fmt.Println(e)
-		return
-	}
+	v := strng.InstanceOf("{3}5")
 	r := v.(int8)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Int8 {
 		t.Fail()
@@ -178,12 +161,7 @@ func TestFromStringInt8(t *testing.T) {
 }
 
 func TestFromStringInt16(t *testing.T) {
-	v, e := strng.InstanceOf("{4}5")
-	if e != nil {
-		t.Fail()
-		fmt.Println(e)
-		return
-	}
+	v := strng.InstanceOf("{4}5")
 	r := v.(int16)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Int16 {
 		t.Fail()
@@ -193,12 +171,7 @@ func TestFromStringInt16(t *testing.T) {
 }
 
 func TestFromStringFloat32(t *testing.T) {
-	v, e := strng.InstanceOf("{13}5.8")
-	if e != nil {
-		t.Fail()
-		fmt.Println(e)
-		return
-	}
+	v := strng.InstanceOf("{13}5.8")
 	r := v.(float32)
 	if r != 5.8 || reflect.ValueOf(r).Kind() != reflect.Float32 {
 		t.Fail()
@@ -208,12 +181,7 @@ func TestFromStringFloat32(t *testing.T) {
 }
 
 func TestFromStringSlice(t *testing.T) {
-	s, e := strng.InstanceOf("{23,24}[a,b]")
-	if e != nil {
-		t.Fail()
-		fmt.Println(e)
-		return
-	}
+	s := strng.InstanceOf("{23,24}[a,b]")
 	s1 := s.([]string)
 	if s1[0] != "a" {
 		t.Fail()
@@ -228,12 +196,7 @@ func TestFromStringSlice(t *testing.T) {
 }
 
 func TestFromStringMap(t *testing.T) {
-	s, e := strng.InstanceOf("{21,24,2}[a=1,b=2]")
-	if e != nil {
-		t.Fail()
-		fmt.Println(e)
-		return
-	}
+	s := strng.InstanceOf("{21,24,2}[a=1,b=2]")
 	s1 := s.(map[string]int)
 	if s1["a"] != 1 {
 		t.Fail()
