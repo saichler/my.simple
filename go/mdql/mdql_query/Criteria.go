@@ -1,17 +1,17 @@
-package idql_query
+package mdql_query
 
 import (
 	"bytes"
 	"errors"
 	"github.com/saichler/my.simple/go/common"
-	"github.com/saichler/my.simple/go/idql/idql_parser"
+	"github.com/saichler/my.simple/go/mdql/mdql_parser"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
 )
 
 type Criteria struct {
 	criteriaSymbol *CriteriaSymbol
-	symbol         idql_parser.Symbol
+	symbol         mdql_parser.Symbol
 	nextCriteria   *Criteria
 	subCriteria    *Criteria
 }
@@ -36,7 +36,7 @@ func (criteria *Criteria) String() string {
 	return s.String()
 }
 
-func newCriteria(pCriteria *idql_parser.Criteria, elementType string, introspect common.IIntrospect) (*Criteria, error) {
+func newCriteria(pCriteria *mdql_parser.Criteria, elementType string, introspect common.IIntrospect) (*Criteria, error) {
 	if pCriteria == nil {
 		return nil, nil
 	}
@@ -75,7 +75,7 @@ func (criteria *Criteria) Match(any reflect.Value) (bool, error) {
 	cSub := true
 	cNext := true
 	var e error
-	if criteria.symbol == idql_parser.Or {
+	if criteria.symbol == mdql_parser.Or {
 		cSymbol = false
 		cSub = false
 		cNext = false
@@ -101,10 +101,10 @@ func (criteria *Criteria) Match(any reflect.Value) (bool, error) {
 	if criteria.symbol == "" {
 		return cSub && cNext && cSymbol, nil
 	}
-	if criteria.symbol == idql_parser.And {
+	if criteria.symbol == mdql_parser.And {
 		return cSub && cNext && cSymbol, nil
 	}
-	if criteria.symbol == idql_parser.Or {
+	if criteria.symbol == mdql_parser.Or {
 		return cSub || cNext || cSymbol, nil
 	}
 

@@ -1,4 +1,4 @@
-package idql_parser
+package mdql_parser
 
 import (
 	"github.com/saichler/my.simple/go/utils/strng"

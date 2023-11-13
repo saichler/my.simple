@@ -3,14 +3,14 @@ package tests
 import (
 	"fmt"
 	"github.com/saichler/my.simple/go/common"
-	"github.com/saichler/my.simple/go/idql/idql_parser"
-	"github.com/saichler/my.simple/go/idql/idql_query"
+	"github.com/saichler/my.simple/go/mdql/mdql_parser"
+	"github.com/saichler/my.simple/go/mdql/mdql_query"
 	"testing"
 )
 
 func TestFetchParse(t *testing.T) {
 	fetch := "fetch elem only 1,2,3 criteria 1=4 and 6=7"
-	f, e := idql_parser.NewFetch(fetch)
+	f, e := mdql_parser.NewFetch(fetch)
 	if e != nil {
 		t.Fail()
 		fmt.Println(e)
@@ -27,7 +27,7 @@ func TestFetchQuery(t *testing.T) {
 	common.Introspect.Inspect(test)
 
 	request := "fetch mytestmodel only mysingle.mystring, mysingle.myint64 criteria mysingle.mystring='string-sub-1'"
-	fetch, err := idql_query.NewFetch(request, common.Introspect)
+	fetch, err := mdql_query.NewFetch(request, common.Introspect)
 	if err != nil {
 		fmt.Println(err)
 		t.Fail()

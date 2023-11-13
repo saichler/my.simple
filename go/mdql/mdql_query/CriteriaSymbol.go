@@ -1,21 +1,21 @@
-package idql_query
+package mdql_query
 
 import (
 	"bytes"
 	"errors"
 	"github.com/saichler/my.simple/go/common"
-	"github.com/saichler/my.simple/go/idql/idql_parser"
+	"github.com/saichler/my.simple/go/mdql/mdql_parser"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
 )
 
 type CriteriaSymbol struct {
 	varSymbol          *VarSymbol
-	symbol             idql_parser.Symbol
+	symbol             mdql_parser.Symbol
 	nextCriteriaSymbol *CriteriaSymbol
 }
 
-func newCriteriaSymbol(pCriteriaSymbol *idql_parser.CriteriaSymbol, elementType string, introspect common.IIntrospect) (*CriteriaSymbol, error) {
+func newCriteriaSymbol(pCriteriaSymbol *mdql_parser.CriteriaSymbol, elementType string, introspect common.IIntrospect) (*CriteriaSymbol, error) {
 	criteriaSymbol := &CriteriaSymbol{}
 	criteriaSymbol.symbol = pCriteriaSymbol.Symbol()
 	varSymbol, e := newVarSymbol(pCriteriaSymbol.VarSymbol(), elementType, introspect)
@@ -58,7 +58,7 @@ func (criteriaSymbol *CriteriaSymbol) Match(any reflect.Value) (bool, error) {
 		return false, e
 	}
 	nm := true
-	if criteriaSymbol.symbol == idql_parser.Or {
+	if criteriaSymbol.symbol == mdql_parser.Or {
 		nm = false
 	}
 	if criteriaSymbol.nextCriteriaSymbol != nil {
@@ -70,10 +70,10 @@ func (criteriaSymbol *CriteriaSymbol) Match(any reflect.Value) (bool, error) {
 	if criteriaSymbol.symbol == "" {
 		return nm && m, nil
 	}
-	if criteriaSymbol.symbol == idql_parser.And {
+	if criteriaSymbol.symbol == mdql_parser.And {
 		return m && nm, nil
 	}
-	if criteriaSymbol.symbol == idql_parser.Or {
+	if criteriaSymbol.symbol == mdql_parser.Or {
 		return m || nm, nil
 	}
 	return false, errors.New("Unsupported symbol :" + criteriaSymbol.symbol.String())

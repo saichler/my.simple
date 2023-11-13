@@ -1,12 +1,12 @@
-package idql_query
+package mdql_query
 
 import (
 	"errors"
 	"fmt"
 	"github.com/saichler/my.simple/go/common"
-	"github.com/saichler/my.simple/go/idql/idql_parser"
-	"github.com/saichler/my.simple/go/idql/idql_query/symbol_impl"
 	"github.com/saichler/my.simple/go/instance"
+	"github.com/saichler/my.simple/go/mdql/mdql_parser"
+	"github.com/saichler/my.simple/go/mdql/mdql_query/symbol_impl"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
 	"strings"
@@ -15,7 +15,7 @@ import (
 type VarSymbol struct {
 	aSide         string
 	aSideInstance *instance.Instance
-	symbol        idql_parser.Symbol
+	symbol        mdql_parser.Symbol
 	zSide         string
 	zSideInstance *instance.Instance
 }
@@ -24,17 +24,17 @@ type VarSymbolImpl interface {
 	Exec([]reflect.Value, []reflect.Value) bool
 }
 
-var symbolImpls = make(map[idql_parser.Symbol]VarSymbolImpl)
+var symbolImpls = make(map[mdql_parser.Symbol]VarSymbolImpl)
 
 func init() {
-	symbolImpls[idql_parser.Equal] = symbol_impl.NewEqual()
-	symbolImpls[idql_parser.NotEqual] = symbol_impl.NewNotEqual()
-	symbolImpls[idql_parser.Contain] = symbol_impl.NewContain()
-	symbolImpls[idql_parser.NotContain] = symbol_impl.NewNotContain()
-	symbolImpls[idql_parser.GreaterThan] = symbol_impl.NewGreaterThan()
-	symbolImpls[idql_parser.GreaterOrEqual] = symbol_impl.NewGreaterThanOrEqual()
-	symbolImpls[idql_parser.LessThan] = symbol_impl.NewLessThan()
-	symbolImpls[idql_parser.LessOrEqual] = symbol_impl.NewLessThanOrEqual()
+	symbolImpls[mdql_parser.Equal] = symbol_impl.NewEqual()
+	symbolImpls[mdql_parser.NotEqual] = symbol_impl.NewNotEqual()
+	symbolImpls[mdql_parser.Contain] = symbol_impl.NewContain()
+	symbolImpls[mdql_parser.NotContain] = symbol_impl.NewNotContain()
+	symbolImpls[mdql_parser.GreaterThan] = symbol_impl.NewGreaterThan()
+	symbolImpls[mdql_parser.GreaterOrEqual] = symbol_impl.NewGreaterThanOrEqual()
+	symbolImpls[mdql_parser.LessThan] = symbol_impl.NewLessThan()
+	symbolImpls[mdql_parser.LessOrEqual] = symbol_impl.NewLessThanOrEqual()
 }
 
 func (varSymbol *VarSymbol) String() string {
@@ -92,7 +92,7 @@ func (varSymbol *VarSymbol) Simple() string {
 	return s.String()
 }
 
-func newVarSymbol(pVarSymbol *idql_parser.VarSymbol, elementType string, introspect common.IIntrospect) (*VarSymbol, error) {
+func newVarSymbol(pVarSymbol *mdql_parser.VarSymbol, elementType string, introspect common.IIntrospect) (*VarSymbol, error) {
 	varSymbol := &VarSymbol{}
 	varSymbol.symbol = pVarSymbol.Symbol()
 	varSymbol.aSide = pVarSymbol.ASide()
@@ -165,7 +165,7 @@ func (varSymbol *VarSymbol) ZSideInstance() *instance.Instance {
 	return varSymbol.zSideInstance
 }
 
-func (varSymbol *VarSymbol) Symbol() idql_parser.Symbol {
+func (varSymbol *VarSymbol) Symbol() mdql_parser.Symbol {
 	return varSymbol.symbol
 }
 

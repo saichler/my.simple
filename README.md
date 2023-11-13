@@ -65,10 +65,10 @@ A single mistake in this area will crete a very big headache, pose challenges th
 The process of deep analysis & cloning a tree/graph models at runtime without having the model at compile time is called [Introspection](https://github.com/saichler/my.simple/tree/main/go/introspect).
 The is extremely usable in agnostic handling of **Delta Notifications**, **ORM (Object Relation Mapping)** &**Generic Distributed Cache**.
 
-## IDQL (Intent Driven Query Language)
+## [MDQL (Model Driven Query Language)](ttps://github.com/saichler/my.simple/tree/main/go/mdql)
 Process 2 Process interaction is de-facto a language. 
 To avoid reinventing the language, we converged to English, it is time to converge to the same query language in software.
-[IDQL](https://github.com/saichler/my.simple/tree/main/go/idql), so the wheel will not be invented everytime on every project.
+**MDQL**, so the **"Wheel"** will not be invented everytime on every project.
 
 ## Protocol buffers & Services
 * [Protobuf Object](https://github.com/saichler/my.simple/tree/main/go/protobuf_object)

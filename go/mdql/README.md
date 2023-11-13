@@ -1,4 +1,4 @@
-# IDQL (Intent Driven Query Language)
+# MDQL (Model Driven Query Language)
 
 ## Overview
 Process 2 Process interaction is de-facto a language. 
@@ -14,16 +14,18 @@ Consuming the proprietary API query from the NBI, translating it to a set of que
 
 The world has consolidated into **English** when developing software, it is time to **consolidate into a single query language!**
 
-## Intent Driven Query Language
-**IDQL** is a model driven, model agnostic, API query language, 
-enabling the **Querying Entity** to express intent to fetch, filter & scope data from the **Querying Provider**, while the **Querying Provider** has minimal to no effort exposing & securing the data.
+## Model Driven Query Language
+**MDQL** is a model driven, model agnostic, API query language, 
+enabling the **Querying Entity** to express intent to fetch model instances, filter & scope model instances from the **Querying Provider**, while the **Querying Provider** has minimal to no effort exposing & securing the model instances.
 
-In other words, unified language to query a data provider regardless if it is an SQL database, Microservice, No SQL database & etc. 
-**Offloading the translation of the component/persistent layer from the consumer to the provider, giving the consumer a unified language to fetch data from any kind of provider.**
+In other words, unified language to query a model provider regardless if it is an SQL database, Microservice, No SQL database & etc. 
+**Offloading the translation of the component/persistent layer from the consumer to the provider, giving the consumer a unified language to fetch model instances from any kind of provider.**
 
-## Usage
+## Syntax
 
 An example of fetching data:
 ````
 fetch <model (nested) element> only <scoped attributes (nested)> (optional) criteria <expression referring attributes (nested)>"
 ````
+
+## Usage

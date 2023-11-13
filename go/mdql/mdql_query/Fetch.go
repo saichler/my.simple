@@ -1,22 +1,22 @@
-package idql_query
+package mdql_query
 
 import (
 	"errors"
 	"github.com/saichler/my.simple/go/common"
-	"github.com/saichler/my.simple/go/idql/idql_parser"
+	"github.com/saichler/my.simple/go/mdql/mdql_parser"
 	"reflect"
 	"strings"
 )
 
 type Fetch struct {
-	pFetch     *idql_parser.Fetch
+	pFetch     *mdql_parser.Fetch
 	criteria   *Criteria
 	only       []string
 	introspect common.IIntrospect
 }
 
 func NewFetch(request string, introspect common.IIntrospect) (*Fetch, error) {
-	pFetch, err := idql_parser.NewFetch(request)
+	pFetch, err := mdql_parser.NewFetch(request)
 	if err != nil {
 		return nil, err
 	}
