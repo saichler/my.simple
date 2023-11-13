@@ -1,18 +1,30 @@
-# my.simple
-# Fullstack Building Blocks for Model Driven Application Development
-# Work Less & Do More - Better Work/Life balance enhancing your business
+# Model Driven Programing Framework for Micro Services
+
 ## Overview
-In a nutshell, **Software Development** is being treated & manage as any other industry out there.
-However, some of the very basic management & work/life practices, alongside thought to be true paradoxes, are simply not true for **Software Development**.
-Via **Coherent Analysis**, **Design Decomposition** & **Out-of-the-Box** thinking, Software Development, done right, can solve paradoxes and extremely better work/life balance.
+**Model Driven Development**, or **MDD** is a development methodology, purposed in **extremely expediting** software development **without** compromising on quality.
+**However**, there isn't any **coherent, secure, simple, abstract, maintainable, high available, agnostic & fullstack** framework that delivers on the concept.
 
 ## Help from a Giraffe
 ![alt text](https://github.com/saichler/my.simple/blob/main/giraffe.png)
 
-# Simple Is A State Of Mind
+## Can Software Development be that Simple?
+# Yes! Yes! Yes!
+
+**my.simple** is a full implementation providing fullstack, coherent, components for **Model Driven Programing**, without compromising on quality or security.
+It's Sole purpose is to extremely reduce **Time to Market** when developing a MicroService application/service for VM, dockers & Kubernetes.
+* **No Install** - Just coherent & agnostic libraries to use.
+* **Seamless Config** - Minimum to no config is needed.
+* **Seamless Security** - Integrated Security to the Bone.
+* **Built in health & monitoring** - Health made simple.
+* **Single Point of Maintenance** - The model control it all.
+
 Deep dive into my.simple [story](https://github.com/saichler/my.simple/blob/main/docs) or continue on to the components & building blocks of Model Driven Programing.
 
-. @TODO - Add a link to an example project using my.simple here that does <Employee Database Module>
+## Example Application
+**my.simple** contains vast amount of components. 
+To emphasize, how easy it is to build, test & deploy a microservice base application with **my.simple**, 
+allow us to show off with an [example application](@TODO - example application).
+
 
 ## So let's Make It Simple... 
 
