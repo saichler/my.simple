@@ -1,16 +1,17 @@
-package maps
+package service_point
 
 import (
 	"github.com/saichler/my.simple/go/common"
+	"github.com/saichler/my.simple/go/utils/maps"
 )
 
 type String2ServicePointMap struct {
-	impl *SyncMap
+	impl *maps.SyncMap
 }
 
 func NewString2ServicePointMap() *String2ServicePointMap {
 	newMap := &String2ServicePointMap{}
-	newMap.impl = NewSyncMap()
+	newMap.impl = maps.NewSyncMap()
 	return newMap
 }
 

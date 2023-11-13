@@ -10,8 +10,19 @@
 ## Can Software Development be that Simple?
 # Yes! Yes! Yes!
 
-**my.simple** is a full implementation providing fullstack, coherent, components for **Model Driven Programing**, without compromising on quality or security.
-It's Sole purpose is to extremely reduce **Time to Market** when developing a MicroService application/service for VM, dockers & Kubernetes.
+**my.simple** is a full implementation, providing fullstack, coherent, components for **Model Driven Programing**, without compromising on **quality or security**.
+Its purpose is to **extremely** reduce & simplify **Time to Market** when developing a MicroServices based applications/services, 
+while being completely **agnostic** to the **underline infrastructure**. 
+
+**Infrastructure agnostic** as to:
+* **Machine/VM Phisical location** - The code is the same, regardless of process location. 
+* **Running On Bare Metal** - Can be run on bare metal, no need for dockers or K8s.
+* **Being Dockerized** - Can be dockerized, no need for K8s.
+* **Deployed on Kubernetes** Can be deployed on K8s.
+* **Database/Datastore** The code is the same, regardless of persistence layer you choose.
+
+With:
+
 * **No Install** - Just coherent & agnostic libraries to use.
 * **Seamless Config** - Minimum to no config is needed.
 * **Seamless Security** - Integrated Security to the Bone.
@@ -26,20 +37,23 @@ To emphasize, how easy it is to build, test & deploy a microservice base applica
 allow us to show off with an [example application](@TODO - example application).
 
 
-## So let's Make It Simple... 
+# So let's Make It Simple... 
 
-.
+And deliver on the promise, as well as explaining the **"Magic"**.
 
 ## Basic Building Blocks
 The basic building blocks are a must-have for any application. 
-They implement the most basic design patterns used inside any microservice and expedite development.
+They implement the most basic design patterns, used inside any microservice development.
 * [String conversions & concatenation](https://github.com/saichler/my.simple/tree/main/go/utils/strng)
 * [Logs & Logging](https://github.com/saichler/my.simple/tree/main/go/utils/logs)
 * [Blocking Sync Queues](https://github.com/saichler/my.simple/tree/main/go/utils/queues)
 * [Sync Maps](https://github.com/saichler/my.simple/tree/main/go/utils/maps)
-* [Struct Type Registry](https://github.com/saichler/my.simple/tree/main/go/registry)
 And
 * [Security](https://github.com/saichler/my.simple/tree/main/go/security)
+
+## [Struct Type Registry](https://github.com/saichler/my.simple/tree/main/go/registry)
+**Unfortunetaly**, Golang does not have a registry of **Name2Type** fashion. 
+This is an implementation of such a mechanism so instances can be instantiated by type name. 
 
 ## Process 2 Process Secure Networking
 One of the biggest challenges of MicroServices, one that usually pose the biggest pain point, "Troubles"/Challenges is the Process 2 Process communication.

@@ -7,20 +7,19 @@ import (
 	"github.com/saichler/my.simple/go/net/protocol"
 	"github.com/saichler/my.simple/go/services/health"
 	"github.com/saichler/my.simple/go/utils/logs"
-	"github.com/saichler/my.simple/go/utils/maps"
 	"google.golang.org/protobuf/proto"
 )
 
 type SwitchTable struct {
-	internalPorts *maps.PortMap
-	externalPorts *maps.PortMap
+	internalPorts *protocol.PortMap
+	externalPorts *protocol.PortMap
 	health        common.IHealthCeter
 }
 
 func newSwitchTable(health common.IHealthCeter) *SwitchTable {
 	switchTable := &SwitchTable{}
-	switchTable.internalPorts = maps.NewPortMap()
-	switchTable.externalPorts = maps.NewPortMap()
+	switchTable.internalPorts = protocol.NewPortMap()
+	switchTable.externalPorts = protocol.NewPortMap()
 	switchTable.health = health
 	return switchTable
 }

@@ -1,12 +1,13 @@
-package maps
+package protocol
 
 import (
 	"github.com/saichler/my.simple/go/common"
+	"github.com/saichler/my.simple/go/utils/maps"
 	"reflect"
 )
 
 type PortMap struct {
-	impl *SyncMap
+	impl *maps.SyncMap
 }
 
 var port common.Port
@@ -14,7 +15,7 @@ var portType = reflect.TypeOf(port)
 
 func NewPortMap() *PortMap {
 	m := &PortMap{}
-	m.impl = NewSyncMap()
+	m.impl = maps.NewSyncMap()
 	return m
 }
 
@@ -35,7 +36,7 @@ func (pm *PortMap) Contains(key string) bool {
 }
 
 func (pm *PortMap) PortList() []common.Port {
-	return pm.impl.valuesAsList(portType, nil).([]common.Port)
+	return pm.impl.ValuesAsList(portType, nil).([]common.Port)
 }
 
 func (pm *PortMap) Iterate(do func(k, v interface{})) {

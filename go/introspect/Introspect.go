@@ -4,15 +4,14 @@ import (
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/introspect/model"
 	"github.com/saichler/my.simple/go/utils/logs"
-	"github.com/saichler/my.simple/go/utils/maps"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
 	"strings"
 )
 
 type Introspect struct {
-	pathToNode *maps.IntrospectNodeMap
-	typeToNode *maps.IntrospectNodeMap
+	pathToNode *NodeMap
+	typeToNode *NodeMap
 	registry   common.IRegistry
 	cloner     *Cloner
 }
@@ -21,8 +20,8 @@ func NewIntrospect(registry common.IRegistry) *Introspect {
 	i := &Introspect{}
 	i.registry = registry
 	i.cloner = newCloner()
-	i.pathToNode = maps.NewIntrospectNodeMap()
-	i.typeToNode = maps.NewIntrospectNodeMap()
+	i.pathToNode = NewIntrospectNodeMap()
+	i.typeToNode = NewIntrospectNodeMap()
 	return i
 }
 

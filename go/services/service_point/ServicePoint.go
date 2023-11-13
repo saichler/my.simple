@@ -4,18 +4,17 @@ import (
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/utils/logs"
-	"github.com/saichler/my.simple/go/utils/maps"
 	"google.golang.org/protobuf/proto"
 	"reflect"
 )
 
 type ServicePoints struct {
-	structName2ServicePoint *maps.String2ServicePointMap
+	structName2ServicePoint *String2ServicePointMap
 }
 
 func NewServicePoints() *ServicePoints {
 	sp := &ServicePoints{}
-	sp.structName2ServicePoint = maps.NewString2ServicePointMap()
+	sp.structName2ServicePoint = NewString2ServicePointMap()
 	return sp
 }
 
