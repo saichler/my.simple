@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/saichler/my.security/go/sec_common"
 	"github.com/saichler/my.simple/go/common"
 	port2 "github.com/saichler/my.simple/go/net/port"
 	"github.com/saichler/my.simple/go/net/protocol"
@@ -15,7 +16,7 @@ import (
 
 type SwitchService struct {
 	uuid          string
-	port          int32
+	port          uint32
 	socket        net.Listener
 	active        bool
 	switchTable   *SwitchTable
@@ -23,7 +24,7 @@ type SwitchService struct {
 	servicePoints common.IServicePoints
 }
 
-func NewSwitchService(port int32, registry common.IRegistry, health common.IHealthCeter, servicePoints common.IServicePoints) *SwitchService {
+func NewSwitchService(port uint32, registry common.IRegistry, health common.IHealthCeter, servicePoints common.IServicePoints) *SwitchService {
 	switchService := &SwitchService{}
 	switchService.uuid = uuid.New().String()
 	switchService.port = port
@@ -71,12 +72,18 @@ func (switchService *SwitchService) bind() error {
 }
 
 func (switchService *SwitchService) connect(conn net.Conn) {
-	uuid, err := protocol.Incoming(conn, switchService.uuid)
+	err := sec_common.MySecurityProvider.CanAccept(conn)
 	if err != nil {
-		logs.Error("Failed to connect:", err.Error())
+		logs.Error(err)
 		return
 	}
-	port := port2.NewPortImpl(true, conn, uuid, switchService, switchService.registry, switchService.servicePoints)
+
+	zuuid, err := sec_common.MySecurityProvider.ValidateConnection(conn, switchService.uuid)
+	if err != nil {
+		logs.Error(err)
+		return
+	}
+	port := port2.NewPortImpl(true, conn, zuuid, switchService, switchService.registry, switchService.servicePoints)
 	port.Start()
 	switchService.notifyNewPort(port)
 }

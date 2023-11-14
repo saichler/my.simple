@@ -51,5 +51,5 @@ message NetConfig {
   int64 max_data_size = 1;
   uint64 default_tx_queue_size = 2;
   uint64 default_rx_queue_size = 3;
-  int32 default_switch_port = 4;
+  uint32 default_switch_port = 4;
 }

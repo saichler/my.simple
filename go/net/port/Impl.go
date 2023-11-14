@@ -2,9 +2,9 @@ package port
 
 import (
 	"github.com/google/uuid"
+	"github.com/saichler/my.security/go/sec_common"
 	"github.com/saichler/my.simple/go/common"
 	model2 "github.com/saichler/my.simple/go/net/model"
-	"github.com/saichler/my.simple/go/net/protocol"
 	"github.com/saichler/my.simple/go/services/health"
 	"github.com/saichler/my.simple/go/services/health/model"
 	"github.com/saichler/my.simple/go/utils/logs"
@@ -48,7 +48,7 @@ type ReconnectInfo struct {
 	//The host
 	host string
 	//The port
-	port int32
+	port uint32
 	// Mutex as multiple go routines might call reconnect
 	reconnectMtx *sync.Mutex
 	// Indicates if the port was already reconnected
@@ -56,15 +56,12 @@ type ReconnectInfo struct {
 }
 
 // Instantiate a new port with a connection
-func NewPortImpl(incomingConnection bool, con net.Conn, _uuid string, dataListener common.DatatListener, registry common.IRegistry, servicePoints common.IServicePoints) *PortImpl {
+func NewPortImpl(incomingConnection bool, con net.Conn, uid string, dataListener common.DatatListener, registry common.IRegistry, servicePoints common.IServicePoints) *PortImpl {
 	port := &PortImpl{}
-	port.uuid = _uuid
+	port.uuid = uid
 	port.registry = registry
 	port.servicePoints = servicePoints
 	port.createdAt = time.Now().Unix()
-	if port.uuid == "" {
-		port.uuid = uuid.New().String()
-	}
 	port.conn = con
 	port.active = true
 	port.dataListener = dataListener
@@ -83,16 +80,18 @@ func NewPortImpl(incomingConnection bool, con net.Conn, _uuid string, dataListen
 }
 
 // This is the method that the service port is using to connect to the switch for the VM/machine
-func ConnectTo(host string, destPort int32, datalistener common.DatatListener, registry common.IRegistry, servicePoints common.IServicePoints) (common.Port, error) {
+func ConnectTo(host string, destPort uint32, datalistener common.DatatListener, registry common.IRegistry, servicePoints common.IServicePoints) (common.Port, error) {
 
 	// Dial the destination and validate the secret and key
-	conn, err := protocol.ConnectToAndValidateSecretAndKey(host, destPort)
+	conn, err := sec_common.MySecurityProvider.CanDial(host, destPort)
 	if err != nil {
 		return nil, err
 	}
 
-	// Instantiate the port
-	port := NewPortImpl(false, conn, "", datalistener, registry, servicePoints)
+	auuid := uuid.New().String()
+	zuuid, err := sec_common.MySecurityProvider.ValidateConnection(conn, auuid)
+
+	port := NewPortImpl(false, conn, auuid, datalistener, registry, servicePoints)
 
 	//Below attributes are only for the port initiating the connection
 	port.reconnectInfo = &ReconnectInfo{
@@ -101,16 +100,11 @@ func ConnectTo(host string, destPort int32, datalistener common.DatatListener, r
 		reconnectMtx: &sync.Mutex{},
 	}
 
-	// Request the connecting port to send over its uuid
-	zuuid, err := protocol.ExchangeUuid(port.uuid, conn)
-	if err != nil {
-		return nil, err
-	}
 	port.zside = zuuid
 
 	//We have only one go routing per each because we want to keep the order of incoming and outgoing messages
-
 	port.Start()
+
 	return port, nil
 }
 
@@ -186,13 +180,11 @@ func (port *PortImpl) attemptToReconnect() {
 
 func (port *PortImpl) reconnect() error {
 	// Dial the destination and validate the secret and key
-	conn, err := protocol.ConnectToAndValidateSecretAndKey(port.reconnectInfo.host, port.reconnectInfo.port)
+	conn, err := sec_common.MySecurityProvider.CanDial(port.reconnectInfo.host, port.reconnectInfo.port)
 	if err != nil {
 		return err
 	}
-
-	// Request the connecting port to send over its uuid
-	zuuid, err := protocol.ExchangeUuid(port.uuid, conn)
+	zuuid, err := sec_common.MySecurityProvider.ValidateConnection(conn, port.uuid)
 	if err != nil {
 		return err
 	}

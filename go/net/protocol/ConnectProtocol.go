@@ -1,18 +1,14 @@
 package protocol
 
-import (
-	"errors"
-	"github.com/saichler/my.security/go/sec_common"
-	"github.com/saichler/my.simple/go/common"
-	"net"
-	"strconv"
-)
-
-func ConnectToAndValidateSecretAndKey(host string, port int32) (net.Conn, error) {
-	conn, err := net.Dial("tcp", host+":"+strconv.Itoa(int(port)))
+/*
+func ConnectToAndValidateSecretAndKey(host string, port uint32, salts ...interface{}) (net.Conn, error) {
+	conn, err := common.SP.CanDial(host, port, salts...)
 	if err != nil {
 		return nil, err
 	}
+
+	err = common.SP.ValidateConnection(conn, salts...)
+
 	data, err := sec_common.MySecurityProvider.EncryptedSecret()
 	if err != nil {
 		return nil, err
@@ -47,3 +43,4 @@ func ExchangeUuid(uuid string, conn net.Conn) (string, error) {
 	}
 	return string(inData), nil
 }
+*/

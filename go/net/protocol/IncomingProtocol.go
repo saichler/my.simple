@@ -1,12 +1,6 @@
 package protocol
 
-import (
-	"errors"
-	"github.com/saichler/my.security/go/sec_common"
-	"github.com/saichler/my.simple/go/common"
-	"net"
-)
-
+/*
 func Incoming(conn net.Conn, uuid string) (string, error) {
 	initData, err := common.Read(conn)
 	if err != nil {
@@ -54,3 +48,4 @@ func Incoming(conn net.Conn, uuid string) (string, error) {
 	}
 	return portUuid, nil
 }
+*/
