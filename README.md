@@ -2,7 +2,11 @@
 
 ## Overview
 **Model Driven Development**, or **MDD** is a development methodology, purposed in **extremely expediting** software development **without** compromising on quality.
-**However**, there isn't any **coherent, secure, simple, abstract, maintainable, high available, agnostic & fullstack** framework that delivers on the concept.
+**However**, there isn't any **coherent, secure, simple, scalable, abstract, maintainable, high available, agnostic & fullstack** framework that delivers on the concept.
+
+### About the Author...
+**Decades** of software architecting, developing, testing & **maintaining** experience, alongside deep observation & insights, 
+were consolidated & purified into this project. 
 
 ## Help from a Giraffe
 ![alt text](https://github.com/saichler/my.simple/blob/main/giraffe.png)
