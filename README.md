@@ -52,22 +52,24 @@ They implement the most basic design patterns, used inside any microservice deve
 * [Logs & Logging](https://github.com/saichler/my.simple/tree/main/go/utils/logs)
 * [Blocking Sync Queues](https://github.com/saichler/my.simple/tree/main/go/utils/queues)
 * [Sync Maps](https://github.com/saichler/my.simple/tree/main/go/utils/maps)
-And
-* [Security](https://github.com/saichler/my.simple/tree/main/go/security)
+
+## [Model Driven Security](https://github.com/saichler/my.simple/tree/main/go/security)
+**Security** & AAA is embedded from day 1 throughout the components, hence avoiding later challenges, 
+trying to embed it when the project is well ongoing.
 
 ## [Struct Type Registry](https://github.com/saichler/my.simple/tree/main/go/registry)
 **Unfortunetaly**, Golang does not have a registry of **Name2Type** fashion. 
 This is an implementation of such a mechanism so instances can be instantiated by type name. 
 
-## Process 2 Process Secure Networking
+## [Secure Networking]((https://github.com/saichler/my.simple/tree/main/go/net))
 One of the biggest challenges of MicroServices, one that usually pose the biggest pain point, "Troubles"/Challenges is the Process 2 Process communication.
 In other words, "How will my MicroServices **Communicate, Interact & Share data** with each other?"
 A single mistake in this area will crete a very big headache, pose challenges that should not have been there, worsen dramatically the engineers work/life balance and will cause the company Hundreds of Millions of dollars in maintenance.
 **[my.simple Secure Networking](https://github.com/saichler/my.simple/tree/main/go/net)** is giving a seamless & simple, secure communication between your MicroServices.
 
-## Introspection & Deep Cloning
-The process of deep analysis & cloning a tree/graph models at runtime without having the model at compile time is called [Introspection](https://github.com/saichler/my.simple/tree/main/go/introspect).
-The is extremely usable in agnostic handling of **Delta Notifications**, **ORM (Object Relation Mapping)** &**Generic Distributed Cache**.
+## [Model Introspection & Deep Cloning](https://github.com/saichler/my.simple/tree/main/go/introspect)
+The process of deep analysis & cloning a tree/graph models at runtime without having the model at compile time is called Introspection.
+This is extremely usable in agnostic handling of **Delta Notifications**, **ORM (Object Relation Mapping)** &**Generic Distributed Cache**.
 
 ## [MDQL (Model Driven Query Language)](ttps://github.com/saichler/my.simple/tree/main/go/mdql)
 Process 2 Process interaction is de-facto a language. 
