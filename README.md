@@ -61,17 +61,17 @@ trying to embed it when the project is well ongoing.
 **Unfortunetaly**, Golang does not have a registry of **Name2Type** fashion. 
 This is an implementation of such a mechanism so instances can be instantiated by type name. 
 
-## [Secure Networking]((https://github.com/saichler/my.simple/tree/main/go/net))
+## [Secure Networking](https://github.com/saichler/my.simple/tree/main/go/net)
 One of the biggest challenges of MicroServices, one that usually pose the biggest pain point, "Troubles"/Challenges is the Process 2 Process communication.
 In other words, "How will my MicroServices **Communicate, Interact & Share data** with each other?"
 A single mistake in this area will crete a very big headache, pose challenges that should not have been there, worsen dramatically the engineers work/life balance and will cause the company Hundreds of Millions of dollars in maintenance.
-**[my.simple Secure Networking](https://github.com/saichler/my.simple/tree/main/go/net)** is giving a seamless & simple, secure communication between your MicroServices.
+**[my.simple Secure Networking** is giving a seamless & simple, secure communication between your MicroServices.
 
 ## [Model Introspection & Deep Cloning](https://github.com/saichler/my.simple/tree/main/go/introspect)
 The process of deep analysis & cloning a tree/graph models at runtime without having the model at compile time is called Introspection.
 This is extremely usable in agnostic handling of **Delta Notifications**, **ORM (Object Relation Mapping)** &**Generic Distributed Cache**.
 
-## [MDQL (Model Driven Query Language)](ttps://github.com/saichler/my.simple/tree/main/go/mdql)
+## [MDQL (Model Driven Query Language)](https://github.com/saichler/my.simple/tree/main/go/mdql)
 Process 2 Process interaction is de-facto a language. 
 To avoid reinventing the language, we converged to English, it is time to converge to the same query language in software.
 **MDQL**, so the **"Wheel"** will not be invented everytime on every project.
