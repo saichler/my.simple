@@ -2,7 +2,7 @@ package port
 
 import (
 	"github.com/google/uuid"
-	"github.com/saichler/my.security/go/sec_common"
+	"github.com/saichler/my.security/go/sec"
 	"github.com/saichler/my.simple/go/common"
 	model2 "github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/services/health"
@@ -83,13 +83,13 @@ func NewPortImpl(incomingConnection bool, con net.Conn, uid string, dataListener
 func ConnectTo(host string, destPort uint32, datalistener common.DatatListener, registry common.IRegistry, servicePoints common.IServicePoints) (common.Port, error) {
 
 	// Dial the destination and validate the secret and key
-	conn, err := sec_common.MySecurityProvider.CanDial(host, destPort)
+	conn, err := sec.CanDial(host, destPort)
 	if err != nil {
 		return nil, err
 	}
 
 	auuid := uuid.New().String()
-	zuuid, err := sec_common.MySecurityProvider.ValidateConnection(conn, auuid)
+	zuuid, err := sec.ValidateConnection(conn, auuid)
 
 	port := NewPortImpl(false, conn, auuid, datalistener, registry, servicePoints)
 
@@ -180,11 +180,11 @@ func (port *PortImpl) attemptToReconnect() {
 
 func (port *PortImpl) reconnect() error {
 	// Dial the destination and validate the secret and key
-	conn, err := sec_common.MySecurityProvider.CanDial(port.reconnectInfo.host, port.reconnectInfo.port)
+	conn, err := sec.CanDial(port.reconnectInfo.host, port.reconnectInfo.port)
 	if err != nil {
 		return err
 	}
-	zuuid, err := sec_common.MySecurityProvider.ValidateConnection(conn, port.uuid)
+	zuuid, err := sec.ValidateConnection(conn, port.uuid)
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"github.com/saichler/my.security/go/sec"
 	"github.com/saichler/my.simple/go/defaults"
 	"github.com/saichler/my.simple/go/tests/model"
 	"strconv"
@@ -8,6 +9,7 @@ import (
 )
 
 func init() {
+	sec.SetProvider("../security/plugin/plugin.so")
 	defaults.ApplyDefaults()
 }
 

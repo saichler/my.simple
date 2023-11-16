@@ -2,11 +2,12 @@ package security
 
 import (
 	"errors"
+	"fmt"
+	"github.com/saichler/my.security/go/sec"
 	"github.com/saichler/my.simple/go/common"
 	"net"
 	"strconv"
 )
-import "github.com/saichler/my.security/go/sec_common"
 
 type ShallowSecurityProvider struct {
 	secret string
@@ -15,9 +16,9 @@ type ShallowSecurityProvider struct {
 
 func NewShallowSecurityProvider(key, secret string) *ShallowSecurityProvider {
 	sp := &ShallowSecurityProvider{}
+	fmt.Println(key)
 	sp.key = key
 	sp.secret = secret
-	sec_common.MySecurityProvider = sp
 	return sp
 }
 
@@ -25,18 +26,18 @@ func (sp *ShallowSecurityProvider) CanDial(host string, port uint32, salts ...in
 	return net.Dial("tcp", host+":"+strconv.Itoa(int(port)))
 }
 
-func (sp *ShallowSecurityProvider) CanAccept(conn net.Conn) error {
+func (sp *ShallowSecurityProvider) CanAccept(conn net.Conn, salts ...interface{}) error {
 	return nil
 }
 
 func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, uuid string, salts ...interface{}) (string, error) {
-	err := sp.writeEncrypted(conn, sp.secret)
+	err := sec.WriteEncrypted(conn, []byte(uuid), salts...)
 	if err != nil {
 		conn.Close()
 		return "", err
 	}
 
-	secret, err := sp.readEncrypted(conn)
+	secret, err := sec.ReadEncrypted(conn, salts...)
 	if err != nil {
 		conn.Close()
 		return "", err
@@ -47,13 +48,13 @@ func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, uuid string
 		return "", errors.New("incorrect Secret/Key, aborting connection")
 	}
 
-	err = sp.writeEncrypted(conn, uuid)
+	err = sec.WriteEncrypted(conn, []byte(uuid), salts...)
 	if err != nil {
 		conn.Close()
 		return "", err
 	}
 
-	zside, err := sp.readEncrypted(conn)
+	zside, err := sec.ReadEncrypted(conn, salts...)
 	if err != nil {
 		conn.Close()
 		return "", err
@@ -62,10 +63,16 @@ func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, uuid string
 	return zside, nil
 }
 
-func (sp *ShallowSecurityProvider) Encrypt(data []byte) (string, error) {
+func (sp *ShallowSecurityProvider) Encrypt(data []byte, salts ...interface{}) (string, error) {
 	return common.Encrypt(data, sp.key)
 }
 
-func (sp *ShallowSecurityProvider) Decrypt(data string) ([]byte, error) {
+func (sp *ShallowSecurityProvider) Decrypt(data string, salts ...interface{}) ([]byte, error) {
 	return common.Decrypt(data, sp.key)
+}
+
+func (sp *ShallowSecurityProvider) CanDo(action sec.Action, endpoint string, token string, salts ...interface{}) {
+
+}
+func (sp *ShallowSecurityProvider) CanView(typ string, attrName string, token string, salts ...interface{}) {
 }

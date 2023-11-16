@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/saichler/my.security/go/sec_common"
+	"github.com/saichler/my.security/go/sec"
 	"github.com/saichler/my.simple/go/common"
 	port2 "github.com/saichler/my.simple/go/net/port"
 	"github.com/saichler/my.simple/go/net/protocol"
@@ -72,13 +72,13 @@ func (switchService *SwitchService) bind() error {
 }
 
 func (switchService *SwitchService) connect(conn net.Conn) {
-	err := sec_common.MySecurityProvider.CanAccept(conn)
+	err := sec.CanAccept(conn)
 	if err != nil {
 		logs.Error(err)
 		return
 	}
 
-	zuuid, err := sec_common.MySecurityProvider.ValidateConnection(conn, switchService.uuid)
+	zuuid, err := sec.ValidateConnection(conn, switchService.uuid)
 	if err != nil {
 		logs.Error(err)
 		return

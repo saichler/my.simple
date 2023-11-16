@@ -5,14 +5,11 @@ import (
 	model2 "github.com/saichler/my.simple/go/net/model"
 	"github.com/saichler/my.simple/go/net/port"
 	"github.com/saichler/my.simple/go/net/switching"
-	security2 "github.com/saichler/my.simple/go/security"
 	"github.com/saichler/my.simple/go/tests/model"
 	"github.com/saichler/my.simple/go/utils/logs"
 	"testing"
 	"time"
 )
-
-var securityProvider = security2.NewShallowSecurityProvider(common.GenerateAES256Key(), "testing 1..2..3")
 
 func TestPortsSwitch(t *testing.T) {
 	mh := &model.MyTestModelHandler{}
