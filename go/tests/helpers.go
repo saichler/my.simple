@@ -3,13 +3,14 @@ package tests
 import (
 	"github.com/saichler/my.security/go/sec"
 	"github.com/saichler/my.simple/go/defaults"
+	"github.com/saichler/my.simple/go/security"
 	"github.com/saichler/my.simple/go/tests/model"
 	"strconv"
 	"time"
 )
 
 func init() {
-	sec.SetProvider("../security/plugin/plugin.so")
+	sec.SetProvider(security.NewShallowSecurityProvider("v7mdWmN7YtkK9o9RXVlezRd7j5Qntohg", "Top Secret"))
 	defaults.ApplyDefaults()
 }
 

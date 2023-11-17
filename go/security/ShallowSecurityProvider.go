@@ -31,7 +31,7 @@ func (sp *ShallowSecurityProvider) CanAccept(conn net.Conn, salts ...interface{}
 }
 
 func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, uuid string, salts ...interface{}) (string, error) {
-	err := sec.WriteEncrypted(conn, []byte(uuid), salts...)
+	err := sec.WriteEncrypted(conn, []byte(sp.secret), salts...)
 	if err != nil {
 		conn.Close()
 		return "", err
@@ -45,6 +45,7 @@ func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, uuid string
 
 	if sp.secret != secret {
 		conn.Close()
+		fmt.Println(sp.secret, ":", secret)
 		return "", errors.New("incorrect Secret/Key, aborting connection")
 	}
 
@@ -71,8 +72,9 @@ func (sp *ShallowSecurityProvider) Decrypt(data string, salts ...interface{}) ([
 	return common.Decrypt(data, sp.key)
 }
 
-func (sp *ShallowSecurityProvider) CanDo(action sec.Action, endpoint string, token string, salts ...interface{}) {
-
+func (sp *ShallowSecurityProvider) CanDo(action sec.Action, endpoint string, token string, salts ...interface{}) error {
+	return nil
 }
-func (sp *ShallowSecurityProvider) CanView(typ string, attrName string, token string, salts ...interface{}) {
+func (sp *ShallowSecurityProvider) CanView(typ string, attrName string, token string, salts ...interface{}) error {
+	return nil
 }
