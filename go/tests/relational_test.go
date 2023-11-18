@@ -10,8 +10,10 @@ import (
 
 func TestRelationalData(t *testing.T) {
 	common.Introspect.Inspect(&model.MyTestModel{})
-	data := createTestModelInstance(1)
+	data := []*model.MyTestModel{createTestModelInstance(1),
+		createTestModelInstance(2)}
 	tbls := relational.NewTables("1")
+
 	err := tbls.Add(data, common.Introspect)
 	fmt.Println(err)
 	tbls.Print()

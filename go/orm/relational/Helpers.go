@@ -17,14 +17,14 @@ func keyOf(key, value reflect.Value, node *model.Node, path, attr string, inspec
 	//This is a root key
 	if path == "" {
 		if primary == "" && key.IsValid() {
-			primary = toString(key)
+			return strng.New(node.TypeName, "<", toString(key), ">").String()
 		}
 		if primary != "" {
-			primary = strng.New(path, "<", primary, ">").String()
+			return strng.New(node.TypeName, "<", primary, ">").String()
 		}
 		//No key for the item was found and this is a root element
 		if primary == "" && path == "" {
-			return strng.New(value.Type().Name(), "<", uuid.New().String(), ">").String()
+			return strng.New(node.TypeName, "<", uuid.New().String(), ">").String()
 		}
 	}
 	if primary != "" {
