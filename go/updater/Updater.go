@@ -6,7 +6,6 @@ import (
 	"github.com/saichler/my.simple/go/instance"
 	"github.com/saichler/my.simple/go/introspect/model"
 	"reflect"
-	"strings"
 )
 
 type Updater struct {
@@ -38,7 +37,7 @@ func (updates *Updater) Update(old, new interface{}, introspect common.IIntrospe
 		oldValue = oldValue.Elem()
 		newValue = newValue.Elem()
 	}
-	node, _ := introspect.Node(strings.ToLower(oldValue.Type().Name()))
+	node, _ := introspect.Node(oldValue.Type().Name())
 	if node == nil {
 		return errors.New("cannot find node for type " + oldValue.Type().Name() + ", please register it")
 	}

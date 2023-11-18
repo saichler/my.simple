@@ -30,6 +30,7 @@ func (i *Introspect) addNode(_type reflect.Type, _parent *model.Node, _fieldName
 		clone := i.cloner.Clone(exist).(*model.Node)
 		clone.Parent = _parent
 		clone.FieldName = _fieldName
+		clone.CachedKey = ""
 		nodePath := NodeKey(clone)
 		i.pathToNode.Put(nodePath, clone)
 		return clone, true
@@ -57,11 +58,9 @@ func (i *Introspect) inspectStruct(_type reflect.Type, _parent *model.Node, _fie
 			continue
 		}
 		if field.Type.Kind() == reflect.Slice {
-			subNode := i.inspectSlice(field.Type, node, field.Name)
-			subNode.IsSlice = true
+			i.inspectSlice(field.Type, node, field.Name)
 		} else if field.Type.Kind() == reflect.Map {
-			subNode := i.inspectMap(field.Type, node, field.Name)
-			subNode.IsMap = true
+			i.inspectMap(field.Type, node, field.Name)
 		} else if field.Type.Kind() == reflect.Ptr {
 			i.inspectPtr(field.Type.Elem(), node, field.Name)
 		} else {
@@ -81,7 +80,10 @@ func (i *Introspect) inspectPtr(_type reflect.Type, _parent *model.Node, _fieldN
 
 func (i *Introspect) inspectMap(_type reflect.Type, _parent *model.Node, _fieldName string) *model.Node {
 	if _type.Elem().Kind() == reflect.Ptr && _type.Elem().Elem().Kind() == reflect.Struct {
-		return i.inspectStruct(_type.Elem().Elem(), _parent, _fieldName)
+		subNode := i.inspectStruct(_type.Elem().Elem(), _parent, _fieldName)
+		subNode.IsMap = true
+		_parent.Attributes[_fieldName] = subNode
+		return subNode
 	} else {
 		node, _ := i.addNode(_type.Elem(), _parent, _fieldName)
 		return node
@@ -90,9 +92,13 @@ func (i *Introspect) inspectMap(_type reflect.Type, _parent *model.Node, _fieldN
 
 func (i *Introspect) inspectSlice(_type reflect.Type, _parent *model.Node, _fieldName string) *model.Node {
 	if _type.Elem().Kind() == reflect.Ptr && _type.Elem().Elem().Kind() == reflect.Struct {
-		return i.inspectStruct(_type.Elem().Elem(), _parent, _fieldName)
+		subNode := i.inspectStruct(_type.Elem().Elem(), _parent, _fieldName)
+		subNode.IsSlice = true
+		_parent.Attributes[_fieldName] = subNode
+		return subNode
 	} else {
 		node, _ := i.addNode(_type.Elem(), _parent, _fieldName)
+		node.IsSlice = true
 		return node
 	}
 }

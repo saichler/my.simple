@@ -34,11 +34,11 @@ func (i *Introspect) Inspect(any interface{}) (*model.Node, error) {
 		return nil, logs.Error("Cannot introspect a nil value")
 	}
 	i.registry.RegisterStruct(any)
-	_, t, ts := common.ValueTypeLower(any)
+	_, t := common.ValueAndType(any)
 	if t.Kind() != reflect.Struct {
 		return nil, logs.Error("Cannot introspect a value that is not a struct")
 	}
-	node, ok := i.pathToNode.Get(ts)
+	node, ok := i.pathToNode.Get(strings.ToLower(t.Name()))
 	if ok {
 		return node, nil
 	}
@@ -46,7 +46,7 @@ func (i *Introspect) Inspect(any interface{}) (*model.Node, error) {
 }
 
 func (i *Introspect) Node(path string) (*model.Node, bool) {
-	return i.pathToNode.Get(path)
+	return i.pathToNode.Get(strings.ToLower(path))
 }
 
 func (i *Introspect) NodeByType(any interface{}) (*model.Node, bool) {

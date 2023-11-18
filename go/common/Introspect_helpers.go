@@ -6,14 +6,13 @@ import (
 	"strings"
 )
 
-func ValueTypeLower(any interface{}) (reflect.Value, reflect.Type, string) {
+func ValueAndType(any interface{}) (reflect.Value, reflect.Type) {
 	v := reflect.ValueOf(any)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
 	t := v.Type()
-	ts := strings.ToLower(t.Name())
-	return v, t, ts
+	return v, t
 }
 
 func IsLeaf(node *model.Node) bool {
