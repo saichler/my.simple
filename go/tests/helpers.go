@@ -6,6 +6,7 @@ import (
 	"github.com/saichler/my.simple/go/security"
 	"github.com/saichler/my.simple/go/tests/model"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -44,4 +45,10 @@ func createTestModelInstance(index int) *model.MyTestModel {
 		MyString2ModelMap:  map[string]*model.MyTestSubModelSingle{sub1.MyString: sub1, sub2.MyString: sub2},
 	}
 	return i
+}
+
+func extractKeyValue(key string) string {
+	index1 := strings.LastIndex(key, "<")
+	index2 := strings.LastIndex(key, ">")
+	return key[index1+1 : index2]
 }

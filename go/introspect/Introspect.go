@@ -33,7 +33,6 @@ func (i *Introspect) Inspect(any interface{}) (*model.Node, error) {
 	if any == nil {
 		return nil, logs.Error("Cannot introspect a nil value")
 	}
-	i.registry.RegisterStruct(any)
 	_, t := common.ValueAndType(any)
 	if t.Kind() != reflect.Struct {
 		return nil, logs.Error("Cannot introspect a value that is not a struct")

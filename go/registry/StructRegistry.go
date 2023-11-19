@@ -36,6 +36,9 @@ func (r *StructRegistryImpl) RegisterStruct(any interface{}) bool {
 }
 
 func (r *StructRegistryImpl) RegisterStructType(t reflect.Type) bool {
+	if t.Name() == "rtype" {
+		return false
+	}
 	return r.structName2Type.Put(t.Name(), t)
 }
 

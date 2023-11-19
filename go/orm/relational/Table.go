@@ -10,11 +10,11 @@ import (
 )
 
 type Table struct {
-	rows map[string]*Row
+	rows map[string]map[string]map[string]*Row
 }
 
 func newTable() *Table {
-	return &Table{make(map[string]*Row)}
+	return &Table{rows: make(map[string]map[string]map[string]*Row)}
 }
 
 func toString(value reflect.Value) string {
@@ -29,15 +29,29 @@ func (table *Table) Print() {
 	}
 }
 
-func (table *Table) addRow(key, value reflect.Value, node *model.Node, path, attr string, inspect common.IIntrospect, tables *Tables) error {
+func (table *Table) addRow(key, value reflect.Value, node *model.Node, path, attr string, inspect common.IIntrospect, tables *RelationalData) error {
 	recKey := keyOf(key, value, node, path, attr, inspect)
 	row := newRow()
 	row.addValues(value, recKey, node, inspect, tables)
-	table.rows[recKey] = row
+	table.addRowToMap(path, attr, recKey, row)
 	return nil
 }
 
-func (table *Table) addRoot(key, value reflect.Value, inspect common.IIntrospect, tables *Tables) error {
+func (table *Table) addRowToMap(path, colName, recKey string, row *Row) {
+	pathMap, ok := table.rows[path]
+	if !ok {
+		pathMap = make(map[string]map[string]*Row)
+		table.rows[path] = pathMap
+	}
+	colNameMap, ok := pathMap[colName]
+	if !ok {
+		colNameMap = make(map[string]*Row)
+		pathMap[colName] = colNameMap
+	}
+	colNameMap[recKey] = row
+}
+
+func (table *Table) addRoot(key, value reflect.Value, inspect common.IIntrospect, tables *RelationalData) error {
 	if value.Kind() == reflect.Ptr {
 		value = value.Elem()
 	}
@@ -48,7 +62,7 @@ func (table *Table) addRoot(key, value reflect.Value, inspect common.IIntrospect
 	return table.addRow(key, value, rootNode, "", "", inspect, tables)
 }
 
-func (table *Table) add(value reflect.Value, node *model.Node, path, attr string, inspect common.IIntrospect, tables *Tables) {
+func (table *Table) add(value reflect.Value, node *model.Node, path, attr string, inspect common.IIntrospect, tables *RelationalData) {
 
 	if !value.IsValid() {
 		return
@@ -70,4 +84,12 @@ func (table *Table) add(value reflect.Value, node *model.Node, path, attr string
 	} else if value.Kind() == reflect.Struct {
 		table.addRow(reflect.ValueOf(nil), removePtr(value), node, path, attr, inspect, tables)
 	}
+}
+
+func (table *Table) rowsOf(colName, key string) map[string]*Row {
+	colNameMap, ok := table.rows[key]
+	if ok {
+		return colNameMap[colName]
+	}
+	return nil
 }

@@ -8,10 +8,6 @@ import (
 	"reflect"
 )
 
-func newRow() *Row {
-	return &Row{colValues: make(map[string]reflect.Value)}
-}
-
 func keyOf(key, value reflect.Value, node *model.Node, path, attr string, inspect common.IIntrospect) string {
 	primary := inspect.StringOfPrimaryDecorator(node, value)
 	//This is a root key

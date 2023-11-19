@@ -52,6 +52,7 @@ func (i *Introspect) inspectStruct(_type reflect.Type, _parent *model.Node, _fie
 	if isClone {
 		return node
 	}
+	i.registry.RegisterStructType(_type)
 	for index := 0; index < _type.NumField(); index++ {
 		field := _type.Field(index)
 		if common.IgnoreName(field.Name) {
