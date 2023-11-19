@@ -76,12 +76,11 @@ Process 2 Process interaction is de-facto a language.
 To avoid reinventing the language, we converged to English, it is time to converge to the same query language in software.
 **MDQL**, so the **"Wheel"** will not be invented everytime on every project.
 
-## Protocol buffers & Services
-* [Protobuf Object](https://github.com/saichler/my.simple/tree/main/go/protobuf_object)
-* Protobuf Service Points
+## [Protocol Buffers Object](https://github.com/saichler/my.simple/tree/main/go/protobuf_object) 
+**An Object** like implementation for **Protocol Buffers**, so delta updating model attributes will be generic and seamless.
 
-## Metadata driven getter/setter for nested tree/graph models
-[Instance](https://github.com/saichler/my.simple/tree/main/go/instance) is a metadata driven utility for updating **Delta** pieces of data in a nested tree/graph model instances. 
+## [Metadata driven getter/setter for nested tree/graph models](https://github.com/saichler/my.simple/tree/main/go/instance)
+**Instance** is a metadata driven utility for updating **Delta** pieces of data in a nested tree/graph model instances. 
 With a few lines of code, one can generically receive and update values inside an internal distribute cache copy.
 
 ## [Updater](https://github.com/saichler/my.simple/tree/main/go/updater)
@@ -95,6 +94,7 @@ How about **No Configuration, No Annotations & Pluggable Persistence Layer**.
 ## API Gateways
 Dynamic, Secured, [API Gateways](https://github.com/saichler/my.simple/tree/main/go/api_gateways) that avoids multiple implementations, bugs & maintenance.
 
+## Model Driven Service Points
 
 ### Stateful Services
 
