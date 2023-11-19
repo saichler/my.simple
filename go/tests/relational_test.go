@@ -2,8 +2,9 @@ package tests
 
 import (
 	"fmt"
-	"github.com/saichler/my.simple/go/common"
+	"github.com/saichler/my.simple/go/introspect"
 	"github.com/saichler/my.simple/go/orm/relational"
+	registry2 "github.com/saichler/my.simple/go/registry"
 	"github.com/saichler/my.simple/go/tests/model"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
@@ -11,20 +12,23 @@ import (
 )
 
 func TestRelationalData(t *testing.T) {
-	common.Introspect.Inspect(&model.MyTestModel{})
+	registry := registry2.NewStructRegistry()
+	inspect := introspect.NewIntrospect(registry)
+
+	inspect.Inspect(&model.MyTestModel{})
 	data := []*model.MyTestModel{createTestModelInstance(1),
 		createTestModelInstance(2)}
-	rdata := relational.NewRelationalData("1")
+	relationalData := relational.NewRelationalData("<transaction ref>")
 
-	err := rdata.AddInstances(data, common.Introspect)
+	err := relationalData.AddInstances(data, inspect)
 	if err != nil {
 		t.Fail()
 		fmt.Println(err)
 		return
 	}
-	//rdata.Print()
+	//relationalData.Print()
 
-	instances, err := rdata.ToIstances(common.Introspect)
+	instances, err := relationalData.ToIstances(inspect)
 	if len(instances) != 2 {
 		t.Fail()
 		fmt.Println("Expected 2 instances but got ", len(instances))

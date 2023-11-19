@@ -17,8 +17,9 @@ func TestIntrospect(t *testing.T) {
 	}
 	common.Introspect.Print()
 	nodes := common.Introspect.Nodes(false, false)
-	if len(nodes) != 14 {
-		fmt.Println("Expected length to be 14 but got ", len(nodes))
+	expectedNodes := 16
+	if len(nodes) != expectedNodes {
+		fmt.Println("Expected length to be ", expectedNodes, " but got ", len(nodes))
 		t.Fail()
 		return
 	}
