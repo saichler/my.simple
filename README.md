@@ -83,7 +83,7 @@ To avoid reinventing the language, we converged to English, it is time to conver
 **Instance** is a metadata driven utility for updating **Delta** pieces of data in a nested tree/graph model instances. 
 With a few lines of code, one can generically receive and update values inside an internal distribute cache copy.
 
-## [Updater](https://github.com/saichler/my.simple/tree/main/go/updater)
+## [Model Driven Updater](https://github.com/saichler/my.simple/tree/main/go/updater)
 **Extremely** simplifying, **Updater** is a **nested model agnostic** utility to update model instances nested attributes, track them and react on explicit nested model attribute values changes. 
 
 ## [Seamless & Pluggable, Model Driven, ORM](https://github.com/saichler/my.simple/tree/main/go/orm)
