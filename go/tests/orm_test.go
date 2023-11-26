@@ -18,7 +18,7 @@ func TestPostgresPlugin(t *testing.T) {
 	}
 
 	o := orm.NewOrm(pp, common.Introspect)
-	sample := createTestModelInstance(0)
+	sample := createTestModelInstance(5)
 	common.Introspect.Inspect(sample)
 	err = o.Write(sample)
 	if err != nil {

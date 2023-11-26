@@ -15,6 +15,11 @@ func newRow() *Row {
 	return &Row{colValues: make(map[string]reflect.Value)}
 }
 
+func (row *Row) ValueOf(name string) (reflect.Value, bool) {
+	v, ok := row.colValues[name]
+	return v, ok
+}
+
 func (row *Row) addValue(colName string, parent reflect.Value) {
 	row.colValues[colName] = parent.FieldByName(colName)
 }

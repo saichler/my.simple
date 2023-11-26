@@ -89,7 +89,8 @@ func (i *Introspect) inspectMap(_type reflect.Type, _parent *model.Node, _fieldN
 		_parent.Attributes[_fieldName] = subNode
 		return subNode
 	} else {
-		node, _ := i.addNode(_type.Elem(), _parent, _fieldName)
+		subNode, _ := i.addNode(_type.Elem(), _parent, _fieldName)
+		subNode.IsMap = true
 		return node
 	}
 }
@@ -101,9 +102,9 @@ func (i *Introspect) inspectSlice(_type reflect.Type, _parent *model.Node, _fiel
 		_parent.Attributes[_fieldName] = subNode
 		return subNode
 	} else {
-		node, _ := i.addNode(_type.Elem(), _parent, _fieldName)
-		node.IsSlice = true
-		return node
+		subNode, _ := i.addNode(_type.Elem(), _parent, _fieldName)
+		subNode.IsSlice = true
+		return subNode
 	}
 }
 

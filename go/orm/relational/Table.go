@@ -29,6 +29,18 @@ func (table *Table) Print() {
 	}
 }
 
+func (table *Table) Rows() map[string]*Row {
+	rows := make(map[string]*Row, 0)
+	for _, path := range table.rows {
+		for _, typ := range path {
+			for rk, row := range typ {
+				rows[rk] = row
+			}
+		}
+	}
+	return rows
+}
+
 func (table *Table) addRow(key, value reflect.Value, node *model.Node, path, attr string, inspect common.IIntrospect, tables *RelationalData) error {
 	recKey := keyOf(key, value, node, path, attr, inspect)
 	row := newRow()

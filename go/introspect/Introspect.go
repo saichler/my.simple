@@ -4,6 +4,7 @@ import (
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/introspect/model"
 	"github.com/saichler/my.simple/go/utils/logs"
+	"github.com/saichler/my.simple/go/utils/maps"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
 	"strings"
@@ -14,6 +15,7 @@ type Introspect struct {
 	typeToNode *NodeMap
 	registry   common.IRegistry
 	cloner     *Cloner
+	attrOrder  *maps.SyncMap
 }
 
 func NewIntrospect(registry common.IRegistry) *Introspect {
@@ -22,6 +24,7 @@ func NewIntrospect(registry common.IRegistry) *Introspect {
 	i.cloner = newCloner()
 	i.pathToNode = NewIntrospectNodeMap()
 	i.typeToNode = NewIntrospectNodeMap()
+	i.attrOrder = maps.NewSyncMap()
 	return i
 }
 
@@ -97,6 +100,21 @@ func (i *Introspect) Kind(node *model.Node) reflect.Kind {
 
 func (i *Introspect) Clone(any interface{}) interface{} {
 	return i.cloner.Clone(any)
+}
+
+func (i *Introspect) AttributesNames(node *model.Node) []string {
+	names, ok := i.attrOrder.Get(node.TypeName)
+	if !ok {
+		result := make([]string, 0)
+		for name, attr := range node.Attributes {
+			if common.IsLeaf(attr) {
+				result = append(result, name)
+			}
+		}
+		i.attrOrder.Put(node.TypeName, result)
+		return result
+	}
+	return names.([]string)
 }
 
 func NodeKey(node *model.Node) string {

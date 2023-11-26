@@ -20,6 +20,7 @@ type IIntrospect interface {
 	DecoratorOf(model.DecoratorType, *model.Node) interface{}
 	StringOfPrimaryDecorator(*model.Node, reflect.Value) string
 	DeepDecorator(*model.Node) bool
+	AttributesNames(node *model.Node) []string
 }
 
 var Introspect IIntrospect
