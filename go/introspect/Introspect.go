@@ -33,7 +33,11 @@ func (i *Introspect) Inspect(any interface{}) (*model.Node, error) {
 	if any == nil {
 		return nil, logs.Error("Cannot introspect a nil value")
 	}
+
 	_, t := common.ValueAndType(any)
+	if t.Kind() == reflect.Slice && t.Kind() == reflect.Map {
+		t = t.Elem().Elem()
+	}
 	if t.Kind() != reflect.Struct {
 		return nil, logs.Error("Cannot introspect a value that is not a struct")
 	}
@@ -48,12 +52,20 @@ func (i *Introspect) Node(path string) (*model.Node, bool) {
 	return i.pathToNode.Get(strings.ToLower(path))
 }
 
-func (i *Introspect) NodeByType(any interface{}) (*model.Node, bool) {
-	typ := reflect.ValueOf(any)
-	if typ.Kind() == reflect.Ptr {
-		typ = typ.Elem()
+func (i *Introspect) NodeByValue(any interface{}) (*model.Node, bool) {
+	val := reflect.ValueOf(any)
+	if val.Kind() == reflect.Ptr {
+		val = val.Elem()
 	}
-	return i.typeToNode.Get(typ.Type().Name())
+	return i.NodeByType(val.Type())
+}
+
+func (i *Introspect) NodeByType(typ reflect.Type) (*model.Node, bool) {
+	return i.NodeByTypeName(typ.Name())
+}
+
+func (i *Introspect) NodeByTypeName(name string) (*model.Node, bool) {
+	return i.typeToNode.Get(name)
 }
 
 func (i *Introspect) Nodes(onlyLeafs, onlyRoots bool) []*model.Node {

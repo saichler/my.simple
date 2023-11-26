@@ -25,6 +25,9 @@ func (r *StructRegistryImpl) registerPrimitives() {
 	r.RegisterStructType(reflect.TypeOf(int32(0)))
 	r.RegisterStructType(reflect.TypeOf(int64(0)))
 	r.RegisterStructType(reflect.TypeOf(""))
+	r.RegisterStructType(reflect.TypeOf(true))
+	r.RegisterStructType(reflect.TypeOf(float32(0)))
+	r.RegisterStructType(reflect.TypeOf(float64(0)))
 }
 
 func (r *StructRegistryImpl) RegisterStruct(any interface{}) bool {

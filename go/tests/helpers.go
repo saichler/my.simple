@@ -1,6 +1,8 @@
 package tests
 
 import (
+	"database/sql"
+	_ "github.com/lib/pq"
 	"github.com/saichler/my.security/go/sec"
 	"github.com/saichler/my.simple/go/defaults"
 	"github.com/saichler/my.simple/go/security"
@@ -51,4 +53,15 @@ func extractKeyValue(key string) string {
 	index1 := strings.LastIndex(key, "<")
 	index2 := strings.LastIndex(key, ">")
 	return key[index1+1 : index2]
+}
+
+func newPostgresConnection() *sql.DB {
+	def := "host=127.0.0.1 port=5432 user=postgres password=admin dbname=test sslmode=disable"
+
+	// open database
+	db, err := sql.Open("postgres", def)
+	if err != nil {
+		panic(err)
+	}
+	return db
 }

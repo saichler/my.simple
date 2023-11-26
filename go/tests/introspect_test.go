@@ -45,7 +45,7 @@ func TestIntrospect(t *testing.T) {
 		return
 	}
 
-	_, ok = common.Introspect.NodeByType(&model.MyTestSubModelSingle{})
+	_, ok = common.Introspect.NodeByValue(&model.MyTestSubModelSingle{})
 	if !ok {
 		fmt.Println("Could not fetch node by type")
 		t.Fail()

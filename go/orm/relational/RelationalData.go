@@ -23,6 +23,10 @@ func (data *RelationalData) getOrCreateTable(typ string) *Table {
 	return table
 }
 
+func (data *RelationalData) TablesMap() map[string]*Table {
+	return data.name2Table
+}
+
 func (data *RelationalData) Print() {
 	for name, table := range data.name2Table {
 		fmt.Println(name)

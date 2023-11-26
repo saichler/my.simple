@@ -43,7 +43,9 @@ func (i *Introspect) addNode(_type reflect.Type, _parent *model.Node, _fieldName
 		return nil, false
 	}
 	i.pathToNode.Put(nodePath, node)
-	i.typeToNode.Put(node.TypeName, node)
+	if _type.Kind() == reflect.Struct {
+		i.typeToNode.Put(node.TypeName, node)
+	}
 	return node, false
 }
 
@@ -63,7 +65,8 @@ func (i *Introspect) inspectStruct(_type reflect.Type, _parent *model.Node, _fie
 		} else if field.Type.Kind() == reflect.Map {
 			i.inspectMap(field.Type, node, field.Name)
 		} else if field.Type.Kind() == reflect.Ptr {
-			i.inspectPtr(field.Type.Elem(), node, field.Name)
+			subnode := i.inspectPtr(field.Type.Elem(), node, field.Name)
+			i.typeToNode.Put(subnode.TypeName, subnode)
 		} else {
 			i.addNode(field.Type, node, field.Name)
 		}
