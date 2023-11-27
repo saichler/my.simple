@@ -1,68 +1,45 @@
-package postgres
+package stmt
 
 import (
 	"errors"
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/introspect/model"
-	"github.com/saichler/my.simple/go/orm/relational"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
-	"strings"
 )
 
-func (plugin *OrmPostgresPlugin) validateTables(rdata *relational.RelationalData, o common.IORM) error {
-	tables := rdata.TablesMap()
-	for tname, _ := range tables {
-		err := plugin.validateOrCreateTable(tname, o.Introspect())
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (plugin *OrmPostgresPlugin) validateOrCreateTable(tname string, inspect common.IIntrospect) error {
-	node, ok := inspect.NodeByTypeName(tname)
-	if !ok {
-		return errors.New("Cannot find inspect data for: " + tname)
-	}
-
-	if plugin.names.Contains(tname) {
-		return plugin.validateOrCreateFields(node)
-	}
-
-	sq := strng.New("select count(*) from ", tname).String()
-	_, err := plugin.db.Exec(sq)
-	if err != nil && strings.Contains(err.Error(), "relation") &&
-		strings.Contains(err.Error(), "does not exist") {
-		err = plugin.createTable(node, inspect)
-		if err != nil {
-			return err
-		}
-		plugin.names.Put(tname, true)
-	}
-	return nil
-}
-
-func (plugin *OrmPostgresPlugin) createTable(node *model.Node, inspect common.IIntrospect) error {
-	//if we need to ignore this table and not persist it
-	if inspect.DecoratorOf(model.DecoratorType_Ignore, node) != nil {
+func (sb *SqlStatementBuilder) CreateSchema() error {
+	if sb.schema == "" {
 		return nil
 	}
-	ignoredAttr, _ := inspect.DecoratorOf(model.DecoratorType_IgnoreAttr, node).(map[string]bool)
+	st := strng.New("CREATE SCHEMA IF NOT EXISTS ")
+	st.Add(sb.schema).Add(";")
+	_, err := sb.db.Exec(st.String())
+	if err != nil {
+		return errors.New(err.Error() + "\n" + st.String())
+	}
+	return nil
+}
+
+func (sb *SqlStatementBuilder) CreateTable() error {
+	//if we need to ignore this table and not persist it
+	if sb.o.Introspect().DecoratorOf(model.DecoratorType_Ignore, sb.node) != nil {
+		return nil
+	}
+	ignoredAttr, _ := sb.o.Introspect().DecoratorOf(model.DecoratorType_IgnoreAttr, sb.node).(map[string]bool)
 	sq := strng.New("CREATE TABLE IF NOT EXISTS ")
-	sq.Add(plugin.schema).Add(".").Add(node.TypeName).Add(" (\n")
+	sq.Add(sb.tableName()).Add(" (\n")
 	sq.Add("    ").Add(common.RECKEY).Add("    ").Add("VARCHAR,\n")
-	for _, attr := range node.Attributes {
+	for _, attr := range sb.node.Attributes {
 		//This attribute was marked as none persist, hence ignore it
 		if ignoredAttr != nil && ignoredAttr[attr.FieldName] {
 			continue
 		} else if common.IsLeaf(attr) {
-			k := inspect.Kind(attr)
+			k := sb.o.Introspect().Kind(attr)
 			if attr.IsSlice || attr.IsMap {
 				k = reflect.Slice
 			}
-			fldSql, err := fieldDef(attr.FieldName, ",\n", k)
+			fldSql, err := FieldDef(attr.FieldName, ",\n", k)
 			if err != nil {
 				return err
 			}
@@ -77,14 +54,14 @@ func (plugin *OrmPostgresPlugin) createTable(node *model.Node, inspect common.II
 
 	sq.Add(");")
 	sqlStr := sq.String()
-	_, err := plugin.db.Exec(sqlStr)
+	_, err := sb.db.Exec(sqlStr)
 	if err != nil {
 		return errors.New(err.Error() + "\n" + sq.String())
 	}
 	return nil
 }
 
-func fieldDef(fieldName, delimiter string, kind reflect.Kind) (string, error) {
+func FieldDef(fieldName, delimiter string, kind reflect.Kind) (string, error) {
 	sq := strng.New()
 	//User is a saved word, hence add _ to it
 	if fieldName == "User" {

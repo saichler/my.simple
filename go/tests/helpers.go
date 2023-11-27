@@ -3,10 +3,12 @@ package tests
 import (
 	"database/sql"
 	_ "github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/saichler/my.security/go/sec"
 	"github.com/saichler/my.simple/go/defaults"
 	"github.com/saichler/my.simple/go/security"
 	"github.com/saichler/my.simple/go/tests/model"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -63,5 +65,14 @@ func newPostgresConnection() *sql.DB {
 	if err != nil {
 		panic(err)
 	}
+	return db
+}
+
+func newSqliteConnection() *sql.DB {
+	os.Remove("/tmp/sqlite.db")
+	file, _ := os.Create("/tmp/sqlite.db")
+	file.Close()
+
+	db, _ := sql.Open("sqlite3", "/tmp/sqlite.db")
 	return db
 }

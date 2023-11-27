@@ -1,4 +1,4 @@
-package postgres
+package sqlite
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 	"github.com/saichler/my.simple/go/orm/relational"
 )
 
-func (plugin *OrmPostgresPlugin) Write(data interface{}, o common.IORM) error {
+func (plugin *OrmSqlitePlugin) Write(data interface{}, o common.IORM) error {
 	rdata := data.(*relational.RelationalData)
 	err := plugin.stmt.ValidateTables(rdata, plugin.names)
 	if err != nil {
@@ -17,7 +17,7 @@ func (plugin *OrmPostgresPlugin) Write(data interface{}, o common.IORM) error {
 	return err
 }
 
-func (plugin *OrmPostgresPlugin) write(rdata *relational.RelationalData, o common.IORM) error {
+func (plugin *OrmSqlitePlugin) write(rdata *relational.RelationalData, o common.IORM) error {
 	tables := rdata.TablesMap()
 	tx, _ := plugin.stmt.Db().Begin()
 	defer tx.Rollback()

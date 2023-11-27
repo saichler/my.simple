@@ -3,24 +3,23 @@ package stmt
 import (
 	"database/sql"
 	"github.com/saichler/my.simple/go/common"
-	"github.com/saichler/my.simple/go/introspect/model"
 	"github.com/saichler/my.simple/go/orm/relational"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
 	"strconv"
 )
 
-func (st *SqlStatementBuilder) createInsertStatement(schema string, node *model.Node, inspect common.IIntrospect, tx *sql.Tx) error {
+func (sb *SqlStatementBuilder) createInsertStatement(tx *sql.Tx) error {
 
 	//conflict := st.conflict(node)
 
-	sqls := strng.New("insert into ", schema, ".", node.TypeName, " ")
+	sqls := strng.New("insert into ", sb.tableName(), " ")
 
 	attrs := strng.New(" (", common.RECKEY, ",")
 	values := strng.New(" values ($1,")
 	first := true
-	st.attrNames = inspect.AttributesNames(node)
-	for i, attr := range st.attrNames {
+	sb.attrNames = sb.o.Introspect().AttributesNames(sb.node)
+	for i, attr := range sb.attrNames {
 		if !first {
 			attrs.Add(",")
 			values.Add(",")
@@ -35,27 +34,27 @@ func (st *SqlStatementBuilder) createInsertStatement(schema string, node *model.
 	sqls.Join(attrs)
 	sqls.Join(values)
 	//sqls.Add(conflict)
-	st.stmtString = sqls.String()
-	stmt, err := tx.Prepare(st.stmtString)
+	sb.stmtString = sqls.String()
+	stmt, err := tx.Prepare(sb.stmtString)
 	if err != nil {
 		return err
 	}
-	st.stmt = stmt
+	sb.stmt = stmt
 	return err
 }
 
-func (st *SqlStatementBuilder) Insert(schema, rk string, node *model.Node, inspect common.IIntrospect, row *relational.Row, tx *sql.Tx) error {
-	if st.stmt == nil {
-		err := st.createInsertStatement(schema, node, inspect, tx)
+func (sb *SqlStatementBuilder) Insert(rk string, row *relational.Row, tx *sql.Tx) error {
+	if sb.stmt == nil {
+		err := sb.createInsertStatement(tx)
 		if err != nil {
 			return err
 		}
 	}
-	args := make([]interface{}, len(st.attrNames)+1)
+	args := make([]interface{}, len(sb.attrNames)+1)
 	toString := strng.New()
 	toString.TypesPrefix = true
 	args[0] = rk
-	for i, key := range st.attrNames {
+	for i, key := range sb.attrNames {
 		val, ok := row.ValueOf(key)
 		if ok {
 			if val.Kind() == reflect.Map || val.Kind() == reflect.Slice {
@@ -63,10 +62,10 @@ func (st *SqlStatementBuilder) Insert(schema, rk string, node *model.Node, inspe
 			}
 			args[i+1] = val.Interface()
 		} else {
-			panic("unsupported insert type (yet) for " + key + " in " + node.TypeName)
+			panic("unsupported insert type (yet) for " + key + " in " + sb.node.TypeName)
 		}
 	}
-	_, err := st.stmt.Exec(args...)
+	_, err := sb.stmt.Exec(args...)
 	return err
 }
 
