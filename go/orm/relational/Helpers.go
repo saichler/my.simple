@@ -9,7 +9,7 @@ import (
 )
 
 func keyOf(key, value reflect.Value, node *model.Node, path, attr string, inspect common.IIntrospect) string {
-	primary := inspect.StringOfPrimaryDecorator(node, value)
+	primary := common.PrimaryDecorator(node, value)
 	//This is a root key
 	if path == "" {
 		if primary == "" && key.IsValid() {

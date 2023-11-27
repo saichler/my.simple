@@ -12,7 +12,7 @@ func (sb *SqlStatementBuilder) ValidateTables(rdata *relational.RelationalData, 
 	sb.children = maps.NewSyncMap()
 
 	for tname, _ := range tables {
-		sbt, err := NewSqlStatementBuilder(sb.schema, tname, sb.o, sb.db, nameCache)
+		sbt, err := NewSqlStatementBuilder(sb.schema, tname, sb.o, sb.db, nameCache, sb.decorator)
 		if err != nil {
 			return err
 		}

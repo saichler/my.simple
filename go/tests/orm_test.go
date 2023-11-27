@@ -10,8 +10,8 @@ import (
 )
 
 func TestPostgresPlugin(t *testing.T) {
-	db := newPostgresConnection()
 	pp := postgres.NewOrmPostgresPlugin()
+	db := newPostgresConnection(pp.Decorator())
 	o := orm.NewOrm(pp, common.Introspect)
 	err := pp.Init(db, "test", o)
 
@@ -32,10 +32,10 @@ func TestPostgresPlugin(t *testing.T) {
 }
 
 func TestSqlitePlugin(t *testing.T) {
-	db := newSqliteConnection()
-	pp := sqlite.NewOrmSqlitePlugin()
-	o := orm.NewOrm(pp, common.Introspect)
-	err := pp.Init(db, "", o)
+	sp := sqlite.NewOrmSqlitePlugin()
+	db := newSqliteConnection(sp.Decorator())
+	o := orm.NewOrm(sp, common.Introspect)
+	err := sp.Init(db, "", o)
 
 	if err != nil {
 		t.Fail()

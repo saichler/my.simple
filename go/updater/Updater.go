@@ -42,7 +42,7 @@ func (updates *Updater) Update(old, new interface{}, introspect common.IIntrospe
 		return errors.New("cannot find node for type " + oldValue.Type().Name() + ", please register it")
 	}
 
-	instance := instance.NewInstance(node, nil, introspect.StringOfPrimaryDecorator(node, oldValue), oldValue, introspect)
+	instance := instance.NewInstance(node, nil, common.PrimaryDecorator(node, oldValue), oldValue, introspect)
 
 	err := update(instance, node, oldValue, newValue, updates)
 	return err

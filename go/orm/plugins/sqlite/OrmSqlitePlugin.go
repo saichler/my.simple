@@ -2,27 +2,27 @@ package sqlite
 
 import (
 	"database/sql"
-	"github.com/saichler/my.simple/go/common"
-	"github.com/saichler/my.simple/go/orm/stmt"
-	"github.com/saichler/my.simple/go/utils/maps"
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/saichler/my.simple/go/orm/plugins/sqlbase"
 )
 
-type OrmSqlitePlugin struct {
-	stmt  *stmt.SqlStatementBuilder
-	names *maps.String2BoolMap
+type OrmSqlitePluginDecorator struct {
 }
 
-func NewOrmSqlitePlugin() *OrmSqlitePlugin {
-	plugin := &OrmSqlitePlugin{}
-	plugin.names = maps.NewString2BoolMap()
+func NewOrmSqlitePlugin() *sqlbase.OrmSqlBasePlugin {
+	sDecorator := &OrmSqlitePluginDecorator{}
+	plugin := sqlbase.NewOrmSqlBasePlugin(sDecorator)
 	return plugin
 }
 
-func (plugin *OrmSqlitePlugin) Init(db *sql.DB, schema string, o common.IORM) error {
-	plugin.stmt, _ = stmt.NewSqlStatementBuilder(schema, "", o, db, plugin.names)
-	return plugin.stmt.CreateSchema()
+func (plugin *OrmSqlitePluginDecorator) DbType() string {
+	return "SQLite"
 }
 
-func (plugin *OrmSqlitePlugin) SQL() bool {
-	return true
+func (plugin *OrmSqlitePluginDecorator) Connect(args ...string) *sql.DB {
+	db, err := sql.Open("sqlite3", args[0])
+	if err != nil {
+		panic(err)
+	}
+	return db
 }

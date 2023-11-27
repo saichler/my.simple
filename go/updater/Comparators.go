@@ -2,6 +2,7 @@ package updater
 
 import (
 	"errors"
+	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/instance"
 	"github.com/saichler/my.simple/go/introspect/model"
 	"reflect"
@@ -141,7 +142,7 @@ func sliceOrMapUpdate(instance *instance.Instance, node *model.Node, oldValue, n
 	//If this is a struct, we need to check if we need to do deep update
 	//and not just copy the new slice/map to the old slice/map
 	if updates.introspect.Kind(node) == reflect.Struct {
-		if updates.introspect.DeepDecorator(node) {
+		if common.DeepDecorator(node) {
 			if node.IsSlice {
 				return deepSliceUpdate(instance, node, oldValue, newValue, updates)
 			} else if node.IsMap {

@@ -2,10 +2,10 @@ package tests
 
 import (
 	"database/sql"
-	_ "github.com/lib/pq"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/saichler/my.security/go/sec"
+	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/defaults"
+	model2 "github.com/saichler/my.simple/go/introspect/model"
 	"github.com/saichler/my.simple/go/security"
 	"github.com/saichler/my.simple/go/tests/model"
 	"os"
@@ -17,6 +17,7 @@ import (
 func init() {
 	sec.SetProvider(security.NewShallowSecurityProvider("v7mdWmN7YtkK9o9RXVlezRd7j5Qntohg", "Top Secret"))
 	defaults.ApplyDefaults()
+	decorateModel()
 }
 
 func createTestModelInstance(index int) *model.MyTestModel {
@@ -57,22 +58,19 @@ func extractKeyValue(key string) string {
 	return key[index1+1 : index2]
 }
 
-func newPostgresConnection() *sql.DB {
-	def := "host=127.0.0.1 port=5432 user=postgres password=admin dbname=test sslmode=disable"
-
-	// open database
-	db, err := sql.Open("postgres", def)
-	if err != nil {
-		panic(err)
-	}
-	return db
+func newPostgresConnection(decorator common.SqlDatabaseDecorator) *sql.DB {
+	return decorator.Connect("127.0.0.1", "5432", "postgres", "admin", "test", "disable")
 }
 
-func newSqliteConnection() *sql.DB {
+func newSqliteConnection(decorator common.SqlDatabaseDecorator) *sql.DB {
 	os.Remove("/tmp/sqlite.db")
 	file, _ := os.Create("/tmp/sqlite.db")
 	file.Close()
+	return decorator.Connect("/tmp/sqlite.db")
+}
 
-	db, _ := sql.Open("sqlite3", "/tmp/sqlite.db")
-	return db
+func decorateModel() {
+	m := &model.MyTestModel{}
+	node, _ := common.Introspect.Inspect(m)
+	common.Introspect.AddDecorator(model2.DecoratorType_Primary, []string{"MyString"}, node)
 }

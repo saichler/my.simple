@@ -18,8 +18,6 @@ type IIntrospect interface {
 	Clone(interface{}) interface{}
 	AddDecorator(model.DecoratorType, interface{}, *model.Node)
 	DecoratorOf(model.DecoratorType, *model.Node) interface{}
-	StringOfPrimaryDecorator(*model.Node, reflect.Value) string
-	DeepDecorator(*model.Node) bool
 	AttributesNames(node *model.Node) []string
 }
 

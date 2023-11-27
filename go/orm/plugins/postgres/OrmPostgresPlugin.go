@@ -2,27 +2,29 @@ package postgres
 
 import (
 	"database/sql"
-	"github.com/saichler/my.simple/go/common"
-	"github.com/saichler/my.simple/go/orm/stmt"
-	"github.com/saichler/my.simple/go/utils/maps"
+	_ "github.com/lib/pq"
+	"github.com/saichler/my.simple/go/orm/plugins/sqlbase"
+	"github.com/saichler/my.simple/go/utils/strng"
 )
 
-type OrmPostgresPlugin struct {
-	stmt  *stmt.SqlStatementBuilder
-	names *maps.String2BoolMap
+type OrmPostgresPluginDecorator struct {
 }
 
-func NewOrmPostgresPlugin() *OrmPostgresPlugin {
-	plugin := &OrmPostgresPlugin{}
-	plugin.names = maps.NewString2BoolMap()
+func NewOrmPostgresPlugin() *sqlbase.OrmSqlBasePlugin {
+	pDecorator := &OrmPostgresPluginDecorator{}
+	plugin := sqlbase.NewOrmSqlBasePlugin(pDecorator)
 	return plugin
 }
 
-func (plugin *OrmPostgresPlugin) Init(db *sql.DB, schema string, o common.IORM) error {
-	plugin.stmt, _ = stmt.NewSqlStatementBuilder(schema, "", o, db, plugin.names)
-	return plugin.stmt.CreateSchema()
+func (decorator *OrmPostgresPluginDecorator) DbType() string {
+	return "postgres"
 }
 
-func (plugin *OrmPostgresPlugin) SQL() bool {
-	return true
+func (decorator *OrmPostgresPluginDecorator) Connect(args ...string) *sql.DB {
+	def := strng.New("host=", args[0], " port=", args[1], " user=", args[2], " password=", args[3], " dbname=", args[4], " sslmode=", args[5])
+	db, err := sql.Open("postgres", def.String())
+	if err != nil {
+		panic(err)
+	}
+	return db
 }

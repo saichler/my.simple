@@ -11,8 +11,6 @@ import (
 
 func (sb *SqlStatementBuilder) createInsertStatement(tx *sql.Tx) error {
 
-	//conflict := st.conflict(node)
-
 	sqls := strng.New("insert into ", sb.tableName(), " ")
 
 	attrs := strng.New(" (", common.RECKEY, ",")
@@ -33,7 +31,8 @@ func (sb *SqlStatementBuilder) createInsertStatement(tx *sql.Tx) error {
 	values.Add(")")
 	sqls.Join(attrs)
 	sqls.Join(values)
-	//sqls.Add(conflict)
+	onConflict := sb.conflict()
+	sqls.Add(onConflict)
 	sb.stmtString = sqls.String()
 	stmt, err := tx.Prepare(sb.stmtString)
 	if err != nil {
@@ -69,36 +68,15 @@ func (sb *SqlStatementBuilder) Insert(rk string, row *relational.Row, tx *sql.Tx
 	return err
 }
 
-/*
-func (st *SqlStatementBuilder) conflict(node *model.Node) string {
-
-	conflict := utils.NewString("")
-	indexFields := make(map[string]string)
-	conflict.Add(" on conflict (")
-
-	primary := introspect.Primary(node)
-
-	if primary != nil {
-		firstAttr := true
-		for _, attr := range primary.Attributes {
-			if !firstAttr {
-				conflict.Add(",")
-			}
-			firstAttr = false
-			conflict.Add(attr)
-			indexFields[attr] = attr
-		}
-	} else {
-		conflict.Add(table_model.REC_KEY)
-	}
-	conflict.Add(") do update set ")
+func (sb *SqlStatementBuilder) conflict() string {
+	conflict := strng.New(" on conflict (").Add(common.RECKEY).Add(") do update set ")
 	firstAttr := true
-	for i, key := range st.keys {
+	for i, key := range sb.attrNames {
 		if !firstAttr {
 			conflict.Add(",")
 		}
 		firstAttr = false
-		conflict.Add(key).Add("=").Add("$").Add(strconv.Itoa(i + 1))
+		conflict.Add(key).Add("=").Add("$").Add(strconv.Itoa(i + 2))
 	}
 	return conflict.String()
-}*/
+}

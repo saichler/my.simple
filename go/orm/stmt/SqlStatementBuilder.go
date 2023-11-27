@@ -10,10 +10,11 @@ import (
 )
 
 type SqlStatementBuilder struct {
-	o      common.IORM
-	node   *model.Node
-	schema string
-	db     *sql.DB
+	o         common.IORM
+	node      *model.Node
+	schema    string
+	db        *sql.DB
+	decorator common.SqlDatabaseDecorator
 
 	stmt       *sql.Stmt
 	stmtString string
@@ -22,8 +23,8 @@ type SqlStatementBuilder struct {
 	children   *maps.SyncMap
 }
 
-func NewSqlStatementBuilder(schema, tableName string, o common.IORM, db *sql.DB, namecache *maps.String2BoolMap) (*SqlStatementBuilder, error) {
-	sb := &SqlStatementBuilder{schema: schema, o: o, nameCache: namecache, db: db}
+func NewSqlStatementBuilder(schema, tableName string, o common.IORM, db *sql.DB, namecache *maps.String2BoolMap, decorator common.SqlDatabaseDecorator) (*SqlStatementBuilder, error) {
+	sb := &SqlStatementBuilder{schema: schema, o: o, nameCache: namecache, db: db, decorator: decorator}
 	if tableName != "" {
 		node, ok := sb.o.Introspect().NodeByTypeName(tableName)
 		if !ok {
