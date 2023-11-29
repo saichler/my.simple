@@ -11,6 +11,9 @@ import (
 func (data *RelationalData) ToIstances(inspect common.IIntrospect) (map[string]interface{}, error) {
 	rootRows := make(map[string]*Row, 0)
 	table := data.name2Table[data.rootTableName]
+	if table == nil {
+		return map[string]interface{}{}, nil
+	}
 	for key, row := range table.rows[""][""] {
 		rootRows[key] = row
 	}

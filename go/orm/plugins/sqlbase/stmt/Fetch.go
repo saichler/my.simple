@@ -2,9 +2,11 @@ package stmt
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/orm/plugins/sqlbase/cache"
 	"github.com/saichler/my.simple/go/utils/strng"
+	"reflect"
 )
 
 func (sb *StmtBuilder) Fetch(fetch common.IFetch, tx *sql.Tx, o common.IORM, c *cache.Cache) error {
@@ -14,7 +16,16 @@ func (sb *StmtBuilder) Fetch(fetch common.IFetch, tx *sql.Tx, o common.IORM, c *
 			return err
 		}
 	}
-	_, err := sb.stmt.Query()
+	attrNames := c.AttrNames(sb.node.TypeName)
+	rows, err := sb.stmt.Query()
+	args := make([]interface{}, len(attrNames)+1)
+	for i, arg := range args {
+		args[i] = reflect.New(reflect.TypeOf(arg)).Interface()
+	}
+	for rows.Next() {
+		err := rows.Scan(args...)
+		fmt.Println(err)
+	}
 	return err
 }
 
