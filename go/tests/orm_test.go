@@ -13,7 +13,7 @@ func TestPostgresPlugin(t *testing.T) {
 	pp := postgres.NewOrmPostgresPlugin()
 	db := newPostgresConnection(pp.Decorator())
 	o := orm.NewOrm(pp, common.Introspect)
-	err := pp.Init(db, "test", o)
+	err := pp.Init(o, db, "test")
 
 	if err != nil {
 		t.Fail()
@@ -23,7 +23,7 @@ func TestPostgresPlugin(t *testing.T) {
 
 	sample := createTestModelInstance(5)
 	common.Introspect.Inspect(sample)
-	err = o.Write(sample)
+	err = o.Persist(sample)
 	if err != nil {
 		t.Fail()
 		fmt.Println(err)
@@ -35,7 +35,7 @@ func TestSqlitePlugin(t *testing.T) {
 	sp := sqlite.NewOrmSqlitePlugin()
 	db := newSqliteConnection(sp.Decorator())
 	o := orm.NewOrm(sp, common.Introspect)
-	err := sp.Init(db, "", o)
+	err := sp.Init(o, db, "")
 
 	if err != nil {
 		t.Fail()
@@ -45,7 +45,7 @@ func TestSqlitePlugin(t *testing.T) {
 
 	sample := createTestModelInstance(5)
 	common.Introspect.Inspect(sample)
-	err = o.Write(sample)
+	err = o.Persist(sample)
 	if err != nil {
 		t.Fail()
 		fmt.Println(err)
@@ -57,4 +57,6 @@ func TestSqlitePlugin(t *testing.T) {
 		rows.Scan(&count)
 	}
 	fmt.Println(count)
+
+	o.Fetch(nil)
 }

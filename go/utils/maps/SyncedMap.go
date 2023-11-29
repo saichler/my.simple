@@ -85,6 +85,30 @@ func (syncMap *SyncMap) ValuesAsList(typ reflect.Type, filter func(interface{}) 
 	return newSlice.Interface()
 }
 
+func (syncMap *SyncMap) KeysAsList(typ reflect.Type, filter func(interface{}) bool) interface{} {
+	syncMap.s.RLock()
+	defer syncMap.s.RUnlock()
+	newSlice := reflect.MakeSlice(reflect.SliceOf(typ), len(syncMap.m), len(syncMap.m))
+	index := 0
+	for v, _ := range syncMap.m {
+		if filter != nil && !filter(v) {
+			continue
+		}
+		newSlice.Index(index).Set(reflect.ValueOf(v))
+		index++
+	}
+
+	if index+1 < len(syncMap.m) {
+		filterSlice := reflect.MakeSlice(reflect.SliceOf(typ), index+1, index+1)
+		for i := 0; i < index+1; i++ {
+			filterSlice.Index(i).Set(newSlice.Index(i))
+		}
+		return filterSlice.Interface()
+	}
+
+	return newSlice.Interface()
+}
+
 func (syncMap *SyncMap) Iterate(do func(k, v interface{})) {
 	syncMap.s.RLock()
 	defer syncMap.s.RUnlock()

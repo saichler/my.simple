@@ -58,15 +58,17 @@ func extractKeyValue(key string) string {
 	return key[index1+1 : index2]
 }
 
-func newPostgresConnection(decorator common.SqlDatabaseDecorator) *sql.DB {
-	return decorator.Connect("127.0.0.1", "5432", "postgres", "admin", "test", "disable")
+func newPostgresConnection(decorator common.DataStoreDecorator) *sql.DB {
+	db := decorator.Connect("127.0.0.1", "5432", "postgres", "admin", "test", "disable")
+	return db.(*sql.DB)
 }
 
-func newSqliteConnection(decorator common.SqlDatabaseDecorator) *sql.DB {
+func newSqliteConnection(decorator common.DataStoreDecorator) *sql.DB {
 	os.Remove("/tmp/sqlite.db")
 	file, _ := os.Create("/tmp/sqlite.db")
 	file.Close()
-	return decorator.Connect("/tmp/sqlite.db")
+	db := decorator.Connect("/tmp/sqlite.db")
+	return db.(*sql.DB)
 }
 
 func decorateModel() {

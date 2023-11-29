@@ -9,39 +9,6 @@ import (
 	"strconv"
 )
 
-func (sb *SqlStatementBuilder) createInsertStatement(tx *sql.Tx) error {
-
-	sqls := strng.New("insert into ", sb.tableName(), " ")
-
-	attrs := strng.New(" (", common.RECKEY, ",")
-	values := strng.New(" values ($1,")
-	first := true
-	sb.attrNames = sb.o.Introspect().AttributesNames(sb.node)
-	for i, attr := range sb.attrNames {
-		if !first {
-			attrs.Add(",")
-			values.Add(",")
-		}
-		first = false
-		attrs.Add(attr)
-		values.Add("$")
-		values.Add(strconv.Itoa(i + 2))
-	}
-	attrs.Add(") ")
-	values.Add(")")
-	sqls.Join(attrs)
-	sqls.Join(values)
-	onConflict := sb.conflict()
-	sqls.Add(onConflict)
-	sb.stmtString = sqls.String()
-	stmt, err := tx.Prepare(sb.stmtString)
-	if err != nil {
-		return err
-	}
-	sb.stmt = stmt
-	return err
-}
-
 func (sb *SqlStatementBuilder) Insert(rk string, row *relational.Row, tx *sql.Tx) error {
 	if sb.stmt == nil {
 		err := sb.createInsertStatement(tx)
@@ -68,7 +35,42 @@ func (sb *SqlStatementBuilder) Insert(rk string, row *relational.Row, tx *sql.Tx
 	return err
 }
 
-func (sb *SqlStatementBuilder) conflict() string {
+func (sb *SqlStatementBuilder) createInsertStatement(tx *sql.Tx) error {
+
+	insertSql := strng.New("insert into ", sb.tableName(), " ")
+	attrs := strng.New(" (", common.RECKEY, ",")
+	values := strng.New(" values ($1,")
+	sb.attrNames = sb.o.Introspect().AttributesNames(sb.node)
+
+	first := true
+	for i, attr := range sb.attrNames {
+		if !first {
+			attrs.Add(",")
+			values.Add(",")
+		}
+		first = false
+		attrs.Add(attr)
+		values.Add("$")
+		values.Add(strconv.Itoa(i + 2))
+	}
+
+	attrs.Add(") ")
+	values.Add(")")
+	insertSql.Join(attrs)
+	insertSql.Join(values)
+	onConflict := sb.createOnConflict()
+	insertSql.Add(onConflict)
+	sb.stmtString = insertSql.String()
+
+	stmt, err := tx.Prepare(sb.stmtString)
+	if err != nil {
+		return err
+	}
+	sb.stmt = stmt
+	return err
+}
+
+func (sb *SqlStatementBuilder) createOnConflict() string {
 	conflict := strng.New(" on conflict (").Add(common.RECKEY).Add(") do update set ")
 	firstAttr := true
 	for i, key := range sb.attrNames {

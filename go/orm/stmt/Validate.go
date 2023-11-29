@@ -9,28 +9,30 @@ import (
 
 func (sb *SqlStatementBuilder) ValidateTables(rdata *relational.RelationalData, nameCache *maps.String2BoolMap) error {
 	tables := rdata.TablesMap()
-	sb.children = maps.NewSyncMap()
-
+	sb.builders = make(map[BuilderType]*maps.SyncMap)
+	sb.builders[BInsert] = maps.NewSyncMap()
+	sb.builders[BFetch] = maps.NewSyncMap()
 	for tname, _ := range tables {
 		sbt, err := NewSqlStatementBuilder(sb.schema, tname, sb.o, sb.db, nameCache, sb.decorator)
 		if err != nil {
 			return err
 		}
-		sb.children.Put(tname, sbt)
+		sb.builders[BInsert].Put(tname, sbt)
 		err = sbt.ValidateTable()
 		if err != nil {
 			return err
 		}
+
+		sbt, err = NewSqlStatementBuilder(sb.schema, tname, sb.o, sb.db, nameCache, sb.decorator)
+		sb.builders[BFetch].Put(tname, sbt)
 	}
 	return nil
 }
 
 func (sb *SqlStatementBuilder) ValidateTable() error {
-
 	if sb.nameCache != nil && sb.nameCache.Contains(sb.node.TypeName) {
 		return sb.ValidateFields()
 	}
-
 	sq := strng.New("select count(*) from ", sb.node.TypeName).String()
 
 	_, err := sb.db.Exec(sq)

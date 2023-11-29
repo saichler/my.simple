@@ -9,21 +9,28 @@ import (
 	"github.com/saichler/my.simple/go/utils/strng"
 )
 
+type BuilderType int
+
+const (
+	BInsert BuilderType = 1
+	BFetch  BuilderType = 2
+)
+
 type SqlStatementBuilder struct {
 	o         common.IORM
 	node      *model.Node
 	schema    string
 	db        *sql.DB
-	decorator common.SqlDatabaseDecorator
+	decorator common.DataStoreDecorator
 
 	stmt       *sql.Stmt
 	stmtString string
 	attrNames  []string
 	nameCache  *maps.String2BoolMap
-	children   *maps.SyncMap
+	builders   map[BuilderType]*maps.SyncMap
 }
 
-func NewSqlStatementBuilder(schema, tableName string, o common.IORM, db *sql.DB, namecache *maps.String2BoolMap, decorator common.SqlDatabaseDecorator) (*SqlStatementBuilder, error) {
+func NewSqlStatementBuilder(schema, tableName string, o common.IORM, db *sql.DB, namecache *maps.String2BoolMap, decorator common.DataStoreDecorator) (*SqlStatementBuilder, error) {
 	sb := &SqlStatementBuilder{schema: schema, o: o, nameCache: namecache, db: db, decorator: decorator}
 	if tableName != "" {
 		node, ok := sb.o.Introspect().NodeByTypeName(tableName)
@@ -46,8 +53,8 @@ func (sb *SqlStatementBuilder) tableName() string {
 	return strng.New(sb.schema, ".", sb.node.TypeName).String()
 }
 
-func (sb *SqlStatementBuilder) BuilderOf(tname string) (*SqlStatementBuilder, bool) {
-	bldr, ok := sb.children.Get(tname)
+func (sb *SqlStatementBuilder) BuilderOf(bt BuilderType, tname string) (*SqlStatementBuilder, bool) {
+	bldr, ok := sb.builders[bt].Get(tname)
 	if !ok {
 		return nil, ok
 	}

@@ -1,5 +1,7 @@
 package maps
 
+import "reflect"
+
 type String2BoolMap struct {
 	impl *SyncMap
 }
@@ -24,4 +26,9 @@ func (s2b *String2BoolMap) Get(key string) (string, bool) {
 
 func (s2b *String2BoolMap) Contains(key string) bool {
 	return s2b.impl.Contains(key)
+}
+
+func (s2b *String2BoolMap) Keys() []string {
+	keys := s2b.impl.KeysAsList(reflect.TypeOf(""), nil)
+	return keys.([]string)
 }
