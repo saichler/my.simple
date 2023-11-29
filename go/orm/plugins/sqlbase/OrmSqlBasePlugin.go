@@ -4,20 +4,21 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/saichler/my.simple/go/common"
-	"github.com/saichler/my.simple/go/orm/stmt"
-	"github.com/saichler/my.simple/go/utils/maps"
+	cache2 "github.com/saichler/my.simple/go/orm/plugins/sqlbase/cache"
 )
 
 type OrmSqlBasePlugin struct {
 	decorator common.DataStoreDecorator
-	stmt      *stmt.SqlStatementBuilder
-	names     *maps.String2BoolMap
+	schema    string
+	db        *sql.DB
+	o         common.IORM
+	cache     *cache2.Cache
 }
 
 func NewOrmSqlBasePlugin(decorator common.DataStoreDecorator) common.IOrmPlugin {
 	plugin := &OrmSqlBasePlugin{}
-	plugin.names = maps.NewString2BoolMap()
 	plugin.decorator = decorator
+	plugin.cache = cache2.NewCache()
 	return plugin
 }
 
@@ -33,12 +34,14 @@ func (plugin *OrmSqlBasePlugin) Init(o common.IORM, args ...interface{}) error {
 	if !ok {
 		return errors.New("Sql base plugin requires second argument to be a schema name")
 	}
-	return plugin.init(db, schema, o)
+	plugin.schema = schema
+	plugin.o = o
+	plugin.db = db
+	return plugin.init()
 }
 
-func (plugin *OrmSqlBasePlugin) init(db *sql.DB, schema string, o common.IORM) error {
-	plugin.stmt, _ = stmt.NewSqlStatementBuilder(schema, "", o, db, plugin.names, plugin.decorator)
-	return plugin.stmt.CreateSchema()
+func (plugin *OrmSqlBasePlugin) init() error {
+	return CreateSchema(plugin.schema, plugin.db, plugin.o, plugin.cache)
 }
 
 func (plugin *OrmSqlBasePlugin) RelationalData() bool {

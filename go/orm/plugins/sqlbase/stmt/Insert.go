@@ -3,24 +3,26 @@ package stmt
 import (
 	"database/sql"
 	"github.com/saichler/my.simple/go/common"
+	"github.com/saichler/my.simple/go/orm/plugins/sqlbase/cache"
 	"github.com/saichler/my.simple/go/orm/relational"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
 	"strconv"
 )
 
-func (sb *SqlStatementBuilder) Insert(rk string, row *relational.Row, tx *sql.Tx) error {
+func (sb *StmtBuilder) Insert(rk string, row *relational.Row, tx *sql.Tx, o common.IORM, c *cache.Cache) error {
 	if sb.stmt == nil {
-		err := sb.createInsertStatement(tx)
+		err := sb.createInsertStatement(tx, o, c)
 		if err != nil {
 			return err
 		}
 	}
-	args := make([]interface{}, len(sb.attrNames)+1)
+	attrNames := c.AttrNames(sb.node.TypeName)
+	args := make([]interface{}, len(attrNames)+1)
 	toString := strng.New()
 	toString.TypesPrefix = true
 	args[0] = rk
-	for i, key := range sb.attrNames {
+	for i, key := range attrNames {
 		val, ok := row.ValueOf(key)
 		if ok {
 			if val.Kind() == reflect.Map || val.Kind() == reflect.Slice {
@@ -35,15 +37,19 @@ func (sb *SqlStatementBuilder) Insert(rk string, row *relational.Row, tx *sql.Tx
 	return err
 }
 
-func (sb *SqlStatementBuilder) createInsertStatement(tx *sql.Tx) error {
+func (sb *StmtBuilder) createInsertStatement(tx *sql.Tx, o common.IORM, c *cache.Cache) error {
 
-	insertSql := strng.New("insert into ", sb.tableName(), " ")
+	insertSql := strng.New("insert into ", sb.TableName(), " ")
 	attrs := strng.New(" (", common.RECKEY, ",")
 	values := strng.New(" values ($1,")
-	sb.attrNames = sb.o.Introspect().AttributesNames(sb.node)
+	attrNames := c.AttrNames(sb.node.TypeName)
+	if attrNames == nil {
+		attrNames = o.Introspect().AttributesNames(sb.node)
+		c.PutAttrNames(sb.node.TypeName, attrNames)
+	}
 
 	first := true
-	for i, attr := range sb.attrNames {
+	for i, attr := range attrNames {
 		if !first {
 			attrs.Add(",")
 			values.Add(",")
@@ -58,7 +64,7 @@ func (sb *SqlStatementBuilder) createInsertStatement(tx *sql.Tx) error {
 	values.Add(")")
 	insertSql.Join(attrs)
 	insertSql.Join(values)
-	onConflict := sb.createOnConflict()
+	onConflict := sb.createOnConflict(attrNames)
 	insertSql.Add(onConflict)
 	sb.stmtString = insertSql.String()
 
@@ -70,10 +76,10 @@ func (sb *SqlStatementBuilder) createInsertStatement(tx *sql.Tx) error {
 	return err
 }
 
-func (sb *SqlStatementBuilder) createOnConflict() string {
+func (sb *StmtBuilder) createOnConflict(attrNames []string) string {
 	conflict := strng.New(" on conflict (").Add(common.RECKEY).Add(") do update set ")
 	firstAttr := true
-	for i, key := range sb.attrNames {
+	for i, key := range attrNames {
 		if !firstAttr {
 			conflict.Add(",")
 		}

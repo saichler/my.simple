@@ -98,9 +98,9 @@ func (syncMap *SyncMap) KeysAsList(typ reflect.Type, filter func(interface{}) bo
 		index++
 	}
 
-	if index+1 < len(syncMap.m) {
-		filterSlice := reflect.MakeSlice(reflect.SliceOf(typ), index+1, index+1)
-		for i := 0; i < index+1; i++ {
+	if index < len(syncMap.m) {
+		filterSlice := reflect.MakeSlice(reflect.SliceOf(typ), index, index)
+		for i := 0; i < index; i++ {
 			filterSlice.Index(i).Set(newSlice.Index(i))
 		}
 		return filterSlice.Interface()

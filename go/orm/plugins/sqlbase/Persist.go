@@ -3,13 +3,14 @@ package sqlbase
 import (
 	"errors"
 	"fmt"
+	"github.com/saichler/my.simple/go/orm/plugins/sqlbase/cache"
+	"github.com/saichler/my.simple/go/orm/plugins/sqlbase/stmt"
 	"github.com/saichler/my.simple/go/orm/relational"
-	"github.com/saichler/my.simple/go/orm/stmt"
 )
 
 func (plugin *OrmSqlBasePlugin) Persist(data interface{}) error {
 	rdata := data.(*relational.RelationalData)
-	err := plugin.stmt.ValidateTables(rdata, plugin.names)
+	err := plugin.prepareStmt(rdata)
 	if err != nil {
 		return err
 	}
@@ -19,22 +20,39 @@ func (plugin *OrmSqlBasePlugin) Persist(data interface{}) error {
 
 func (plugin *OrmSqlBasePlugin) write(rdata *relational.RelationalData) error {
 	tables := rdata.TablesMap()
-	tx, _ := plugin.stmt.Db().Begin()
+	tx, _ := plugin.db.Begin()
 	defer tx.Rollback()
 	for tname, table := range tables {
 		rows := table.Rows()
-		sb, ok := plugin.stmt.BuilderOf(stmt.BInsert, tname)
+		isb, ok := plugin.cache.Get(cache.Insert, tname)
 		if !ok {
-			return errors.New("No Statement Builder found for " + tname)
+			return errors.New("No insert statement was found for " + tname)
 		}
+		sb := isb.(*stmt.StmtBuilder)
 
 		for rk, row := range rows {
-			err := sb.Insert(rk, row, tx)
+			err := sb.Insert(rk, row, tx, plugin.o, plugin.cache)
 			if err != nil {
 				fmt.Println(err)
 			}
 		}
 	}
 	tx.Commit()
+	return nil
+}
+
+func (plugin *OrmSqlBasePlugin) prepareStmt(rdata *relational.RelationalData) error {
+	tables := rdata.TablesMap()
+	for tableName, _ := range tables {
+		node, ok := plugin.o.Introspect().NodeByTypeName(tableName)
+		if !ok {
+			return errors.New("Cannot find introspect data for: " + tableName)
+		}
+		err := CheckSchemaTable(node, plugin.db, plugin.o, plugin.cache)
+		if err != nil {
+			return err
+		}
+		plugin.cache.PutIfNotExist(cache.Insert, node.TypeName, stmt.NewStmtBuilder(plugin.schema, node))
+	}
 	return nil
 }

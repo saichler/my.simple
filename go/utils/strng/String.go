@@ -29,12 +29,16 @@ func (s *String) init() {
 }
 
 // Add concatenate a string to this String instance
-func (s *String) Add(str string) *String {
+func (s *String) Add(strs ...string) *String {
 	s.init()
 	if s.AddSpaceWhenAdding {
 		s.buff.WriteString(" ")
 	}
-	s.buff.WriteString(str)
+	if strs != nil {
+		for _, str := range strs {
+			s.buff.WriteString(str)
+		}
+	}
 	return s
 }
 

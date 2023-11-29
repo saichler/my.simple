@@ -6,7 +6,7 @@ import (
 )
 
 func (plugin *OrmSqlBasePlugin) Fetch(fetch common.IFetch) (interface{}, error) {
-	for _, tname := range plugin.names.Keys() {
+	for _, tname := range plugin.cache.Tables() {
 		fmt.Println(tname)
 	}
 	return nil, nil
