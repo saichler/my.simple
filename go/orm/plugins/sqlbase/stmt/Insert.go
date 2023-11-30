@@ -17,20 +17,20 @@ func (sb *StmtBuilder) Insert(rk string, row *relational.Row, tx *sql.Tx, o comm
 			return err
 		}
 	}
-	attrNames := c.AttrNames(sb.node.TypeName)
-	args := make([]interface{}, len(attrNames)+1)
+
+	args := make([]interface{}, len(sb.view.Columns)+1)
 	toString := strng.New()
 	toString.TypesPrefix = true
 	args[0] = rk
-	for i, key := range attrNames {
-		val, ok := row.ValueOf(key)
+	for i, attr := range sb.view.Columns {
+		val, ok := row.ValueOf(attr.FieldName)
 		if ok {
 			if val.Kind() == reflect.Map || val.Kind() == reflect.Slice {
 				val = reflect.ValueOf(toString.ToString(val))
 			}
 			args[i+1] = val.Interface()
 		} else {
-			panic("unsupported insert type (yet) for " + key + " in " + sb.node.TypeName)
+			panic("unsupported insert type (yet) for " + attr.FieldName + " in " + sb.view.Table.TypeName)
 		}
 	}
 	_, err := sb.stmt.Exec(args...)
@@ -42,20 +42,15 @@ func (sb *StmtBuilder) createInsertStatement(tx *sql.Tx, o common.IORM, c *cache
 	insertSql := strng.New("insert into ", sb.TableName(), " ")
 	attrs := strng.New(" (", common.RECKEY, ",")
 	values := strng.New(" values ($1,")
-	attrNames := c.AttrNames(sb.node.TypeName)
-	if attrNames == nil {
-		attrNames = o.Introspect().AttributesNames(sb.node)
-		c.PutAttrNames(sb.node.TypeName, attrNames)
-	}
 
 	first := true
-	for i, attr := range attrNames {
+	for i, attr := range sb.view.Columns {
 		if !first {
 			attrs.Add(",")
 			values.Add(",")
 		}
 		first = false
-		attrs.Add(attr)
+		attrs.Add(attr.FieldName)
 		values.Add("$")
 		values.Add(strconv.Itoa(i + 2))
 	}
@@ -64,7 +59,7 @@ func (sb *StmtBuilder) createInsertStatement(tx *sql.Tx, o common.IORM, c *cache
 	values.Add(")")
 	insertSql.Join(attrs)
 	insertSql.Join(values)
-	onConflict := sb.createOnConflict(attrNames)
+	onConflict := sb.createOnConflict()
 	insertSql.Add(onConflict)
 	sb.stmtString = insertSql.String()
 
@@ -76,15 +71,15 @@ func (sb *StmtBuilder) createInsertStatement(tx *sql.Tx, o common.IORM, c *cache
 	return err
 }
 
-func (sb *StmtBuilder) createOnConflict(attrNames []string) string {
+func (sb *StmtBuilder) createOnConflict() string {
 	conflict := strng.New(" on conflict (").Add(common.RECKEY).Add(") do update set ")
 	firstAttr := true
-	for i, key := range attrNames {
+	for i, attr := range sb.view.Columns {
 		if !firstAttr {
 			conflict.Add(",")
 		}
 		firstAttr = false
-		conflict.Add(key).Add("=").Add("$").Add(strconv.Itoa(i + 2))
+		conflict.Add(attr.FieldName).Add("=").Add("$").Add(strconv.Itoa(i + 2))
 	}
 	return conflict.String()
 }

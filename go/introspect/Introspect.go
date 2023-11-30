@@ -15,7 +15,7 @@ type Introspect struct {
 	typeToNode *NodeMap
 	registry   common.IRegistry
 	cloner     *Cloner
-	attrOrder  *maps.SyncMap
+	tableViews *maps.SyncMap
 }
 
 func NewIntrospect(registry common.IRegistry) *Introspect {
@@ -24,7 +24,7 @@ func NewIntrospect(registry common.IRegistry) *Introspect {
 	i.cloner = newCloner()
 	i.pathToNode = NewIntrospectNodeMap()
 	i.typeToNode = NewIntrospectNodeMap()
-	i.attrOrder = maps.NewSyncMap()
+	i.tableViews = maps.NewSyncMap()
 	return i
 }
 
@@ -102,19 +102,27 @@ func (i *Introspect) Clone(any interface{}) interface{} {
 	return i.cloner.Clone(any)
 }
 
-func (i *Introspect) AttributesNames(node *model.Node) []string {
-	names, ok := i.attrOrder.Get(node.TypeName)
-	if !ok {
-		result := make([]string, 0)
-		for name, attr := range node.Attributes {
-			if common.IsLeaf(attr) {
-				result = append(result, name)
-			}
+func (i *Introspect) addTableView(node *model.Node) {
+	tv := &model.TableView{Table: node, Columns: make([]*model.Node, 0)}
+	for _, attr := range node.Attributes {
+		if common.IsLeaf(attr) {
+			tv.Columns = append(tv.Columns, attr)
 		}
-		i.attrOrder.Put(node.TypeName, result)
-		return result
 	}
-	return names.([]string)
+	i.tableViews.Put(node.TypeName, tv)
+}
+
+func (i *Introspect) TableView(name string) (*model.TableView, bool) {
+	tv, ok := i.tableViews.Get(name)
+	if !ok {
+		return nil, ok
+	}
+	return tv.(*model.TableView), ok
+}
+
+func (i *Introspect) TableViews() []*model.TableView {
+	list := i.tableViews.ValuesAsList(reflect.TypeOf(&model.TableView{}), nil)
+	return list.([]*model.TableView)
 }
 
 func NodeKey(node *model.Node) string {

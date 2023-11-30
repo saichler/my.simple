@@ -15,8 +15,8 @@ func (plugin *OrmSqlBasePlugin) Fetch(fetch common.IFetch) (interface{}, error) 
 	defer tx.Rollback()
 	rdata := relational.NewRelationalData("")
 	for _, tname := range plugin.cache.Tables() {
-		node, _ := plugin.o.Introspect().NodeByTypeName(tname)
-		sb := stmt.NewStmtBuilder(plugin.schema, node)
+		view, _ := plugin.o.Introspect().TableView(tname)
+		sb := stmt.NewStmtBuilder(plugin.schema, view)
 		fmt.Println(tname)
 		sb.Fetch(fetch, tx, plugin.o, plugin.cache)
 	}

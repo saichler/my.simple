@@ -18,7 +18,8 @@ type IIntrospect interface {
 	Clone(interface{}) interface{}
 	AddDecorator(model.DecoratorType, interface{}, *model.Node)
 	DecoratorOf(model.DecoratorType, *model.Node) interface{}
-	AttributesNames(node *model.Node) []string
+	TableView(string) (*model.TableView, bool)
+	TableViews() []*model.TableView
 }
 
 var Introspect IIntrospect

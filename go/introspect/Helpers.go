@@ -71,6 +71,7 @@ func (i *Introspect) inspectStruct(_type reflect.Type, _parent *model.Node, _fie
 			i.addNode(field.Type, node, field.Name)
 		}
 	}
+	i.addTableView(node)
 	return node
 }
 

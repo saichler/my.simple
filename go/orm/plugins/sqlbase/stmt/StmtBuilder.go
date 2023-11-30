@@ -9,18 +9,18 @@ import (
 type StmtBuilder struct {
 	stmt       *sql.Stmt
 	stmtString string
-	node       *model.Node
+	view       *model.TableView
 	schema     string
 }
 
-func NewStmtBuilder(schema string, node *model.Node) *StmtBuilder {
-	return &StmtBuilder{schema: schema, node: node}
+func NewStmtBuilder(schema string, view *model.TableView) *StmtBuilder {
+	return &StmtBuilder{schema: schema, view: view}
 }
 
 func (sb *StmtBuilder) TableName() string {
 	if sb.schema == "" {
-		return sb.node.TypeName
+		return sb.view.Table.TypeName
 	} else {
-		return strng.New(sb.schema, ".", sb.node.TypeName).String()
+		return strng.New(sb.schema, ".", sb.view.Table.TypeName).String()
 	}
 }

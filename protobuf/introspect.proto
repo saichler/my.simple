@@ -28,6 +28,11 @@ message Node {
   map<int32, string> decorators = 9;
 }
 
+message TableView {
+  Node  table = 1;
+  repeated Node columns = 2;
+}
+
 enum DecoratorType {
   Invalid = 0;
   Primary = 1;

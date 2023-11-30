@@ -9,13 +9,12 @@ import (
 type EntryType string
 
 const (
-	Insert     EntryType = "I"
-	Select     EntryType = "S"
-	Update     EntryType = "U"
-	Delete     EntryType = "D"
-	Table      EntryType = "T"
-	Field      EntryType = "F"
-	Attributes EntryType = "A"
+	Insert EntryType = "I"
+	Select EntryType = "S"
+	Update EntryType = "U"
+	Delete EntryType = "D"
+	Table  EntryType = "T"
+	Field  EntryType = "F"
 )
 
 type Cache struct {
@@ -58,18 +57,6 @@ func (c *Cache) PutIfNotExist(entryType EntryType, name string, v interface{}) {
 
 func (c *Cache) Get(entryType EntryType, name string) (interface{}, bool) {
 	return c.cache.Get(keyOf(entryType, name))
-}
-
-func (c *Cache) AttrNames(name string) []string {
-	a, ok := c.Get(Attributes, name)
-	if ok {
-		return a.([]string)
-	}
-	return nil
-}
-
-func (c *Cache) PutAttrNames(name string, attrs []string) {
-	c.PutIfNotExist(Attributes, name, attrs)
 }
 
 func keyOf(entryType EntryType, name string) string {

@@ -44,15 +44,15 @@ func (plugin *OrmSqlBasePlugin) write(rdata *relational.RelationalData) error {
 func (plugin *OrmSqlBasePlugin) prepareStmt(rdata *relational.RelationalData) error {
 	tables := rdata.TablesMap()
 	for tableName, _ := range tables {
-		node, ok := plugin.o.Introspect().NodeByTypeName(tableName)
+		view, ok := plugin.o.Introspect().TableView(tableName)
 		if !ok {
-			return errors.New("Cannot find introspect data for: " + tableName)
+			return errors.New("Cannot find introspect view data for: " + tableName)
 		}
-		err := CheckSchemaTable(node, plugin.db, plugin.o, plugin.cache)
+		err := CheckSchemaTable(view, plugin.db, plugin.o, plugin.cache)
 		if err != nil {
 			return err
 		}
-		plugin.cache.PutIfNotExist(cache.Insert, node.TypeName, stmt.NewStmtBuilder(plugin.schema, node))
+		plugin.cache.PutIfNotExist(cache.Insert, view.Table.TypeName, stmt.NewStmtBuilder(plugin.schema, view))
 	}
 	return nil
 }
