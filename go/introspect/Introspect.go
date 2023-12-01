@@ -103,10 +103,12 @@ func (i *Introspect) Clone(any interface{}) interface{} {
 }
 
 func (i *Introspect) addTableView(node *model.Node) {
-	tv := &model.TableView{Table: node, Columns: make([]*model.Node, 0)}
+	tv := &model.TableView{Table: node, Columns: make([]*model.Node, 0), SubTables: make([]*model.Node, 0)}
 	for _, attr := range node.Attributes {
 		if common.IsLeaf(attr) {
 			tv.Columns = append(tv.Columns, attr)
+		} else {
+			tv.SubTables = append(tv.SubTables, attr)
 		}
 	}
 	i.tableViews.Put(node.TypeName, tv)

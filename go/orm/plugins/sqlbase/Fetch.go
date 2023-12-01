@@ -18,7 +18,11 @@ func (plugin *OrmSqlBasePlugin) Fetch(fetch common.IFetch) (interface{}, error) 
 		view, _ := plugin.o.Introspect().TableView(tname)
 		sb := stmt.NewStmtBuilder(plugin.schema, view)
 		fmt.Println(tname)
-		sb.Fetch(fetch, tx, plugin.o, plugin.cache)
+		recs, err := sb.Fetch(fetch, tx, plugin.o)
+		if err != nil {
+			return nil, err
+		}
+		rdata.ImportData(view, recs)
 	}
 	return rdata, nil
 }

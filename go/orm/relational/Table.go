@@ -24,8 +24,14 @@ func toString(value reflect.Value) string {
 }
 
 func (table *Table) Print() {
-	for k, _ := range table.rows {
-		fmt.Println("   ", k)
+	for k, paths := range table.rows {
+		fmt.Println(":-   ", k)
+		for k2, typ := range paths {
+			fmt.Println("     :-   ", k2)
+			for k3, _ := range typ {
+				fmt.Println("        :-", k3)
+			}
+		}
 	}
 }
 

@@ -26,7 +26,7 @@ func TestRelationalData(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	//relationalData.Print()
+	relationalData.Print()
 
 	instances, err := relationalData.ToIstances(inspect)
 	if len(instances) != 2 {

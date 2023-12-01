@@ -32,7 +32,7 @@ func NewInstance(node *model.Node, parent *Instance, key interface{}, value inte
 }
 
 func InstanceOf(instanceId string, i common.IIntrospect) (*Instance, error) {
-	instanceKey := NodeKey(instanceId)
+	instanceKey := common.NodeKey(instanceId)
 	node, ok := i.Node(instanceKey)
 	if !ok {
 		return nil, errors.New("Unknown attribute " + instanceKey)
@@ -109,21 +109,6 @@ func (inst *Instance) InstanceId() (string, error) {
 	}
 	inst.id = buff.String()
 	return inst.id, nil
-}
-
-func NodeKey(instanceId string) string {
-	buff := &strng.String{}
-	open := false
-	for _, c := range instanceId {
-		if c == '<' {
-			open = true
-		} else if c == '>' {
-			open = false
-		} else if !open {
-			buff.Add(string(c))
-		}
-	}
-	return buff.String()
 }
 
 func newInstance(node *model.Node, instancePath string, introspect common.IIntrospect) (*Instance, error) {

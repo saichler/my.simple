@@ -31,6 +31,7 @@ message Node {
 message TableView {
   Node  table = 1;
   repeated Node columns = 2;
+  repeated Node sub_tables = 3;
 }
 
 enum DecoratorType {

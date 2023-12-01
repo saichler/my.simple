@@ -2,22 +2,42 @@ package stmt
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/saichler/my.simple/go/common"
-	"github.com/saichler/my.simple/go/orm/plugins/sqlbase/cache"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
 )
 
-func (sb *StmtBuilder) Fetch(fetch common.IFetch, tx *sql.Tx, o common.IORM, c *cache.Cache) error {
+func (sb *StmtBuilder) Fetch(fetch common.IFetch, tx *sql.Tx, o common.IORM) (map[string][]interface{}, error) {
 	if sb.stmt == nil {
 		err := sb.createSelectStatement(tx)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
 	rows, err := sb.stmt.Query()
+	recs := make(map[string][]interface{})
+
+	for rows.Next() {
+		args := sb.newArgs(o)
+		vals := make([]interface{}, len(args))
+		err = rows.Scan(args...)
+		if err != nil {
+			return nil, err
+		}
+		if err == nil {
+			for i, arg := range args {
+				vals[i] = reflect.ValueOf(arg).Elem().Interface()
+			}
+			recs[vals[0].(string)] = vals
+		} else {
+			return nil, err
+		}
+	}
+	return recs, err
+}
+
+func (sb *StmtBuilder) newArgs(o common.IORM) []interface{} {
 	args := make([]interface{}, len(sb.view.Columns)+1)
 	rk := ""
 	args[0] = &rk
@@ -32,18 +52,7 @@ func (sb *StmtBuilder) Fetch(fetch common.IFetch, tx *sql.Tx, o common.IORM, c *
 		}
 		args[i+1] = reflect.New(typ).Interface()
 	}
-	for rows.Next() {
-		err := rows.Scan(args...)
-		if err == nil {
-			for _, arg := range args {
-				val := reflect.ValueOf(arg).Elem().Interface()
-				fmt.Print(val, " ")
-			}
-			fmt.Println()
-		}
-		fmt.Println(err)
-	}
-	return err
+	return args
 }
 
 func (sb *StmtBuilder) createSelectStatement(tx *sql.Tx) error {

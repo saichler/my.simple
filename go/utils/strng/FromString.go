@@ -81,6 +81,9 @@ func int16FromString(str string, kinds []reflect.Kind) reflect.Value {
 
 // Convert string to int32
 func int32FromString(str string, kinds []reflect.Kind) reflect.Value {
+	if str == "" {
+		return reflect.ValueOf(int32(0))
+	}
 	i, err := strconv.Atoi(str)
 	if err != nil {
 		er(err, "int32")

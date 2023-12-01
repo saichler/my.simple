@@ -10,6 +10,14 @@ import (
 
 func (data *RelationalData) ToIstances(inspect common.IIntrospect) (map[string]interface{}, error) {
 	rootRows := make(map[string]*Row, 0)
+	if data.rootTableName == "" {
+		for tname, tdata := range data.name2Table {
+			if tdata.rows[""] != nil {
+				data.rootTableName = tname
+				break
+			}
+		}
+	}
 	table := data.name2Table[data.rootTableName]
 	if table == nil {
 		return map[string]interface{}{}, nil

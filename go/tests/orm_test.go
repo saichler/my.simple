@@ -6,6 +6,8 @@ import (
 	"github.com/saichler/my.simple/go/orm"
 	"github.com/saichler/my.simple/go/orm/plugins/postgres"
 	"github.com/saichler/my.simple/go/orm/plugins/sqlite"
+	"github.com/saichler/my.simple/go/tests/model"
+	"reflect"
 	"testing"
 )
 
@@ -58,5 +60,27 @@ func TestSqlitePlugin(t *testing.T) {
 	}
 	fmt.Println(count)
 
-	o.Fetch(nil)
+	d, err := o.Fetch(nil)
+	if err != nil {
+		fmt.Println(err)
+		t.Fail()
+		return
+	}
+	data := d.(map[string]interface{})
+
+	for _, rec := range data {
+		sample2 := rec.(*model.MyTestModel)
+		/*
+			a := fmt.Sprintf("%s", sample)
+			b := fmt.Sprintf("%s", sample2)
+			fmt.Println(a)
+			fmt.Println(b)
+
+		*/
+		if !reflect.DeepEqual(sample, sample2) {
+			t.Fail()
+			fmt.Println("Not Equale")
+			return
+		}
+	}
 }
