@@ -22,4 +22,5 @@ type IOrmPlugin interface {
 type DataStoreDecorator interface {
 	DataStoreTypeName() string
 	Connect(...string) interface{}
+	DoesNotExistError(error) bool
 }

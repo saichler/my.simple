@@ -2,10 +2,10 @@ package sqlbase
 
 import (
 	"errors"
-	"fmt"
 	"github.com/saichler/my.simple/go/orm/plugins/sqlbase/cache"
 	"github.com/saichler/my.simple/go/orm/plugins/sqlbase/stmt"
 	"github.com/saichler/my.simple/go/orm/relational"
+	"github.com/saichler/my.simple/go/utils/logs"
 )
 
 func (plugin *OrmSqlBasePlugin) Persist(data interface{}) error {
@@ -33,12 +33,11 @@ func (plugin *OrmSqlBasePlugin) write(rdata *relational.RelationalData) error {
 		for rk, row := range rows {
 			err := sb.Insert(rk, row, tx, plugin.o, plugin.cache)
 			if err != nil {
-				fmt.Println(err)
+				return logs.Error("Failed to insert record:", err)
 			}
 		}
 	}
-	tx.Commit()
-	return nil
+	return tx.Commit()
 }
 
 func (plugin *OrmSqlBasePlugin) prepareStmt(rdata *relational.RelationalData) error {
@@ -48,7 +47,7 @@ func (plugin *OrmSqlBasePlugin) prepareStmt(rdata *relational.RelationalData) er
 		if !ok {
 			return errors.New("Cannot find introspect view data for: " + tableName)
 		}
-		err := CheckSchemaTable(view, plugin.db, plugin.o, plugin.cache)
+		err := CheckSchemaTable(view, plugin.db, plugin.o, plugin.cache, plugin.decorator)
 		if err != nil {
 			return err
 		}

@@ -6,6 +6,7 @@ import (
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/orm/plugins/sqlbase"
 	"github.com/saichler/my.simple/go/utils/strng"
+	"strings"
 )
 
 type OrmPostgresPluginDecorator struct {
@@ -29,3 +30,20 @@ func (decorator *OrmPostgresPluginDecorator) Connect(args ...string) interface{}
 	}
 	return db
 }
+
+func (decorator *OrmPostgresPluginDecorator) DoesNotExistError(err error) bool {
+	if err != nil && strings.Contains(err.Error(), "relation") &&
+		strings.Contains(err.Error(), "does not exist") {
+		return true
+	}
+	return false
+}
+
+/*
+	if err != nil && (strings.Contains(err.Error(), "relation") &&
+		strings.Contains(err.Error(), "does not exist") ||
+		strings.Contains(err.Error(), "no such table")) {
+		return CreateSchemaTable(view, db, o, c)
+	} else if err != nil {
+		return err
+	}*/

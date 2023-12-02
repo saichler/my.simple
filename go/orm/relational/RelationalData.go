@@ -1,7 +1,7 @@
 package relational
 
 import (
-	"fmt"
+	"github.com/saichler/my.simple/go/utils/strng"
 )
 
 type RelationalData struct {
@@ -27,9 +27,11 @@ func (data *RelationalData) TablesMap() map[string]*Table {
 	return data.name2Table
 }
 
-func (data *RelationalData) Print() {
+func (data *RelationalData) String() string {
+	str := strng.New("Relational Data:\n")
 	for name, table := range data.name2Table {
-		fmt.Println(name)
-		table.Print()
+		str.Add("|- ", name, "\n")
+		table.String(str)
 	}
+	return str.String()
 }

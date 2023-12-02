@@ -2,7 +2,6 @@ package relational
 
 import (
 	"errors"
-	"fmt"
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/introspect/model"
 	"github.com/saichler/my.simple/go/utils/strng"
@@ -23,13 +22,13 @@ func toString(value reflect.Value) string {
 	return s.ToString(value)
 }
 
-func (table *Table) Print() {
+func (table *Table) String(str *strng.String) {
 	for k, paths := range table.rows {
-		fmt.Println(":-   ", k)
+		str.Add("  |P- ", k, "\n")
 		for k2, typ := range paths {
-			fmt.Println("     :-   ", k2)
+			str.Add("    |T- ", k2, "\n")
 			for k3, _ := range typ {
-				fmt.Println("        :-", k3)
+				str.Add("       |- ", k3, "\n")
 			}
 		}
 	}

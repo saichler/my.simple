@@ -8,10 +8,9 @@ import (
 	"github.com/saichler/my.simple/go/orm/plugins/sqlbase/cache"
 	"github.com/saichler/my.simple/go/utils/strng"
 	"reflect"
-	"strings"
 )
 
-func CreateSchema(schema string, db *sql.DB, o common.IORM, c *cache.Cache) error {
+func CreateSchema(schema string, db *sql.DB, o common.IORM, c *cache.Cache, d common.DataStoreDecorator) error {
 	if schema == "" {
 		return nil
 	}
@@ -21,13 +20,13 @@ func CreateSchema(schema string, db *sql.DB, o common.IORM, c *cache.Cache) erro
 	if err != nil {
 		return errors.New(err.Error() + "\n" + st.String())
 	}
-	return CreateSchemaTables(db, o, c)
+	return CreateSchemaTables(db, o, c, d)
 }
 
-func CreateSchemaTables(db *sql.DB, o common.IORM, c *cache.Cache) error {
+func CreateSchemaTables(db *sql.DB, o common.IORM, c *cache.Cache, d common.DataStoreDecorator) error {
 	views := o.Introspect().TableViews()
 	for _, view := range views {
-		err := CheckSchemaTable(view, db, o, c)
+		err := CheckSchemaTable(view, db, o, c, d)
 		if err != nil {
 			return err
 		}
@@ -35,7 +34,7 @@ func CreateSchemaTables(db *sql.DB, o common.IORM, c *cache.Cache) error {
 	return nil
 }
 
-func CheckSchemaTable(view *model.TableView, db *sql.DB, o common.IORM, c *cache.Cache) error {
+func CheckSchemaTable(view *model.TableView, db *sql.DB, o common.IORM, c *cache.Cache, d common.DataStoreDecorator) error {
 	if c.TableName(view.Table.TypeName) {
 		return CheckFields(view)
 	}
@@ -43,14 +42,21 @@ func CheckSchemaTable(view *model.TableView, db *sql.DB, o common.IORM, c *cache
 	sq := strng.New("select count(*) from ", view.Table.TypeName).String()
 
 	_, err := db.Exec(sq)
-	if err != nil && (strings.Contains(err.Error(), "relation") &&
-		strings.Contains(err.Error(), "does not exist") ||
-		strings.Contains(err.Error(), "no such table")) {
+	if err != nil && d == nil {
+		return errors.New("Failed to validate table " + view.Table.TypeName + ", no decorator was provided to create it. error:" + err.Error())
+	} else if err != nil && d != nil && d.DoesNotExistError(err) {
 		return CreateSchemaTable(view, db, o, c)
 	} else if err != nil {
-		return err
+		return errors.New("Failed to validate table " + view.Table.TypeName + ", error:" + err.Error())
 	}
-
+	/*
+		if err != nil && (strings.Contains(err.Error(), "relation") &&
+			strings.Contains(err.Error(), "does not exist") ||
+			strings.Contains(err.Error(), "no such table")) {
+			return CreateSchemaTable(view, db, o, c)
+		} else if err != nil {
+			return err
+		}*/
 	return nil
 }
 

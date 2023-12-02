@@ -41,7 +41,7 @@ func (plugin *OrmSqlBasePlugin) Init(o common.IORM, args ...interface{}) error {
 }
 
 func (plugin *OrmSqlBasePlugin) init() error {
-	return CreateSchema(plugin.schema, plugin.db, plugin.o, plugin.cache)
+	return CreateSchema(plugin.schema, plugin.db, plugin.o, plugin.cache, plugin.decorator)
 }
 
 func (plugin *OrmSqlBasePlugin) RelationalData() bool {

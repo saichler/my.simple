@@ -10,6 +10,12 @@ relationalData := relational.NewRelationalData("<transaction ref>")
 
 // Translate the instance/s to relational data. 
 // data, is an instance or a list of instances.
-// inspect, is an instance of introspect, can be common.Inspect of a separate instance.
+// inspect, is an instance of introspect, can be common.Inspect or a separate instance of inspect.
 err := relationalData.AddInstances(data, inspect)
-``
+
+// Translate the RelationalData back to instances
+instances, err := relationalData.ToIstances(inspect)
+
+// Import row data back to RelationalData
+
+````

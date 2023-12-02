@@ -1,5 +1,9 @@
 # Model Driven Programing Framework for Micro Services
 
+* **"80%-90% of the code ever written is repetitive and could have been avoided."**
+* **"Work Less & Do more... The impact of correctly designing & writing software results in better work/life balance"**
+* **"I am so good, that if I get hit by a bus, the team can still go on."** 
+
 ## Overview
 **Model Driven Development**, or **MDD** is a development methodology, purposed in **extremely expediting** software development **without** compromising on quality.
 **However**, there isn't any **coherent, secure, simple, scalable, abstract, maintainable, high available, agnostic & fullstack** framework that delivers on the concept.
