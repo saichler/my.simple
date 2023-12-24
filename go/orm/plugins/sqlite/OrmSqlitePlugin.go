@@ -2,7 +2,7 @@ package sqlite
 
 import (
 	"database/sql"
-	_ "github.com/mattn/go-sqlite3"
+	//_ "github.com/mattn/go-sqlite3"
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/orm/plugins/sqlbase"
 	"strings"

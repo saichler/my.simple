@@ -47,7 +47,7 @@ func (plugin *OrmSqlBasePlugin) prepareStmt(rdata *relational.RelationalData) er
 		if !ok {
 			return errors.New("Cannot find introspect view data for: " + tableName)
 		}
-		err := CheckSchemaTable(view, plugin.db, plugin.o, plugin.cache, plugin.decorator)
+		err := CheckSchemaTable(plugin.schema, view, plugin.db, plugin.o, plugin.cache, plugin.decorator)
 		if err != nil {
 			return err
 		}

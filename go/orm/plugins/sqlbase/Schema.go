@@ -20,13 +20,13 @@ func CreateSchema(schema string, db *sql.DB, o common.IORM, c *cache.Cache, d co
 	if err != nil {
 		return errors.New(err.Error() + "\n" + st.String())
 	}
-	return CreateSchemaTables(db, o, c, d)
+	return CreateSchemaTables(schema, db, o, c, d)
 }
 
-func CreateSchemaTables(db *sql.DB, o common.IORM, c *cache.Cache, d common.DataStoreDecorator) error {
+func CreateSchemaTables(schema string, db *sql.DB, o common.IORM, c *cache.Cache, d common.DataStoreDecorator) error {
 	views := o.Introspect().TableViews()
 	for _, view := range views {
-		err := CheckSchemaTable(view, db, o, c, d)
+		err := CheckSchemaTable(schema, view, db, o, c, d)
 		if err != nil {
 			return err
 		}
@@ -34,18 +34,20 @@ func CreateSchemaTables(db *sql.DB, o common.IORM, c *cache.Cache, d common.Data
 	return nil
 }
 
-func CheckSchemaTable(view *model.TableView, db *sql.DB, o common.IORM, c *cache.Cache, d common.DataStoreDecorator) error {
+func CheckSchemaTable(schema string, view *model.TableView, db *sql.DB, o common.IORM, c *cache.Cache, d common.DataStoreDecorator) error {
 	if c.TableName(view.Table.TypeName) {
 		return CheckFields(view)
 	}
 
-	sq := strng.New("select count(*) from ", view.Table.TypeName).String()
+	schemaTable := TableName(schema, view.Table.TypeName)
+
+	sq := strng.New("select count(*) from ", schemaTable).String()
 
 	_, err := db.Exec(sq)
 	if err != nil && d == nil {
 		return errors.New("Failed to validate table " + view.Table.TypeName + ", no decorator was provided to create it. error:" + err.Error())
 	} else if err != nil && d != nil && d.DoesNotExistError(err) {
-		return CreateSchemaTable(view, db, o, c)
+		return CreateSchemaTable(schema, view, db, o, c)
 	} else if err != nil {
 		return errors.New("Failed to validate table " + view.Table.TypeName + ", error:" + err.Error())
 	}
@@ -65,7 +67,7 @@ func CheckFields(view *model.TableView) error {
 	return nil
 }
 
-func CreateSchemaTable(view *model.TableView, db *sql.DB, o common.IORM, c *cache.Cache) error {
+func CreateSchemaTable(schema string, view *model.TableView, db *sql.DB, o common.IORM, c *cache.Cache) error {
 	//Was table already created
 	if c.TableName(view.Table.TypeName) {
 		return nil
@@ -78,7 +80,7 @@ func CreateSchemaTable(view *model.TableView, db *sql.DB, o common.IORM, c *cach
 
 	ignoredAttr, _ := o.Introspect().DecoratorOf(model.DecoratorType_IgnoreAttr, view.Table).(map[string]bool)
 	sq := strng.New("CREATE TABLE IF NOT EXISTS ")
-	sq.Add(view.Table.TypeName).Add(" (\n")
+	sq.Add(TableName(schema, view.Table.TypeName), " (\n")
 	sq.Add("    ").Add(common.RECKEY).Add("    ").Add("VARCHAR,\n")
 	for _, attr := range view.Columns {
 		//This attribute was marked as none persist, hence ignore it

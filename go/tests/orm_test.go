@@ -31,9 +31,39 @@ func TestPostgresPlugin(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
+	count := 0
+	rows, _ := db.Query("select count(*) from test.mytestmodel;")
+	for rows.Next() {
+		rows.Scan(&count)
+	}
+	fmt.Println(count)
+
+	d, err := o.Fetch(nil)
+	if err != nil {
+		fmt.Println(err)
+		t.Fail()
+		return
+	}
+	data := d.(map[string]interface{})
+
+	for _, rec := range data {
+		sample2 := rec.(*model.MyTestModel)
+		/*
+			a := fmt.Sprintf("%s", sample)
+			b := fmt.Sprintf("%s", sample2)
+			fmt.Println(a)
+			fmt.Println(b)
+
+		*/
+		if !reflect.DeepEqual(sample, sample2) {
+			t.Fail()
+			fmt.Println("Not Equale")
+			return
+		}
+	}
 }
 
-func TestSqlitePlugin(t *testing.T) {
+func testSqlitePlugin(t *testing.T) {
 	sp := sqlite.NewOrmSqlitePlugin()
 	db := newSqliteConnection(sp.Decorator())
 	o := orm.NewOrm(sp, common.Introspect)

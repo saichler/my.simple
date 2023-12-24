@@ -69,7 +69,7 @@ This is an implementation of such a mechanism so instances can be instantiated b
 One of the biggest challenges of MicroServices, one that usually pose the biggest pain point, "Troubles"/Challenges is the Process 2 Process communication.
 In other words, "How will my MicroServices **Communicate, Interact & Share data** with each other?"
 A single mistake in this area will crete a very big headache, pose challenges that should not have been there, worsen dramatically the engineers work/life balance and will cause the company Hundreds of Millions of dollars in maintenance.
-**[my.simple Secure Networking** is giving a seamless & simple, secure communication between your MicroServices.
+**my.simple Secure Networking** is giving a seamless & simple, secure communication between your MicroServices.
 
 ## [Model Introspection & Deep Cloning](https://github.com/saichler/my.simple/tree/main/go/introspect)
 The process of deep analysis & cloning a tree/graph models at runtime without having the model at compile time is called Introspection.

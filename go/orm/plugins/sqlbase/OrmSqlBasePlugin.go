@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/saichler/my.simple/go/common"
 	cache2 "github.com/saichler/my.simple/go/orm/plugins/sqlbase/cache"
+	"github.com/saichler/my.simple/go/utils/strng"
 )
 
 type OrmSqlBasePlugin struct {
@@ -50,4 +51,11 @@ func (plugin *OrmSqlBasePlugin) RelationalData() bool {
 
 func (plugin *OrmSqlBasePlugin) Decorator() common.DataStoreDecorator {
 	return plugin.decorator
+}
+
+func TableName(schema, name string) string {
+	if schema == "" {
+		return name
+	}
+	return strng.New(schema, ".", name).String()
 }
