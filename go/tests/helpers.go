@@ -2,15 +2,19 @@ package tests
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/saichler/my.security/go/sec"
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/defaults"
 	model2 "github.com/saichler/my.simple/go/introspect/model"
+	"github.com/saichler/my.simple/go/orm"
+	"github.com/saichler/my.simple/go/orm/plugins/postgres"
 	"github.com/saichler/my.simple/go/security"
 	"github.com/saichler/my.simple/go/tests/model"
 	"os"
 	"strconv"
 	"strings"
+	"testing"
 	"time"
 )
 
@@ -69,6 +73,27 @@ func newSqliteConnection(decorator common.DataStoreDecorator) *sql.DB {
 	file.Close()
 	db := decorator.Connect("/tmp/sqlite.db")
 	return db.(*sql.DB)
+}
+
+func newPostgresOrm(t *testing.T) (common.IORM, *sql.DB) {
+	pp := postgres.NewOrmPostgresPlugin()
+	db := newPostgresConnection(pp.Decorator())
+	o := orm.NewOrm(pp, common.Introspect)
+	err := pp.Init(o, db, "test")
+
+	if err != nil {
+		t.Fail()
+		fmt.Println("Unable to open database:", err)
+		return nil, nil
+	}
+	sample := createTestModelInstance(0)
+	_, err = common.Introspect.Inspect(sample)
+	if err != nil {
+		t.Fail()
+		fmt.Println(err)
+		return nil, nil
+	}
+	return o, db
 }
 
 func decorateModel() {

@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"net"
 	"strconv"
+	"time"
 )
 
 type SwitchService struct {
@@ -19,6 +20,7 @@ type SwitchService struct {
 	port          uint32
 	socket        net.Listener
 	active        bool
+	ready         bool
 	switchTable   *SwitchTable
 	registry      common.IRegistry
 	servicePoints common.IServicePoints
@@ -36,17 +38,32 @@ func NewSwitchService(port uint32, registry common.IRegistry, health common.IHea
 }
 
 func (switchService *SwitchService) Start() error {
+	var err error
+	go switchService.start(&err)
+
+	for !switchService.ready && err == nil {
+		time.Sleep(time.Millisecond * 50)
+	}
+	time.Sleep(time.Millisecond * 50)
+	return err
+}
+
+func (switchService *SwitchService) start(err *error) {
 	if switchService.port == 0 {
-		return errors.New("Switch Port does not have a port defined")
+		er := errors.New("Switch Port does not have a port defined")
+		err = &er
+		return
 	}
 
-	err := switchService.bind()
-	if err != nil {
-		return err
+	er := switchService.bind()
+	if er != nil {
+		err = &er
+		return
 	}
 
 	for switchService.active {
 		logs.Info("Waiting for connections...")
+		switchService.ready = true
 		conn, e := switchService.socket.Accept()
 		if e != nil && switchService.active {
 			logs.Error("Failed to accept socket connection:", err)
@@ -58,7 +75,6 @@ func (switchService *SwitchService) Start() error {
 		}
 	}
 	logs.Warning("Switch Service has ended")
-	return nil
 }
 
 func (switchService *SwitchService) bind() error {

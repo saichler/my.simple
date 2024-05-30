@@ -1,12 +1,16 @@
 package strng
 
-import "bytes"
+import (
+	"bytes"
+	"fmt"
+)
 
 // String is a wrapper over buff.bytes to make it seamless to concatenate strings
 type String struct {
 	buff               *bytes.Buffer
 	TypesPrefix        bool
 	AddSpaceWhenAdding bool
+	ShouldPanic        bool
 }
 
 // New construct a new String instance and initialize the buff with the input string
@@ -82,5 +86,9 @@ func (s *String) Panic(anys ...interface{}) {
 		}
 	}
 	s.Add("\nPlease email stack trace to saichler@gmail.com")
-	panic(s.String())
+	if s.ShouldPanic {
+		panic(s.String())
+	} else {
+		fmt.Println(s.String())
+	}
 }

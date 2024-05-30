@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/saichler/my.simple/go/common"
 	"github.com/saichler/my.simple/go/orm"
-	"github.com/saichler/my.simple/go/orm/plugins/postgres"
 	"github.com/saichler/my.simple/go/orm/plugins/sqlite"
 	"github.com/saichler/my.simple/go/tests/model"
 	"reflect"
@@ -12,20 +11,14 @@ import (
 )
 
 func TestPostgresPlugin(t *testing.T) {
-	pp := postgres.NewOrmPostgresPlugin()
-	db := newPostgresConnection(pp.Decorator())
-	o := orm.NewOrm(pp, common.Introspect)
-	err := pp.Init(o, db, "test")
-
-	if err != nil {
-		t.Fail()
-		fmt.Println("Unable to open database:", err)
+	o, db := newPostgresOrm(t)
+	if o == nil {
 		return
 	}
 
 	sample := createTestModelInstance(5)
 	common.Introspect.Inspect(sample)
-	err = o.Persist(sample)
+	err := o.Persist(sample)
 	if err != nil {
 		t.Fail()
 		fmt.Println(err)
